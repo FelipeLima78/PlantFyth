@@ -12,30 +12,28 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class TelaDeLogin extends AppCompatActivity {
-
-    EditText edtUsuario, edtSenha;
-    Button btnEntrarLogin, btnCadastroLogin, btnEsqueciASenhaLogin;
+public class TelaCadastro extends AppCompatActivity {
+    Button btnCadastro;
+    EditText edtCadastroUsuario, edtCadastroEmail, edtCadastroSenha, edtConfirmeSenha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
-        setContentView(R.layout.activity_tela_de_login);
+        setContentView(R.layout.activity_tela_cadastro);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        edtUsuario = findViewById(R.id.edtUsuario);
-        edtSenha = findViewById(R.id.edtSenha);
-        btnEntrarLogin = findViewById(R.id.btnEntrarLogin);
-        btnCadastroLogin = findViewById(R.id.btnCadastroLogin);
-        btnEsqueciASenhaLogin = findViewById(R.id.btnEsqueciASenhaLogin);
+        btnCadastro = findViewById(R.id.btnCadastro);
+        edtCadastroUsuario = findViewById(R.id.edtCadastroUsuario);
+        edtCadastroEmail = findViewById(R.id.edtCadastroEmail);
+        edtCadastroSenha = findViewById(R.id.edtCadastroSenha);
+        edtConfirmeSenha = findViewById(R.id.edtConfirmeSenha);
     }
-    public void irParaCadastro(View view){
-        Intent intent = new Intent(TelaDeLogin.this, TelaCadastro.class);
+    public void Cadastrar(View view){
+        Intent intent = new Intent(TelaCadastro.this, TelaDeLogin.class);
         startActivity(intent);
     }
 }

@@ -108,6 +108,7 @@
             android:layout_marginTop="498dp"
             android:backgroundTint="#8BC34A"
             android:fontFamily="@font/amita"
+            android:onClick="irParaCadastro"
             android:text="Cadastrar"
             android:textSize="12sp"
             app:cornerRadius="100px"

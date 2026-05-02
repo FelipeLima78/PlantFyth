@@ -12,8 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlantFyth">
         <activity
+            android:name=".TelaEsqueciASenha"
+            android:exported="false"
+            android:theme="@style/Theme.PlantFyth" />
+        <activity
             android:name=".TelaCadastro"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.App.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
