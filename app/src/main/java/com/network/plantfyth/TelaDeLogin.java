@@ -12,6 +12,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.network.plantfyth.ui.dashboard.DashboardFragment;
+import com.network.plantfyth.ui.home.HomeFragment;
+
 public class TelaDeLogin extends AppCompatActivity {
 
     EditText edtUsuario, edtSenha;
@@ -36,6 +39,10 @@ public class TelaDeLogin extends AppCompatActivity {
     }
     public void irParaCadastro(View view){
         Intent intent = new Intent(TelaDeLogin.this, TelaCadastro.class);
+        startActivity(intent);
+    }
+    public void irParaTeste(View view){
+        Intent intent = new Intent(TelaDeLogin.this, MainActivity.class);
         startActivity(intent);
     }
 }
