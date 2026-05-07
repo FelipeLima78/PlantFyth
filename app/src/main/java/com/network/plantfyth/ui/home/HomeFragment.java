@@ -1,5 +1,6 @@
 package com.network.plantfyth.ui.home;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +12,9 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.network.plantfyth.MainActivity;
 import com.network.plantfyth.R;
+import com.network.plantfyth.TelaDeLogin;
 import com.network.plantfyth.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
@@ -71,4 +74,5 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }
