@@ -7,7 +7,7 @@ public class Plantio {
     private Integer id;
     private String nome;
     private Date dataQueFoiPlantado;
-    private Boolean foiRegado;
+    private boolean foiRegado;
 
     //datas importantes
     private Date dataAdubo;
