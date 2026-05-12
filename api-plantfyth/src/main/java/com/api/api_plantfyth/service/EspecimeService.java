@@ -1,4 +1,4 @@
-package com.api.service;
+package com.api.api_plantfyth.service;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.api_plantfyth.model.Especime;
-import com.api.repository.EspecimeRepository;
+import com.api.api_plantfyth.repository.EspecimeRepository;
 
 @Service
 public class EspecimeService {

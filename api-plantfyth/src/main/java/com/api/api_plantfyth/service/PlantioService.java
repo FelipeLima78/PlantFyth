@@ -1,4 +1,4 @@
-package com.api.service;
+package com.api.api_plantfyth.service;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.api_plantfyth.model.Plantio;
-import com.api.repository.PlantioRepository;
+import com.api.api_plantfyth.repository.PlantioRepository;
 
 @Service
 public class PlantioService {

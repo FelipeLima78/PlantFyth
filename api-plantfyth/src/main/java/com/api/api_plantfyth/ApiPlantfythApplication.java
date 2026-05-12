@@ -1,11 +1,16 @@
 package com.api.api_plantfyth;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootApplication
 public class ApiPlantfythApplication implements CommandLineRunner{
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiPlantfythApplication.class, args);
@@ -13,6 +18,6 @@ public class ApiPlantfythApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception{
-		
+		// por o teste de sql aq
 	}
 }

@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.api.api_plantfyth.model.Plantio;
 import com.api.api_plantfyth.model.Usuario;
-import com.api.repository.UsuarioRepository;
-import com.api.service.PlantioService;
-import com.api.service.UsuarioService;
+import com.api.api_plantfyth.repository.UsuarioRepository;
+import com.api.api_plantfyth.service.PlantioService;
+import com.api.api_plantfyth.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")

@@ -53,7 +53,7 @@ public class Plantio {
     @JsonBackReference
     private Usuario usuario;
 
-     @ManyToOne
+    @ManyToOne
     @JoinColumn(name = "especime_id")
     @JsonBackReference
     private Especime especime;

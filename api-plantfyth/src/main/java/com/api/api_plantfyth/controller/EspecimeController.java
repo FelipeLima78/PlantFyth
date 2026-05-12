@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.api.api_plantfyth.model.Especime;
 import com.api.api_plantfyth.model.Plantio;
-import com.api.repository.EspecimeRepository;
-import com.api.service.EspecimeService;
-import com.api.service.PlantioService;
+import com.api.api_plantfyth.repository.EspecimeRepository;
+import com.api.api_plantfyth.service.EspecimeService;
+import com.api.api_plantfyth.service.PlantioService;
 
 @RestController
 @RequestMapping("/especimes")

@@ -4,7 +4,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -21,11 +25,13 @@ import lombok.Setter;
 public class Especime {
     //atributos
 
-        private Integer id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String nome;
     private int periodoIrrigacao;
     private int periodoAdubacao;
-    private String exposicaoALuz;
+    private String exposicao_A_Luz;
+
     private int periodoPoda;
     private String descricao;
 
@@ -42,7 +48,7 @@ public class Especime {
     private int temperaturaIdealMin;
     private int temperaturaIdealMax;
 
-    @OneToMany(mappedBy = "plantio")
+    @OneToMany(mappedBy = "especime")
     @JsonManagedReference
-    private List<Plantio> plantios;
+    private List<Plantio> plantios1;
 }

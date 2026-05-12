@@ -1,10 +1,13 @@
-package com.api.repository;
+package com.api.api_plantfyth.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import com.api.api_plantfyth.model.Plantio;
 
+@Repository
 public interface PlantioRepository extends JpaRepository<Plantio, Integer>{
 
       public Plantio findByNome(String nome);
