@@ -50,11 +50,11 @@ public class Plantio {
     
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    @JsonBackReference
+    @JsonBackReference(value = "usuario-plantio")
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "especime_id")
-    @JsonBackReference
+    @JsonBackReference(value = "especime-plantio")
     private Especime especime;
 }

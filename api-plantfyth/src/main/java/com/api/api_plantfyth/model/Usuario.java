@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,13 +31,16 @@ public class Usuario {
     private Integer id;
     private String nome;
     private String email;
-    private String hashSenha;
+
+    @Column(name = "hash_senha")
+      private String hashSenha;
+    
     private String fotoPerfil;
     private LocalDateTime dataCriacao;
     private LocalDateTime ultimoLogin;
 
     @OneToMany(mappedBy = "usuario")
-    @JsonManagedReference
-    private List<Plantio> plantios;
+@JsonManagedReference(value = "usuario-plantio")
+private List<Plantio> plantios;
     
 }

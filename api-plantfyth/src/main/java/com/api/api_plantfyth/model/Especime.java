@@ -49,6 +49,6 @@ public class Especime {
     private int temperaturaIdealMax;
 
     @OneToMany(mappedBy = "especime")
-    @JsonManagedReference
+    @JsonManagedReference(value = "especime-plantio")
     private List<Plantio> plantios1;
 }

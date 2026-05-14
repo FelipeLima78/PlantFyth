@@ -1,5 +1,6 @@
 package com.api.api_plantfyth.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,11 @@ public class UsuarioController{
 
 	@Autowired
 	private UsuarioService usuarioService;
+	@Autowired
 	private UsuarioRepository usuarioRepository;
+	@Autowired
     private PlantioService plantioService;
+	
 	
 	@GetMapping
 	public List<Usuario> listarTodos(){
@@ -44,17 +48,14 @@ public class UsuarioController{
 		return usuario;
 	}
 
-
 	
-
-	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/deletar/{id}")
 	public String deletar(@PathVariable int id){
 		usuarioService.deleteUsuario(id);
 		return "Usuario Deletado com Sucesso!!!";
 	}
 
-	@PostMapping
+	@PostMapping("/inserir")
 	public Usuario inserir(@RequestBody Usuario usuario){
 		return usuarioService.saveUsuario(usuario);
 	}

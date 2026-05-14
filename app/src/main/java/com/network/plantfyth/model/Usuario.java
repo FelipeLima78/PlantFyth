@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Usuario {
     //construtor
-    public Usuario(Integer id, String nome, String email, String hashSenha, String fotoPerfil, LocalDateTime dataCriacao, LocalDateTime ultimoLogin) {
+    public Usuario(Integer id, String nome, String email, String hashSenha, String fotoPerfil, String dataCriacao, String ultimoLogin) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -21,10 +21,10 @@ public class Usuario {
     private String email;
     private String hashSenha;
     private String fotoPerfil;
-    private LocalDateTime dataCriacao;
+    private String dataCriacao;
     //Coloquei como LocalDateTime por conta dos conflitos da classe date com o timestamp, mas voce pode mudar pro date e tratar a string pra ela remover o "z"
     //do timestamp.
-    private LocalDateTime ultimoLogin;
+    private String ultimoLogin;
 
     //getters e setters
 
@@ -68,19 +68,19 @@ public class Usuario {
         this.fotoPerfil = fotoPerfil;
     }
 
-    public LocalDateTime getDataCriacao() {
+    public String getDataCriacao() {
         return dataCriacao;
     }
 
-    public void setDataCriacao(LocalDateTime dataCriacao) {
+    public void setDataCriacao(String dataCriacao) {
         this.dataCriacao = dataCriacao;
     }
 
-    public LocalDateTime getUltimoLogin() {
+    public String getUltimoLogin() {
         return ultimoLogin;
     }
 
-    public void setUltimoLogin(LocalDateTime ultimoLogin) {
+    public void setUltimoLogin(String ultimoLogin) {
         this.ultimoLogin = ultimoLogin;
     }
 }
