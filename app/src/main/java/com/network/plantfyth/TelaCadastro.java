@@ -61,7 +61,17 @@ public class TelaCadastro extends AppCompatActivity {
         usuario.setNome(nome);
         usuario.setEmail(email);
         usuario.setHashSenha(senha);
-        Ap.save(usuario)
+        String Confirmacao = String.valueOf(edtConfirmeSenha.getText());
+        if (email.isEmpty() || senha.isEmpty() || nome.isEmpty() || Confirmacao.isEmpty()) {
+            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!senha.equals(Confirmacao)) {
+            edtConfirmeSenha.setError("As senhas não são iguais");
+            edtConfirmeSenha.requestFocus();
+            return;
+        }
+        Ap.saveUsuario(usuario)
                 .enqueue(new Callback<Usuario>() {
                              @Override
                              public void onResponse(Call<Usuario> call, Response<Usuario> response) {
