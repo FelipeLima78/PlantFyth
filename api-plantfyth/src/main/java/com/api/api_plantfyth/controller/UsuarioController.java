@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,8 @@ public class UsuarioController{
 	private UsuarioRepository usuarioRepository;
 	@Autowired
     private PlantioService plantioService;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	
 	@GetMapping
@@ -57,6 +61,11 @@ public class UsuarioController{
 
 	@PostMapping("/inserir")
 	public Usuario inserir(@RequestBody Usuario usuario){
+
+		String hash = passwordEncoder.encode(usuario.getHashSenha());
+
+   		 usuario.setHashSenha(hash);
+
 		return usuarioService.saveUsuario(usuario);
 	}
 
@@ -78,5 +87,27 @@ public class UsuarioController{
 
     return plantioService.buscarPorUsuarioId(id);
 }
- 
+    @PostMapping("/login") 
+    public ResponseEntity<String> login(@RequestBody Usuario usuario) {
+
+    Usuario dbUser= usuarioRepository.findByEmail(usuario.getEmail())
+        .orElse(null);
+
+    if (dbUser == null) {
+        return ResponseEntity.status(401).body("Usuário não encontrado");
+    }
+
+    boolean senhaOk = passwordEncoder.matches(
+        usuario.getHashSenha(),
+        dbUser.getHashSenha()
+    );
+
+    if (!senhaOk) {
+        return ResponseEntity.status(401).body("Senha inválida");
+    }
+
+    return ResponseEntity.ok("Login OK");
+} 
+
+
 }
