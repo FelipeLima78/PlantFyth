@@ -5,19 +5,30 @@ import com.network.plantfyth.model.Usuario;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface PlantFythAPI {
 
-    @GET("/plantios")
+    @GET("plantios")
     Call<List<Plantio>> listarTodos();
+    @POST("plantios/inserir")
+    Call<Plantio> savePlantio(@Body Plantio plantio);
 
+    @POST("usuarios/login")
+    Call<ResponseBody> LoginUsuario(@Body Usuario request);
 
     @POST("usuarios/inserir")
-    Call<Usuario> save(@Body Usuario usuario);
+    Call<Usuario> saveUsuario(@Body Usuario usuario);
+
+    @DELETE("usuarios/deletar/{ìd}")
+    Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
+
 
 
 
