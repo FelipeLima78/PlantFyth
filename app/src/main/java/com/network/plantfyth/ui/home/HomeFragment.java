@@ -1,32 +1,72 @@
 package com.network.plantfyth.ui.home;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
+import com.network.plantfyth.MainActivity;
+import com.network.plantfyth.R;
+import com.network.plantfyth.TelaDeLogin;
 import com.network.plantfyth.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
 
+    private boolean irrigacao1 = false;
+    private boolean irrigacao2 = false;
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+        configurarToggle(binding.btnIrrigacao1, 1);
+        configurarToggle(binding.btnIrrigacao2, 2);
+
+        return binding.getRoot();
+    }
+
+    public void configurarToggle(Button botao, int numero) {
+
+        botao.setOnClickListener(v -> {
+
+            if (numero == 1) {
+                irrigacao1 = !irrigacao1;
+
+                atualizarBotao(botao, irrigacao1);
+
+            } else {
+
+                irrigacao2 = !irrigacao2;
+
+                atualizarBotao(botao, irrigacao2);
+            }
+        });
+    }
+
+    private void atualizarBotao(Button botao, boolean estado) {
+
+        if (estado) {
+
+            botao.setText("YES");
+            botao.setBackgroundResource(R.drawable.bg_toggle_sim);
+            botao.setBackgroundColor(Color.GREEN);
+
+        } else {
+
+            botao.setText("NO");
+            botao.setBackgroundColor(Color.parseColor("#EF5350"));
+        }
     }
 
     @Override
@@ -34,4 +74,5 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }
