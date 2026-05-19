@@ -14,3 +14,4 @@
 .cxx
 local.properties
 /.idea/markdown.xml
+api-plantfyth/src/main/resources/application.properties
