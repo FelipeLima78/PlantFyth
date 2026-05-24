@@ -65,7 +65,7 @@
             android:backgroundTint="#FFFFFF"
             android:ems="10"
             android:fontFamily="sans-serif"
-            android:hint="Digite seu usuário"
+            android:hint="Digite seu email"
             android:inputType="text"
             android:textColor="#FFFFFF"
             android:textColorHint="#DBD9D9"
