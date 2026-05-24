@@ -3,6 +3,7 @@ package com.api.api_plantfyth.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -90,6 +91,17 @@ public class PlantioController{
         plantioAtualizar.setImagemPersonalizada(plantio.getImagemPersonalizada());
 		return plantioService.savePlantio(plantioAtualizar);
 	}
+
+
+    @GetMapping("/plantios/usuario/{id}")
+    public ResponseEntity<List<Plantio>>
+    buscarPlantiosUsuario(
+            @PathVariable Integer id){
+
+        return ResponseEntity.ok(plantioService
+                .buscarPorUsuarioId(id)
+        );
+    }
 
  
 }

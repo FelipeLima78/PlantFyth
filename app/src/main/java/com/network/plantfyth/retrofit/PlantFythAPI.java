@@ -20,13 +20,19 @@ public interface PlantFythAPI {
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
 
+    @GET("plantios/usuario/{id}") Call<List<Plantio>>
+    buscarPlantasUsuario (@Path("id") Integer usuarioId);
+
     @POST("usuarios/login")
     Call<ResponseBody> LoginUsuario(@Body Usuario request);
 
+    @GET("usuarios/email/{email}")
+    Call<Usuario> buscarUsuarioPorEmail(
+            @Path("email") String email);
     @POST("usuarios/inserir")
     Call<Usuario> saveUsuario(@Body Usuario usuario);
 
-    @DELETE("usuarios/deletar/{ìd}")
+    @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
 
 
