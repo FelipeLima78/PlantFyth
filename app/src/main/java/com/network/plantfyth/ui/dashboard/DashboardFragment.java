@@ -1,5 +1,6 @@
-package com.network.plantfyth.ui.dashboard;
+ package com.network.plantfyth.ui.dashboard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,31 +10,43 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.network.plantfyth.R;
+import com.network.plantfyth.TelaCadastroPlanta;
 import com.network.plantfyth.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
 
+    private FloatingActionButton btnAdicionarPlanta;
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState) {
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        View root = inflater.inflate(
+                R.layout.fragment_dashboard,
+                container,
+                false
+        );
 
-        LinearLayout containerPlantas = binding.containerPlantas;
+        FloatingActionButton btnAdicionar =
+                root.findViewById(
+                        R.id.btnAdicionarPlanta
+                );
 
-        // 🔹 Inflate de 3 cards de exemplo
-        for (int i = 0; i < 3; i++) {
-            View card = getLayoutInflater().inflate(R.layout.item_planta, containerPlantas, false);
+        btnAdicionar.setOnClickListener(v -> {
 
-            // ❗ Aqui você pode alterar o texto só para apresentação
-            card.findViewById(R.id.txtNomePlanta); // Exemplo de acesso
-            // (Você pode alterar conteúdo se quiser)
+            Intent intent =
+                    new Intent(
+                            getActivity(),
+                            TelaCadastroPlanta.class
+                    );
 
-            containerPlantas.addView(card);
-        }
+            startActivity(intent);
+        });
 
         return root;
     }
