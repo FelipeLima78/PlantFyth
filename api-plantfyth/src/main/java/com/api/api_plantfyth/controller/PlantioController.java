@@ -67,7 +67,7 @@ public class PlantioController{
 		return "Plantio Deletado com Sucesso!!!";
 	}
 
-	@PostMapping
+	@PostMapping("/inserir")
 	public Plantio inserir(@RequestBody Plantio plantio){
 		return plantioService.savePlantio(plantio);
 	}

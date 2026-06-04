@@ -1,10 +1,10 @@
 package com.network.plantfyth.model;
 
 
-public class Espécime {
+public class Especime {
     //construtor
 
-    public Espécime(Integer id, String nome, int periodoIrrigacao, int periodoAdubacao, String exposicaoALuz, int periodoPoda, String descricao, float tamanhoAdulto, float tamanhoMuda, float crescimentoDiario, float vasoMinimoCM, String caminhoImagemPadrao, int umidadeIdeal, int temperaturaIdealMin, int temperaturaIdealMax) {
+    public Especime(Integer id, String nome, int periodoIrrigacao, int periodoAdubacao, String exposicaoALuz, int periodoPoda, String descricao, float tamanhoAdulto, float tamanhoMuda, float crescimentoDiario, float vasoMinimoCM, String caminhoImagemPadrao, int umidadeIdeal, int temperaturaIdealMin, int temperaturaIdealMax) {
         this.id = id;
         this.nome = nome;
         this.periodoIrrigacao = periodoIrrigacao;
@@ -22,7 +22,7 @@ public class Espécime {
         this.temperaturaIdealMax = temperaturaIdealMax;
     }
 
-    public Espécime() {
+    public Especime() {
     }
 
     private Integer id;
@@ -45,10 +45,13 @@ public class Espécime {
     private int umidadeIdeal;
     private int temperaturaIdealMin;
     private int temperaturaIdealMax;
-
+    //fkEspecime
     //getters e setters
 
-
+    @Override
+    public String toString() {
+        return nome;
+    }
     public Integer getId() {
         return id;
     }

@@ -16,6 +16,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.network.plantfyth.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+    private Integer usuarioId;
 
     private ActivityMainBinding binding;
 

@@ -1,9 +1,13 @@
 package com.api.api_plantfyth.model;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Date;
 
+import org.springframework.cglib.core.Local;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,17 +33,21 @@ public class Plantio {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
-    private Date dataQueFoiPlantado;
+
+    @JsonFormat(
+            pattern = "dd/MM/yyyy"
+    )
+    private LocalDate dataQueFoiPlantado;
     private boolean foiRegado;
 
     //datas importantes
-    private Date dataAdubo;
+    private LocalDate dataAdubo;
     private LocalDateTime horarioAreIrrigar;
 
     //previsoes automaticas
-    private Date previsaoProximaIrrigacao;
-    private Date previsaoProximaAdubacao;
-    private Date previsaoProximaPoda;
+    private LocalDate previsaoProximaIrrigacao;
+    private LocalDate previsaoProximaAdubacao;
+    private LocalDate previsaoProximaPoda;
     //Informações dinâmicas do app
     private int nivelUmidade;
     private float tamanhoAtualCM;

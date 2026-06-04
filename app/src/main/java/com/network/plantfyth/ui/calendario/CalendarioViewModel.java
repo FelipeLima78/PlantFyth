@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.network.plantfyth.Model.EventoCalendario;
+import com.network.plantfyth.model.EventoCalendario;
 
 import java.util.ArrayList;
 import java.util.Calendar;

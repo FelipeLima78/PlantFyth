@@ -1,4 +1,4 @@
-package com.network.plantfyth.Model;
+package com.network.plantfyth.model;
 
 import java.util.Calendar;
 

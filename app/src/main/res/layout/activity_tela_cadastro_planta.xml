@@ -81,8 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="dd/MM/yyyy"
-                    android:focusable="false"
-                    android:clickable="true"/>
+                    android:inputType="date"
+                    android:maxLength="8"/>
 
                 <!-- Foi regado -->
 
@@ -91,20 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Foi regado hoje?"
-                        android:textStyle="bold"/>
-
-                    <Switch
-                        android:id="@+id/switchRegadoHoje"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
+                    android:orientation="horizontal"/>
 
                 <!-- Plantada como -->
 
@@ -190,11 +177,12 @@
                     android:id="@+id/btnSalvarPlanta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Salvar Planta"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="24dp"
                     android:backgroundTint="#2E7D32"
-                    android:layout_marginTop="24dp"/>
+                    android:onClick="CadastrarPlanta"
+                    android:text="Salvar Planta"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 

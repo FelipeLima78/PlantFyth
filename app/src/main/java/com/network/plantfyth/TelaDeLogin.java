@@ -73,8 +73,6 @@ public class TelaDeLogin extends AppCompatActivity {
                         String result = response.body().string();
 
                         Toast.makeText(TelaDeLogin.this, result, Toast.LENGTH_SHORT).show();
-                     //   Intent intent = new Intent(TelaDeLogin.this, MainActivity.class);
-                       // startActivity(intent);
                         buscarUsuario();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -87,7 +85,6 @@ public class TelaDeLogin extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Toast.makeText(TelaDeLogin.this,
@@ -95,76 +92,26 @@ public class TelaDeLogin extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
     private void buscarUsuario() {
-
-        String email =
-                edtUsuario.getText()
-                        .toString()
-                        .trim();
-
-        Call<Usuario> call =
-                Ap.buscarUsuarioPorEmail(
-                        email
-                );
-
-        call.enqueue(
-                new Callback<Usuario>() {
-
+        String email = edtUsuario.getText().toString().trim();
+        Call<Usuario> call = Ap.buscarUsuarioPorEmail(email);
+        call.enqueue(new Callback<Usuario>() {
                     @Override
-                    public void onResponse(
-                            Call<Usuario> call,
-                            Response<Usuario>
-                                    response) {
-
-                        if(response.isSuccessful()
-                                && response.body()
-                                != null){
-
-                            Usuario usuario =
-                                    response.body();
-
-                            Integer idUsuario =
-                                    usuario.getId();
-
-                            Intent intent =
-                                    new Intent(
-                                            TelaDeLogin.this,
-                                            MainActivity.class
-                                    );
-
-                            intent.putExtra(
-                                    "usuarioId",
-                                    idUsuario
-                            );
-
+                    public void onResponse(Call<Usuario> call, Response<Usuario> response) {
+                        if(response.isSuccessful() && response.body() != null){
+                            Usuario usuario = response.body();
+                            Integer idUsuario = usuario.getId();
+                            getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().putInt("usuario_id", idUsuario).apply();
+                            Intent intent = new Intent(TelaDeLogin.this, MainActivity.class);
                             startActivity(intent);
                             finish();
-
                         } else {
-
-                            Toast.makeText(
-                                    TelaDeLogin.this,
-                                    "Usuário não encontrado",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    }
-
+                            Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();
+                        } }
                     @Override
-                    public void onFailure(
-                            Call<Usuario> call,
-                            Throwable t) {
-
-                        Toast.makeText(
-                                TelaDeLogin.this,
-                                "Erro: "
-                                        + t.getMessage(),
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    }
+                    public void onFailure(Call<Usuario> call, Throwable t) {
+                        Toast.makeText(TelaDeLogin.this, "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();}
                 });
     }
 }

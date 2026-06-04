@@ -1,5 +1,6 @@
 package com.network.plantfyth.retrofit;
 
+import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.model.Usuario;
 
@@ -14,6 +15,9 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface PlantFythAPI {
+
+    @GET("especimes")
+    Call<List<Especime>> listarEspecimes();
 
     @GET("plantios")
     Call<List<Plantio>> listarTodos();
@@ -34,8 +38,5 @@ public interface PlantFythAPI {
 
     @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
-
-
-
 
 }
