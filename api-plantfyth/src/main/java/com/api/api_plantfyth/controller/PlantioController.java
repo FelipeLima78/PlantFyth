@@ -93,7 +93,7 @@ public class PlantioController{
 	}
 
 
-    @GetMapping("/plantios/usuario/{id}")
+    @GetMapping("/usuario/{id}")
     public ResponseEntity<List<Plantio>>
     buscarPlantiosUsuario(
             @PathVariable Integer id){

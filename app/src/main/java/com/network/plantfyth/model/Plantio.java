@@ -17,6 +17,7 @@
             this.previsaoProximaIrrigacao = previsaoProximaIrrigacao;
             this.previsaoProximaAdubacao = previsaoProximaAdubacao;
             this.previsaoProximaPoda = previsaoProximaPoda;
+
             this.nivelUmidade = nivelUmidade;
             this.tamanhoAtualCM = tamanhoAtualCM;
             this.previsaoTamanho = previsaoTamanho;
@@ -45,10 +46,41 @@
         private float previsaoTamanho;
         private String plantadaComo;
         private String imagemPersonalizada;
+        private LocalDateTime ultimaIrrigacao;
+        private LocalDateTime ultimaAdubacao;
+        private LocalDateTime ultimaPoda;
         //getters e setters
 
         public Integer getId() {
             return id;
+        }
+
+        public void setFoiRegado(boolean foiRegado) {
+            this.foiRegado = foiRegado;
+        }
+
+        public LocalDateTime getUltimaIrrigacao() {
+            return ultimaIrrigacao;
+        }
+
+        public void setUltimaIrrigacao(LocalDateTime ultimaIrrigacao) {
+            this.ultimaIrrigacao = ultimaIrrigacao;
+        }
+
+        public LocalDateTime getUltimaAdubacao() {
+            return ultimaAdubacao;
+        }
+
+        public void setUltimaAdubacao(LocalDateTime ultimaAdubacao) {
+            this.ultimaAdubacao = ultimaAdubacao;
+        }
+
+        public LocalDateTime getUltimaPoda() {
+            return ultimaPoda;
+        }
+
+        public void setUltimaPoda(LocalDateTime ultimaPoda) {
+            this.ultimaPoda = ultimaPoda;
         }
 
         public void setId(Integer id) {

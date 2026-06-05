@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_planta_home.xml
+    Card exibido por planta no RecyclerView da HomeFragment.
+    IDs obrigatórios que o PlantioHomeAdapter referencia:
+      txtNomePlanta, txtNomeEspecime,
+      txtDiasIrrigar, txtDiasAdubar, txtDiasPodar,
+      btnIrrigar, btnAdubar, btnPodar
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"
+    android:backgroundTint="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- ── CABEÇALHO: nome da planta + espécime ─────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="14dp">
+
+            <!-- Ícone decorativo de folha -->
+            <TextView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="#8BC34A"
+                android:backgroundTintMode="screen"
+                android:gravity="center"
+                android:text="🌱"
+                android:textSize="22sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNomePlanta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nome da Planta"
+                    android:textColor="#1B5E20"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <TextView
+                    android:id="@+id/txtNomeEspecime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Espécime"
+                    android:textColor="#757575"
+                    android:textSize="12sp"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ── DIVISOR ───────────────────────────────────────────── -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E8F5E9"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- ── LINHA 1: IRRIGAÇÃO ────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+
+            <!-- Ícone -->
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:text="💧"
+                android:textSize="16sp"
+                android:gravity="center"/>
+
+            <!-- Label fixo -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Irrigação"
+                android:textColor="#424242"
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"/>
+
+            <!-- Dias restantes (cor definida pelo adapter) -->
+            <TextView
+                android:id="@+id/txtDiasIrrigar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Em Xd"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:minWidth="64dp"
+                android:gravity="end"
+                android:layout_marginEnd="10dp"/>
+
+            <!-- Botão de ação -->
+            <Button
+                android:id="@+id/btnIrrigar"
+                android:layout_width="100dp"
+                android:layout_height="34dp"
+                android:text="💧 Irrigar"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:backgroundTint="#4CAF50"
+                app:cornerRadius="50dp"
+                android:stateListAnimator="@null"
+                android:elevation="2dp"/>
+        </LinearLayout>
+
+        <!-- ── LINHA 2: ADUBAÇÃO ─────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:text="🌿"
+                android:textSize="16sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Adubação"
+                android:textColor="#424242"
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"/>
+
+            <TextView
+                android:id="@+id/txtDiasAdubar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Em Xd"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:minWidth="64dp"
+                android:gravity="end"
+                android:layout_marginEnd="10dp"/>
+
+            <Button
+                android:id="@+id/btnAdubar"
+                android:layout_width="100dp"
+                android:layout_height="34dp"
+                android:text="🌿 Adubar"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:backgroundTint="#4CAF50"
+                app:cornerRadius="50dp"
+                android:stateListAnimator="@null"
+                android:elevation="2dp"/>
+        </LinearLayout>
+
+        <!-- ── LINHA 3: PODA ─────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:text="✂️"
+                android:textSize="16sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Poda"
+                android:textColor="#424242"
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"/>
+
+            <TextView
+                android:id="@+id/txtDiasPodar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Em Xd"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:minWidth="64dp"
+                android:gravity="end"
+                android:layout_marginEnd="10dp"/>
+
+            <Button
+                android:id="@+id/btnPodar"
+                android:layout_width="100dp"
+                android:layout_height="34dp"
+                android:text="✂️ Podar"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:backgroundTint="#4CAF50"
+                app:cornerRadius="50dp"
+                android:stateListAnimator="@null"
+                android:elevation="2dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -12,6 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface PlantFythAPI {
@@ -38,5 +39,7 @@ public interface PlantFythAPI {
 
     @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
+    @PUT("plantios/id/{id}")
+    Call<Plantio> atualizarPlantio(@Body Plantio plantio, @Path("id") Integer id);
 
 }
