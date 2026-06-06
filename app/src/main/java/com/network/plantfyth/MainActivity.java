@@ -1,18 +1,15 @@
 package com.network.plantfyth;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
+import android.view.WindowManager;
 import com.network.plantfyth.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,13 +20,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContentView(R.layout.activity_main); // ← só isso, sem binding
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home,R.id.navigation_calendario, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_home,R.id.navigation_chatbot, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
 
         NavController navController = Navigation.findNavController(

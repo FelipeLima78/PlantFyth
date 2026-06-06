@@ -51,7 +51,7 @@ public interface PlantFythAPI {
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
 
     //chatbot
-    @POST("chatbot/perguntar")
+    @POST("chat")
     @Headers("Content-Type: text/plain")
-    Call<ResponseBody> perguntarChatbot(@Body RequestBody pergunta);
+    Call<ResponseBody> chat(@Body RequestBody pergunta);
 }

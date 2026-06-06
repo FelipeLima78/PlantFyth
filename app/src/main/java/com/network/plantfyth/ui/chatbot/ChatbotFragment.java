@@ -78,22 +78,20 @@ public class ChatbotFragment extends Fragment {
 
         RequestBody body = RequestBody.create(MediaType.parse("text/plain"), texto);
 
-        api.perguntarChatbot(body).enqueue(new Callback<ResponseBody>() {
+        api.chat(body).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                // Remove o "Digitando..."
                 mensagens.remove(mensagens.size() - 1);
-
                 if (response.isSuccessful() && response.body() != null) {
                     try {
-                        String resposta = response.body().string();
-                        adicionarMensagem(resposta, false);
+                        adicionarMensagem(response.body().string(), false);
                     } catch (Exception e) {
                         adicionarMensagem("Erro ao ler resposta.", false);
                     }
                 } else {
-                    adicionarMensagem("Erro ao conectar com o servidor.", false);
+                    adicionarMensagem("Erro ao conectar.", false);
                 }
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -104,7 +102,6 @@ public class ChatbotFragment extends Fragment {
             }
         });
     }
-
     private void adicionarMensagem(String texto, boolean isUsuario) {
         mensagens.add(new ChatMessage(texto, isUsuario));
         adapter.notifyItemInserted(mensagens.size() - 1);

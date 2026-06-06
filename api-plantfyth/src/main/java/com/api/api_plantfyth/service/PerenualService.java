@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -136,7 +138,24 @@ public List<Especime> buscarIndoor(int page) {
     String json = restTemplate.getForObject(url, String.class);
     return ListarEspecies(json);
 }
+    public String buscarPorNome(String nome) {
+    String url = UriComponentsBuilder
+            .fromUriString("https://perenual.com/api/species-list")
+            .queryParam("key", apiKey)
+            .queryParam("q", nome)
+            .toUriString();
 
+    return restTemplate.getForObject(url, String.class);
+}
+
+public String buscarPorId(int id) {
+    String url = UriComponentsBuilder
+            .fromUriString("https://perenual.com/api/v2/species/details/" + id)
+            .queryParam("key", apiKey)
+            .toUriString();
+
+    return restTemplate.getForObject(url, String.class);
+}
 
 
 }
