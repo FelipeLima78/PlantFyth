@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.api_plantfyth.model.Especime;
 import com.api.api_plantfyth.model.Plantio;
+import com.api.api_plantfyth.repository.EspecimeRepository;
 import com.api.api_plantfyth.repository.PlantioRepository;
 import com.api.api_plantfyth.service.PlantioService;
 
@@ -26,7 +28,10 @@ public class PlantioController{
 
 	@Autowired
 	private PlantioService plantioService;
+	@Autowired
 	private PlantioRepository plantioRepository;
+	@Autowired
+	private EspecimeRepository especimeRepository;
 	
 	@GetMapping
 	public List<Plantio> listarTodos(){
@@ -39,7 +44,7 @@ public class PlantioController{
 		return plantio;
 	}
 
-	@GetMapping("/nome_plantio/{nome_plantio}")
+	@GetMapping("/nome_plantio/{nome_planta}")
 	public Plantio buscarPorNome_Planta(@PathVariable String nome_planta){
 		Plantio planta = plantioService.buscarPorNome(nome_planta);
 		return planta;
@@ -67,33 +72,36 @@ public class PlantioController{
 		return "Plantio Deletado com Sucesso!!!";
 	}
 
-	@PostMapping("/inserir")
-	public Plantio inserir(@RequestBody Plantio plantio){
-		return plantioService.savePlantio(plantio);
-	}
 
+
+@PostMapping("/inserir")
+public ResponseEntity<Plantio> inserir(@RequestBody Plantio plantio) {
+      if (plantio.getEspecimeId() != null) {
+        Especime especime = especimeRepository.findById(plantio.getEspecimeId())
+                            .orElseThrow(() -> new RuntimeException("Especime não encontrado"));
+        plantio.setEspecime(especime);}
+    return ResponseEntity.ok(plantioService.savePlantio(plantio));
+}
 	@PutMapping("/id/{id}")
 	public Plantio atualizar(@RequestBody Plantio plantio, @PathVariable Integer id){
 		Plantio plantioAtualizar = plantioService.buscarPorId(id);
-		plantioAtualizar.setId(plantio.getId());
+		plantioAtualizar.setId(id);	
 		plantioAtualizar.setNome(plantio.getNome());
-        plantioAtualizar.setDataQueFoiPlantado(plantio.getDataQueFoiPlantado());
-        plantioAtualizar.setFoiRegado(plantio.isFoiRegado());
-        plantioAtualizar.setDataAdubo(plantio.getDataAdubo());
-        plantioAtualizar.setHorarioAreIrrigar(plantio.getHorarioAreIrrigar());
+        plantioAtualizar.setData_que_foi_Plantado(plantio.getData_que_foi_Plantado());
+        plantioAtualizar.setFoiRegadoHoje(plantio.getFoiRegadoHoje());
+        plantioAtualizar.setHorarioAteIrrigar(plantio.getHorarioAteIrrigar());
         plantioAtualizar.setPrevisaoProximaIrrigacao(plantio.getPrevisaoProximaIrrigacao());
-        plantioAtualizar.setPrevisaoProximaAdubacao(plantio.getPrevisaoProximaAdubacao());
         plantioAtualizar.setPrevisaoProximaPoda(plantio.getPrevisaoProximaPoda());
-        plantioAtualizar.setNivelUmidade(plantio.getNivelUmidade());
         plantioAtualizar.setTamanhoAtualCM(plantio.getTamanhoAtualCM());
-        plantioAtualizar.setPrevisaoTamanho(plantio.getPrevisaoTamanho());
+        plantioAtualizar.setPrevisaoTamanhoCM(plantio.getPrevisaoTamanhoCM());
         plantioAtualizar.setPlantadaComo(plantio.getPlantadaComo());
         plantioAtualizar.setImagemPersonalizada(plantio.getImagemPersonalizada());
+		plantioAtualizar.setEspecime(plantio.getEspecime());
 		return plantioService.savePlantio(plantioAtualizar);
 	}
 
 
-    @GetMapping("/plantios/usuario/{id}")
+    @GetMapping("/usuario/{id}")
     public ResponseEntity<List<Plantio>>
     buscarPlantiosUsuario(
             @PathVariable Integer id){
@@ -102,6 +110,7 @@ public class PlantioController{
                 .buscarPorUsuarioId(id)
         );
     }
+	
 
  
 }

@@ -13,35 +13,19 @@ public class EspecimeService {
      @Autowired
     private EspecimeRepository especimeRepository;
 
-    // LISTAR TODOS
-    public List<Especime> listarTodos() {
 
+    public void salvarListaEspecimes(List<Especime> lista) {
+        for (Especime e : lista) {
+            if (!especimeRepository.existsByPerenualId(e.getPerenualId())) {
+                especimeRepository.save(e);
+            }
+        }
+    }
+    
+    public List<Especime> listarTodos() {
         return especimeRepository.findAll();
     }
 
-    // BUSCAR POR NOME EXATO
-    public Especime buscarPorNome(String nome) {
-
-        return especimeRepository.findByNome(nome);
-    }
-
-    // BUSCAR NOMES QUE COMEÇAM COM
-    public List<Especime> buscarPorPrimeiroNome(String nome) {
-
-        return especimeRepository.findByNomeStartsWith(nome);
-    }
-
-    // BUSCAR NOMES QUE TERMINAM COM
-    public List<Especime> buscarPorUltimoNome(String nome) {
-
-        return especimeRepository.findByNomeEndsWith(nome);
-    }
-
-    // BUSCAR NOMES QUE CONTÉM
-    public List<Especime> buscarPorLetraNoNome(String nome) {
-
-        return especimeRepository.findByNomeContains(nome);
-    }
 
     // SALVAR
     public Especime salvar(Especime especime) {

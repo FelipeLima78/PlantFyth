@@ -1,56 +1,14 @@
 package com.network.plantfyth.model;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class Especime {
     //construtor
 
-    public Especime(Integer id, String nome, int periodoIrrigacao, int periodoAdubacao, String exposicaoALuz, int periodoPoda, String descricao, float tamanhoAdulto, float tamanhoMuda, float crescimentoDiario, float vasoMinimoCM, String caminhoImagemPadrao, int umidadeIdeal, int temperaturaIdealMin, int temperaturaIdealMax) {
-        this.id = id;
-        this.nome = nome;
-        this.periodoIrrigacao = periodoIrrigacao;
-        this.periodoAdubacao = periodoAdubacao;
-        this.exposicaoALuz = exposicaoALuz;
-        this.periodoPoda = periodoPoda;
-        this.descricao = descricao;
-        this.tamanhoAdulto = tamanhoAdulto;
-        this.tamanhoMuda = tamanhoMuda;
-        this.crescimentoDiario = crescimentoDiario;
-        this.vasoMinimoCM = vasoMinimoCM;
-        this.caminhoImagemPadrao = caminhoImagemPadrao;
-        this.umidadeIdeal = umidadeIdeal;
-        this.temperaturaIdealMin = temperaturaIdealMin;
-        this.temperaturaIdealMax = temperaturaIdealMax;
-    }
-
-    public Especime() {
-    }
-
-    private Integer id;
-    private String nome;
-    private int periodoIrrigacao;
-    private int periodoAdubacao;
-    private String exposicaoALuz;
-    private int periodoPoda;
-    private String descricao;
-
-    //dados de crescimento
-
-    private float tamanhoAdulto;
-    private float tamanhoMuda;
-    private float crescimentoDiario;
-
-    //dados gerais
-    private float vasoMinimoCM;
-    private String caminhoImagemPadrao;
-    private int umidadeIdeal;
-    private int temperaturaIdealMin;
-    private int temperaturaIdealMax;
-    //fkEspecime
-    //getters e setters
-
     @Override
     public String toString() {
-        return nome;
+        return this.nome_popular != null ? this.nome_popular : "Planta sem nome";
     }
     public Integer getId() {
         return id;
@@ -60,44 +18,36 @@ public class Especime {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getPeriodo_rrigacao() {
+        return periodo_irrigacao;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setPeriodo_rrigacao(String periodo_irrigacao) {
+        this.periodo_irrigacao = periodo_irrigacao;
     }
 
-    public int getPeriodoIrrigacao() {
-        return periodoIrrigacao;
+    public String getUnidade_irrigacao() {
+        return unidade_irrigacao;
     }
 
-    public void setPeriodoIrrigacao(int periodoIrrigacao) {
-        this.periodoIrrigacao = periodoIrrigacao;
+    public void setUnidade_irrigacao(String unidade_irrigacao) {
+        this.unidade_irrigacao = unidade_irrigacao;
     }
 
-    public int getPeriodoAdubacao() {
-        return periodoAdubacao;
+    public String getExposicao_A_Luz() {
+        return exposicao_a_luz;
     }
 
-    public void setPeriodoAdubacao(int periodoAdubacao) {
-        this.periodoAdubacao = periodoAdubacao;
+    public void setExposicao_A_Luz(String exposicao_a_luz) {
+        this.exposicao_a_luz = exposicao_a_luz;
     }
 
-    public String getExposicaoALuz() {
-        return exposicaoALuz;
+    public String getPeriodo_poda() {
+        return periodo_poda;
     }
 
-    public void setExposicaoALuz(String exposicaoALuz) {
-        this.exposicaoALuz = exposicaoALuz;
-    }
-
-    public int getPeriodoPoda() {
-        return periodoPoda;
-    }
-
-    public void setPeriodoPoda(int periodoPoda) {
-        this.periodoPoda = periodoPoda;
+    public void setPeriodo_poda(String periodo_poda) {
+        this.periodo_poda = periodo_poda;
     }
 
     public String getDescricao() {
@@ -108,67 +58,137 @@ public class Especime {
         this.descricao = descricao;
     }
 
-    public float getTamanhoAdulto() {
-        return tamanhoAdulto;
+    public Float getTamanho_adulto_cm() {
+        return tamanho_adulto_cm;
     }
 
-    public void setTamanhoAdulto(float tamanhoAdulto) {
-        this.tamanhoAdulto = tamanhoAdulto;
+    public void setTamanho_adulto_cm(Float tamanho_adulto_cm) {
+        this.tamanho_adulto_cm = tamanho_adulto_cm;
     }
 
-    public float getTamanhoMuda() {
-        return tamanhoMuda;
+    public Float getTamanho_muda_cm() {
+        return tamanho_muda_cm;
     }
 
-    public void setTamanhoMuda(float tamanhoMuda) {
-        this.tamanhoMuda = tamanhoMuda;
+    public void setTamanho_muda_cm(Float tamanho_muda_cm) {
+        this.tamanho_muda_cm = tamanho_muda_cm;
     }
 
-    public float getCrescimentoDiario() {
-        return crescimentoDiario;
+    public String getCaminho_imagem_padrao() {
+        return caminho_imagem_padrao;
     }
 
-    public void setCrescimentoDiario(float crescimentoDiario) {
-        this.crescimentoDiario = crescimentoDiario;
+    public void setCaminho_imagem_padrao(String caminho_imagem_padrao) {
+        this.caminho_imagem_padrao = caminho_imagem_padrao;
     }
 
-    public float getVasoMinimoCM() {
-        return vasoMinimoCM;
+    public String getFamilia() {
+        return familia;
     }
 
-    public void setVasoMinimoCM(float vasoMinimoCM) {
-        this.vasoMinimoCM = vasoMinimoCM;
+    public void setFamilia(String familia) {
+        this.familia = familia;
     }
 
-    public String getCaminhoImagemPadrao() {
-        return caminhoImagemPadrao;
+    public Float getCrescimento_diario() {
+        return crescimento_diario;
     }
 
-    public void setCaminhoImagemPadrao(String caminhoImagemPadrao) {
-        this.caminhoImagemPadrao = caminhoImagemPadrao;
+    public void setCrescimento_diario(Float crescimento_diario) {
+        this.crescimento_diario = crescimento_diario;
     }
 
-    public int getUmidadeIdeal() {
-        return umidadeIdeal;
+    public String getCiclo() {
+        return ciclo;
     }
 
-    public void setUmidadeIdeal(int umidadeIdeal) {
-        this.umidadeIdeal = umidadeIdeal;
+    public void setCiclo(String ciclo) {
+        this.ciclo = ciclo;
     }
 
-    public int getTemperaturaIdealMin() {
-        return temperaturaIdealMin;
+    public String getCrescimento() {
+        return crescimento;
     }
 
-    public void setTemperaturaIdealMin(int temperaturaIdealMin) {
-        this.temperaturaIdealMin = temperaturaIdealMin;
+    public void setCrescimento(String crescimento) {
+        this.crescimento = crescimento;
     }
 
-    public int getTemperaturaIdealMax() {
-        return temperaturaIdealMax;
+    public String getNome_cientifico() {
+        return nome_cientifico;
     }
 
-    public void setTemperaturaIdealMax(int temperaturaIdealMax) {
-        this.temperaturaIdealMax = temperaturaIdealMax;
+    public void setNome_cientifico(String nome_cientifico) {
+        this.nome_cientifico = nome_cientifico;
     }
+
+    public String getNome_popular() {
+        return nome_popular;
+    }
+
+    public void setNome_popular(String nome_popular) {
+        this.nome_popular = nome_popular;
+    }
+
+    public Integer getPerenual_id() {
+        return perenual_id;
+    }
+
+    public void setPerenual_id(Integer perenual_id) {
+        this.perenual_id = perenual_id;
+    }
+
+
+    public Especime() {
+    }
+
+    public String getPeriodo_irrigacao() {
+        return periodo_irrigacao;
+    }
+
+    public void setPeriodo_irrigacao(String periodo_irrigacao) {
+        this.periodo_irrigacao = periodo_irrigacao;
+    }
+
+    public String getExposicao_a_luz() {
+        return exposicao_a_luz;
+    }
+
+    public void setExposicao_a_luz(String exposicao_a_luz) {
+        this.exposicao_a_luz = exposicao_a_luz;
+    }
+
+    private Integer id;
+
+    private String periodo_irrigacao;
+
+    private String unidade_irrigacao;
+
+    private String exposicao_a_luz;
+
+    private String periodo_poda;
+    private String descricao;
+
+    private Float tamanho_adulto_cm;
+
+    private Float tamanho_muda_cm;
+
+    private String caminho_imagem_padrao;
+
+    private String familia;
+
+    private Float crescimento_diario;
+
+    private String ciclo;
+
+    private String crescimento;
+
+    private String nome_cientifico;
+
+    @SerializedName("nome_popular")
+    private String nome_popular;
+
+    private Integer perenual_id;
+
+
 }

@@ -95,16 +95,16 @@ public class TelaCadastroPlanta extends AppCompatActivity {
         //puxa do shared preferences que fiz la no login
         int usuarioId = getSharedPreferences("USER_DATA", MODE_PRIVATE).getInt("usuario_id", -1);
         Usuario usuario = new Usuario();
-        usuario.setId(usuarioId);
-        plantio.setUsuario(usuario);
         String dataFormatada = data.substring(0,2) + "/" + data.substring(2,4) + "/" + data.substring(4,8);
         plantio.setDataQueFoiPlantado(dataFormatada);
+        Especime especimeSelecionado = (Especime) spinnerEspecime.getSelectedItem();
+        plantio.setEspecimeId(especimeSelecionado.getId());
+        plantio.setUsuarioId(usuarioId);
         plantio.setTamanhoAtualCM(tamanho);
         plantio.setPlantadaComo(plantadoComo);
-        Especime especimeSelecionado = (Especime) spinnerEspecime.getSelectedItem();
-        plantio.setEspecime(especimeSelecionado);
-        Ap.savePlantio(plantio)
+         Ap.savePlantio(plantio)
                 .enqueue(new Callback<Plantio>() {
+
                     @Override
                     public void onResponse(Call<Plantio> call, Response<Plantio> response) {
 
@@ -135,21 +135,28 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                     }
                 });
     }
-    private void carregarEspecimes(){
-
+    private void carregarEspecimes() {
         Ap.listarEspecimes().enqueue(new Callback<List<Especime>>() {
-                            @Override
-                            public void onResponse(Call<List<Especime>> call, Response<List<Especime>> response) {
-                                if(response.isSuccessful() && response.body() != null){
-                                    listaEspecimes = response.body();
-                                    ArrayAdapter<Especime> adapter = new ArrayAdapter<>(TelaCadastroPlanta.this, android.R.layout.simple_spinner_item, listaEspecimes);adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                    spinnerEspecime.setAdapter(adapter);
-                                }
-                            }
-                            @Override
-                            public void onFailure(Call<List<Especime>> call, Throwable t) {
-                                Toast.makeText(TelaCadastroPlanta.this, "Erro ao carregar espécimes", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+            @Override
+            public void onResponse(Call<List<Especime>> call, Response<List<Especime>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    listaEspecimes = response.body();
+                    ArrayAdapter<Especime> adapter = new ArrayAdapter<>(
+                            TelaCadastroPlanta.this,
+                            android.R.layout.simple_spinner_item,
+                            listaEspecimes
+                    );
+
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerEspecime.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Especime>> call, Throwable t) {
+                Toast.makeText(TelaCadastroPlanta.this, "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API_ERRO", "Falha: " + t.getMessage());
+            }
+        });
     }
 }

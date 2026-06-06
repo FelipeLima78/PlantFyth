@@ -62,9 +62,9 @@ public class UsuarioController{
 	@PostMapping("/inserir")
 	public Usuario inserir(@RequestBody Usuario usuario){
 
-		String hash = passwordEncoder.encode(usuario.getHashSenha());
+		String hash = passwordEncoder.encode(usuario.getHash_senha());
 
-   		 usuario.setHashSenha(hash);
+   		 usuario.setHash_senha(hash);
 
 		return usuarioService.saveUsuario(usuario);
 	}
@@ -75,8 +75,8 @@ public class UsuarioController{
         usuarioAtualizar.setId(usuario.getId());
         usuarioAtualizar.setNome(usuario.getNome());
         usuarioAtualizar.setEmail(usuario.getEmail());
-        usuarioAtualizar.setHashSenha(usuario.getHashSenha());
-        usuarioAtualizar.setFotoPerfil(usuario.getFotoPerfil());
+        usuarioAtualizar.setHash_senha(usuario.getHash_senha());
+        usuarioAtualizar.setFoto_perfil(usuario.getFoto_perfil());
 		return usuarioService.saveUsuario(usuarioAtualizar);
 	}
 
@@ -98,8 +98,8 @@ public class UsuarioController{
     }
 
     boolean senhaOk = passwordEncoder.matches(
-        usuario.getHashSenha(),
-        dbUser.getHashSenha()
+        usuario.getHash_senha(),
+        dbUser.getHash_senha()
     );
 
     if (!senhaOk) {

@@ -12,30 +12,25 @@ import com.api.api_plantfyth.repository.UsuarioRepository;
 public class UsuarioService {
 
     @Autowired
-	private UsuarioRepository usuarioRepository;
-	
-	public List<Usuario> findAll(){
-		return usuarioRepository.findAll();
-	}
-	
-	//buscar por id 
-	public Usuario buscarPorId(int id) {
-		return usuarioRepository.findById(id).get();
-	}
-	//busca por email
-	public Usuario buscarPorEmail(String email) {
-		return usuarioRepository.findByEmail(email).get();
-	}
-	
-	//Create e update
-	public Usuario saveUsuario(Usuario usuario) {
-		return usuarioRepository.save(usuario);
-	}
-	
-	//Delete
-	public void deleteUsuario(int id) {
-		usuarioRepository.deleteById(id);
-	}
-	
-	
+    private UsuarioRepository usuarioRepository;
+
+    public List<Usuario> findAll() {
+        return usuarioRepository.findAll();
+    }
+
+    public Usuario buscarPorId(int id) {
+        return usuarioRepository.findById(id).get();
+    }
+
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email).orElse(null);
+    }
+
+    public Usuario saveUsuario(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    public void deleteUsuario(int id) {
+        usuarioRepository.deleteById(id);
+    }
 }

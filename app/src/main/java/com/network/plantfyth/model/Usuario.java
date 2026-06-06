@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 
 public class Usuario {
     //construtor
-    public Usuario(Integer id, String nome, String email, String hashSenha, String fotoPerfil, String dataCriacao, String ultimoLogin) {
+    public Usuario(Integer id, String nome, String email, String hash_senha, String foto_perfil, String data_criacao, String ultimo_login) {
         this.id = id;
         this.nome = nome;
         this.email = email;
-        this.hashSenha = hashSenha;
-        this.fotoPerfil = fotoPerfil;
-        this.dataCriacao = dataCriacao;
-        this.ultimoLogin = ultimoLogin;
+        this.hash_senha = hash_senha;
+        this.foto_perfil = foto_perfil;
+        this.data_criacao = data_criacao;
+        this.ultimo_login = ultimo_login;
     }
     public Usuario() {
     }
@@ -19,12 +19,12 @@ public class Usuario {
     private Integer id;
     private String nome;
     private String email;
-    private String hashSenha;
-    private String fotoPerfil;
-    private String dataCriacao;
+    private String hash_senha;
+    private String foto_perfil;
+    private String data_criacao;
     //Coloquei como LocalDateTime por conta dos conflitos da classe date com o timestamp, mas voce pode mudar pro date e tratar a string pra ela remover o "z"
     //do timestamp.
-    private String ultimoLogin;
+    private String ultimo_login;
 
     //getters e setters
 
@@ -53,34 +53,34 @@ public class Usuario {
     }
 
     public String getHashSenha() {
-        return hashSenha;
+        return hash_senha;
     }
 
-    public void setHashSenha(String hashSenha) {
-        this.hashSenha = hashSenha;
+    public void setHashSenha(String hash_senha) {
+        this.hash_senha = hash_senha;
     }
 
     public String getFotoPerfil() {
-        return fotoPerfil;
+        return foto_perfil;
     }
 
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
+    public void setFotoPerfil(String foto_perfil) {
+        this.foto_perfil = foto_perfil;
     }
 
     public String getDataCriacao() {
-        return dataCriacao;
+        return data_criacao;
     }
 
-    public void setDataCriacao(String dataCriacao) {
-        this.dataCriacao = dataCriacao;
+    public void setDataCriacao(String data_criacao) {
+        this.data_criacao = data_criacao;
     }
 
     public String getUltimoLogin() {
-        return ultimoLogin;
+        return ultimo_login;
     }
 
-    public void setUltimoLogin(String ultimoLogin) {
-        this.ultimoLogin = ultimoLogin;
+    public void setUltimoLogin(String ultimo_login) {
+        this.ultimo_login = ultimo_login;
     }
 }

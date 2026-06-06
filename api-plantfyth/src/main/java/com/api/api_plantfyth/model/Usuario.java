@@ -3,6 +3,7 @@ package com.api.api_plantfyth.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -33,14 +34,14 @@ public class Usuario {
     private String email;
 
     @Column(name = "hash_senha")
-      private String hashSenha;
+      private String hash_senha;
     
-    private String fotoPerfil;
-    private LocalDateTime dataCriacao;
-    private LocalDateTime ultimoLogin;
+    private String foto_perfil;
+    private LocalDateTime data_criacao;
+    private LocalDateTime ultimo_login;
 
     @OneToMany(mappedBy = "usuario")
-@JsonManagedReference(value = "usuario-plantio")
+    @JsonIgnore
 private List<Plantio> plantios;
     
 }

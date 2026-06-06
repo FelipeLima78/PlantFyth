@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.api_plantfyth.model.Especime;
 import com.api.api_plantfyth.model.Plantio;
 import com.api.api_plantfyth.repository.EspecimeRepository;
 import com.api.api_plantfyth.service.EspecimeService;
+import com.api.api_plantfyth.service.PerenualService;
 import com.api.api_plantfyth.service.PlantioService;
 
 @RestController
@@ -24,35 +26,34 @@ public class EspecimeController {
 
 	@Autowired
 	private EspecimeService especimeService;
+	@Autowired
     private PlantioService plantioService;
+	@Autowired
 	private EspecimeRepository especimeRepository;
+	@Autowired
+	private PerenualService perenualService;
 	
 	@GetMapping
 	public List<Especime> listarTodos(){
 		return especimeService.listarTodos();
 	}
 
-	@GetMapping("/nome_especime/{nome_especime}")
-	public Especime buscarPorNome_Especime(@PathVariable String nome_especime){
-		Especime especime = especimeService.buscarPorNome(nome_especime);
-		return especime;
+	@GetMapping("/importar-automatico")
+public String importarAutomatico() {
+   perenualService.importarPlantasIndoor(1);
+    return "Importação automática da página 1 concluída!";
+}
+
+
+	@GetMapping("/indoor")
+	public List<Especime> listarIndoor(@RequestParam(defaultValue = "1") int page) {
+    return perenualService.buscarIndoor(page);
 	}
 
-	@GetMapping("/primeiro_nome/{nome_especime}")
-	public List<Especime> buscarPorPrimeiroNome(@PathVariable String nome_especime){
-		return especimeService.buscarPorPrimeiroNome(nome_especime);
+	@GetMapping("/indoor/{perenualId}")
+	public Especime buscarDetalhe(@PathVariable int perenualId) {
+    return perenualService.buscarDetalhe(perenualId);
 	}
-
-	@GetMapping("/ultimo_nome/{nome_especime}")
-	public List<Especime> buscarPorUltimoNome(@PathVariable String nome_especime) {
-		return especimeService.buscarPorUltimoNome(nome_especime);
-	}
-
-	@GetMapping("/letra-do-nome/{nome_especime}")
-	public List<Especime> buscarPorLetraDoNome(@PathVariable String nome_especime) {
-		return especimeService.buscarPorLetraNoNome(nome_especime);
-	}
-
 	
 	@DeleteMapping("/{id}")
 	public String deletar(@PathVariable int id){
