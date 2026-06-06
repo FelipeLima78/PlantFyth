@@ -1,4 +1,4 @@
-package com.network.plantfyth.ui.calendario;
+package com.network.plantfyth.ui.chatbot;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class CalendarioViewModel extends ViewModel {
+public class ChatbotViewModel extends ViewModel {
 
     private final MutableLiveData<List<EventoCalendario>> eventos = new MutableLiveData<>();
     private final MutableLiveData<List<EventoCalendario>> eventosDoDia = new MutableLiveData<>();
 
-    public CalendarioViewModel() {
+    public ChatbotViewModel() {
         carregarEventos();
     }
 

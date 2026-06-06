@@ -6,27 +6,38 @@ import com.network.plantfyth.model.Usuario;
 
 import java.util.List;
 
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface PlantFythAPI {
 
+    //Especimes
+
     @GET("especimes")
     Call<List<Especime>> listarEspecimes();
 
+    //esse é pra puxar os detalhes
+    @GET("especimes/indoor/{id}") Call<List<Especime>>
+    buscarEspecimesUsuario (@Path("id") Integer perenual_id);
+    //plantios
     @GET("plantios")
-    Call<List<Plantio>> listarTodos();
+    Call<List<Plantio>> listarPlantios();
+    @GET("api/plants/indoor")
+    Call<List<Especime>> listarIndoorPlants();
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
 
     @GET("plantios/usuario/{id}") Call<List<Plantio>>
     buscarPlantasUsuario (@Path("id") Integer usuarioId);
 
+    //usuario
     @POST("usuarios/login")
     Call<ResponseBody> LoginUsuario(@Body Usuario request);
 
@@ -39,4 +50,8 @@ public interface PlantFythAPI {
     @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
 
+    //chatbot
+    @POST("chatbot/perguntar")
+    @Headers("Content-Type: text/plain")
+    Call<ResponseBody> perguntarChatbot(@Body RequestBody pergunta);
 }

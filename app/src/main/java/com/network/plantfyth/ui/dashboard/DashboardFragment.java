@@ -21,33 +21,12 @@ public class DashboardFragment extends Fragment {
 
     private FloatingActionButton btnAdicionarPlanta;
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            ViewGroup container,
-            Bundle savedInstanceState) {
-
-        View root = inflater.inflate(
-                R.layout.fragment_dashboard,
-                container,
-                false
-        );
-
-        FloatingActionButton btnAdicionar =
-                root.findViewById(
-                        R.id.btnAdicionarPlanta
-                );
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        FloatingActionButton btnAdicionar = root.findViewById(R.id.btnAdicionarPlanta);
         btnAdicionar.setOnClickListener(v -> {
-
-            Intent intent =
-                    new Intent(
-                            getActivity(),
-                            TelaCadastroPlanta.class
-                    );
-
+            Intent intent = new Intent(getActivity(), TelaCadastroPlanta.class);
             startActivity(intent);
         });
-
         return root;
     }
 

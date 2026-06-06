@@ -11,10 +11,10 @@
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
     <fragment
-        android:id="@+id/navigation_calendario"
-        android:name="com.network.plantfyth.ui.calendario.CalendarioFragment"
-        android:label="@string/title_calendario"
-        tools:layout="@layout/fragment_calendario" />
+        android:id="@+id/navigation_chatbot"
+        android:name="com.network.plantfyth.ui.chatbot.ChatbotFragment"
+        android:label="@string/title_chatbot"
+        tools:layout="@layout/fragment_chatbot" />
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.network.plantfyth.ui.dashboard.DashboardFragment"

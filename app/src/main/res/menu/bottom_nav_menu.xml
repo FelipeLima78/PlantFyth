@@ -7,9 +7,9 @@
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/title_home" />
     <item
-        android:id="@+id/navigation_calendario"
-        android:icon="@drawable/baseline_calendar_month_24"
-        android:title="@string/title_calendario" />
+        android:id="@+id/navigation_chatbot"
+        android:icon="@drawable/baseline_iconerobo"
+        android:title="@string/title_chatbot" />
     <item
         android:id="@+id/navigation_dashboard"
         android:icon="@drawable/ic_dashboard_black_24dp"
