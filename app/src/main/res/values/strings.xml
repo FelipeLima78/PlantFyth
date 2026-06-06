@@ -3,7 +3,7 @@
     <string name="title_home">Home</string>
     <string name="title_minhas_plantas">Minhas Plantas</string>
     <string name="title_configuracoes">Configurações</string>
-    <string name="title_calendario">Calendário</string>
+    <string name="title_chatbot">Chatbot</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
