@@ -13,7 +13,6 @@ public class PlantioHomeItem {
 
     public Plantio plantio;
     public AcaoStatus irrigacao;
-    public AcaoStatus adubacao;
     public AcaoStatus poda;
     public HomeFragment.TipoAcao salvandoAcao;
 
