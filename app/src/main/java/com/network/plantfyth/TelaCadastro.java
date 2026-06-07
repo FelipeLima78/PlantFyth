@@ -104,9 +104,5 @@ public class TelaCadastro extends AppCompatActivity {
                          });
 
 
-
-
-        Intent intent = new Intent(TelaCadastro.this, TelaDeLogin.class);
-        startActivity(intent);
     }
 }
