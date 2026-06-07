@@ -84,7 +84,7 @@ public class TelaCadastro extends AppCompatActivity {
 
                                      startActivity(new Intent(TelaCadastro.this,
                                              TelaDeLogin.class));
-
+                                        finish();
                                  } else {
 
                                      Toast.makeText(TelaCadastro.this,
