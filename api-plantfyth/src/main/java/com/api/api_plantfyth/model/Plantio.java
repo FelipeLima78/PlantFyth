@@ -85,6 +85,7 @@ private Integer especimeId;
 
     @ManyToOne
     @JoinColumn(name = "fk_especime_id", insertable = false, updatable = false)
+    @JsonIgnore
     private Especime especime;
 
 }
