@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -30,7 +30,8 @@
                 android:text="Minhas Plantas"
                 android:textColor="#FFFFFF"
                 android:textSize="36sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -38,10 +39,13 @@
                 android:layout_marginTop="4dp"
                 android:text="Acompanhe o desenvolvimento das suas plantas"
                 android:textColor="#A5D6A7"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                tools:ignore="HardcodedText,TextContrastCheck" />
+
         </LinearLayout>
 
         <!-- RECYCLERVIEW -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerPlantas"
             android:layout_width="match_parent"
@@ -52,17 +56,17 @@
             android:paddingTop="16dp"
             android:paddingBottom="88dp" />
 
+
     </LinearLayout>
 
-    <!-- FAB ADICIONAR (mantido) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAdicionarPlanta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:src="@android:drawable/ic_input_add"
-        android:backgroundTint="#2E7D32"
-        app:tint="#FFFFFF" />
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="145dp"
+        android:contentDescription="Adicionar"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

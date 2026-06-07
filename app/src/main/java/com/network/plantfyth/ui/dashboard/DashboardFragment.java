@@ -40,6 +40,7 @@
                               Bundle savedInstanceState) {
 
          binding = FragmentDashboardBinding.inflate(inflater, container, false);
+         Log.d("TESTE", String.valueOf(binding.btnAdicionarPlanta));
          api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
 
          configurarRecyclerView();
