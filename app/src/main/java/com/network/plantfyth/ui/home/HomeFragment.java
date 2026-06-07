@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -127,9 +128,10 @@ public class HomeFragment extends Fragment {
 
     private void recalcularStatus(PlantioHomeItem item) {
         Plantio plantio = item.plantio;
-        item.irrigacao = criarStatus(plantio.getPrevisaoProximaIrrigacao());
-        item.adubacao = criarStatus(plantio.getPrevisaoProximaAdubacao());
-        item.poda = criarStatus(plantio.getPrevisaoProximaPoda());
+
+        item.irrigacao = criarStatus(parseDataPlantio(plantio.getPrevisaoProximaIrrigacao()));
+
+        item.poda = criarStatus(parseDataPlantio(plantio.getPrevisaoProximaPoda()));
     }
 
     private PlantioHomeItem.AcaoStatus criarStatus(Date proximaData) {
@@ -163,9 +165,16 @@ public class HomeFragment extends Fragment {
         int posicao = itens.indexOf(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
 
+        if (tipoAcao == TipoAcao.ADUBAR) {
+            Toast.makeText(requireContext(),
+                    "Adubacao ainda nao tem previsao no banco.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Plantio plantio = item.plantio;
-        Date dataAnterior = getDataAcao(plantio, tipoAcao);
-        Date proximaData = calcularProximaData(plantio, tipoAcao);
+        String dataAnterior = getDataAcao(plantio, tipoAcao);
+        String proximaData = calcularProximaData(plantio, tipoAcao);
 
         if (proximaData == null) {
             Toast.makeText(requireContext(),
@@ -175,8 +184,9 @@ public class HomeFragment extends Fragment {
         }
 
         setDataAcao(plantio, tipoAcao, proximaData);
+
         if (tipoAcao == TipoAcao.IRRIGAR) {
-            plantio.setFoiRegado(true);
+            plantio.setFoi_regado_hoje(true);
         }
 
         item.salvandoAcao = tipoAcao;
@@ -187,9 +197,15 @@ public class HomeFragment extends Fragment {
         salvarPlantioAtualizado(item, posicao, tipoAcao, dataAnterior, proximaData);
     }
 
-    private void salvarPlantioAtualizado(PlantioHomeItem item, int posicao, TipoAcao tipoAcao,
-                                         Date dataAnterior, Date proximaData) {
+    private void salvarPlantioAtualizado(
+            PlantioHomeItem item,
+            int posicao,
+            TipoAcao tipoAcao,
+            String dataAnterior,
+            String proximaData
+    ) {
         Plantio plantioLocal = item.plantio;
+
         api.atualizarPlantio(plantioLocal, plantioLocal.getId()).enqueue(new Callback<Plantio>() {
             @Override
             public void onResponse(@NonNull Call<Plantio> call, @NonNull Response<Plantio> response) {
@@ -201,16 +217,19 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     Plantio atualizado = response.body();
                     preservarDataNaoRetornada(atualizado, tipoAcao, proximaData);
+
                     itemAtual.plantio = atualizado;
                     recalcularStatus(itemAtual);
                     adapter.notifyItemChanged(posicao);
                     atualizarAviso();
+
                     Toast.makeText(requireContext(), "Acao registrada.", Toast.LENGTH_SHORT).show();
                 } else {
                     setDataAcao(itemAtual.plantio, tipoAcao, dataAnterior);
                     recalcularStatus(itemAtual);
                     adapter.notifyItemChanged(posicao);
                     atualizarAviso();
+
                     Toast.makeText(requireContext(),
                             "Nao foi possivel salvar: " + response.code(),
                             Toast.LENGTH_SHORT).show();
@@ -223,12 +242,12 @@ public class HomeFragment extends Fragment {
 
                 PlantioHomeItem itemAtual = itens.get(posicao);
                 itemAtual.salvandoAcao = null;
+
                 setDataAcao(itemAtual.plantio, tipoAcao, dataAnterior);
                 recalcularStatus(itemAtual);
                 adapter.notifyItemChanged(posicao);
                 atualizarAviso();
 
-                Log.e(TAG, "Falha ao salvar plantio", t);
                 Toast.makeText(requireContext(),
                         "Falha ao salvar: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
@@ -236,27 +255,26 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void preservarDataNaoRetornada(Plantio atualizado, TipoAcao tipoAcao, Date proximaData) {
+    private void preservarDataNaoRetornada(Plantio atualizado, TipoAcao tipoAcao, String proximaData) {
         if (tipoAcao == TipoAcao.IRRIGAR && atualizado.getPrevisaoProximaIrrigacao() == null) {
             atualizado.setPrevisaoProximaIrrigacao(proximaData);
-        } else if (tipoAcao == TipoAcao.ADUBAR && atualizado.getPrevisaoProximaAdubacao() == null) {
-            atualizado.setPrevisaoProximaAdubacao(proximaData);
         } else if (tipoAcao == TipoAcao.PODAR && atualizado.getPrevisaoProximaPoda() == null) {
             atualizado.setPrevisaoProximaPoda(proximaData);
         }
     }
 
-    private Date calcularProximaData(Plantio plantio, TipoAcao tipoAcao) {
+    private String calcularProximaData(Plantio plantio, TipoAcao tipoAcao) {
         Especime especime = plantio.getEspecime();
+
         switch (tipoAcao) {
             case IRRIGAR:
-                return calcularProximaIrrigacao(especime);
-            case ADUBAR:
-                return plantio.getPrevisaoProximaAdubacao() == null
-                        ? null
-                        : somarDias(new Date(), DIAS_PADRAO_ADUBACAO);
+                return formatarDataParaBackend(calcularProximaIrrigacao(especime));
+
             case PODAR:
-                return calcularProximaPoda(especime);
+                Date proximaPoda = calcularProximaPoda(especime);
+                return proximaPoda == null ? null : formatarDataParaBackend(proximaPoda);
+
+            case ADUBAR:
             default:
                 return null;
         }
@@ -359,29 +377,32 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private Date getDataAcao(Plantio plantio, TipoAcao tipoAcao) {
+
+    private String getDataAcao(Plantio plantio, TipoAcao tipoAcao) {
         switch (tipoAcao) {
             case IRRIGAR:
                 return plantio.getPrevisaoProximaIrrigacao();
-            case ADUBAR:
-                return plantio.getPrevisaoProximaAdubacao();
+
             case PODAR:
                 return plantio.getPrevisaoProximaPoda();
+
+            case ADUBAR:
             default:
                 return null;
         }
     }
 
-    private void setDataAcao(Plantio plantio, TipoAcao tipoAcao, Date data) {
+    private void setDataAcao(Plantio plantio, TipoAcao tipoAcao, String data) {
         switch (tipoAcao) {
             case IRRIGAR:
                 plantio.setPrevisaoProximaIrrigacao(data);
                 break;
-            case ADUBAR:
-                plantio.setPrevisaoProximaAdubacao(data);
-                break;
+
             case PODAR:
                 plantio.setPrevisaoProximaPoda(data);
+                break;
+
+            case ADUBAR:
                 break;
         }
     }
@@ -400,7 +421,7 @@ public class HomeFragment extends Fragment {
     private void atualizarAviso() {
         int atrasadas = 0;
         for (PlantioHomeItem item : itens) {
-            if (item.irrigacao.atrasada || item.adubacao.atrasada || item.poda.atrasada) {
+            if (item.irrigacao.atrasada || item.poda.atrasada) {
                 atrasadas++;
             }
         }
@@ -414,12 +435,44 @@ public class HomeFragment extends Fragment {
             binding.cardAvisos.setVisibility(View.GONE);
         }
     }
+    private Date parseDataPlantio(String dataTexto) {
+        if (dataTexto == null || dataTexto.trim().isEmpty()) return null;
 
+        String[] formatos = {
+                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+                "yyyy-MM-dd'T'HH:mm:ssXXX",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS",
+                "yyyy-MM-dd'T'HH:mm:ss",
+                "yyyy-MM-dd HH:mm:ss",
+                "yyyy-MM-dd",
+                "dd/MM/yyyy"
+        };
+
+        for (String formatoTexto : formatos) {
+            try {
+                SimpleDateFormat formato = new SimpleDateFormat(formatoTexto, Locale.US);
+                formato.setLenient(false);
+                return formato.parse(dataTexto);
+            } catch (ParseException ignored) {
+            }
+        }
+
+        return null;
+    }
     private void mostrarCarregando(boolean carregando) {
         binding.progressBarHome.setVisibility(carregando ? View.VISIBLE : View.GONE);
         binding.recyclerPlantasHome.setVisibility(carregando ? View.GONE : View.VISIBLE);
     }
+    private String formatarDataParaBackend(Date data) {
+        if (data == null) return null;
 
+        SimpleDateFormat formato = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+                Locale.US
+        );
+
+        return formato.format(data);
+    }
     private void mostrarEstadoVazio(boolean vazio) {
         binding.layoutVazio.setVisibility(vazio ? View.VISIBLE : View.GONE);
         binding.recyclerPlantasHome.setVisibility(vazio ? View.GONE : View.VISIBLE);

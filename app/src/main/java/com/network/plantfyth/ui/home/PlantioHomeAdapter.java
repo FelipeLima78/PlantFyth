@@ -43,8 +43,6 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
 
         configurarAcao(holder.txtTempoIrrigar, holder.btnIrrigar, item, item.irrigacao,
                 HomeFragment.TipoAcao.IRRIGAR, "Irriguei");
-        configurarAcao(holder.txtTempoAdubar, holder.btnAdubar, item, item.adubacao,
-                HomeFragment.TipoAcao.ADUBAR, "Adubei");
         configurarAcao(holder.txtTempoPodar, holder.btnPodar, item, item.poda,
                 HomeFragment.TipoAcao.PODAR, "Podei");
     }
@@ -95,10 +93,8 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
             txtNomePlanta = itemView.findViewById(R.id.txtNomePlanta);
             txtNomeEspecime = itemView.findViewById(R.id.txtNomeEspecime);
             txtTempoIrrigar = itemView.findViewById(R.id.txtTempoIrrigar);
-            txtTempoAdubar = itemView.findViewById(R.id.txtTempoAdubar);
             txtTempoPodar = itemView.findViewById(R.id.txtTempoPodar);
             btnIrrigar = itemView.findViewById(R.id.btnIrrigar);
-            btnAdubar = itemView.findViewById(R.id.btnAdubar);
             btnPodar = itemView.findViewById(R.id.btnPodar);
         }
     }
