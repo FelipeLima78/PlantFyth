@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -13,8 +12,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- TÍTULO -->
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,8 +20,6 @@
             android:textStyle="bold"
             android:textColor="#1B5E20"
             android:layout_marginBottom="20dp"/>
-
-        <!-- CARD -->
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -39,7 +34,6 @@
                 android:padding="20dp">
 
                 <!-- Nome -->
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -54,7 +48,6 @@
                     android:inputType="textCapWords"/>
 
                 <!-- Espécime -->
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -67,8 +60,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <!-- Data do plantio -->
-
+                <!-- Data do Plantio -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -80,21 +72,11 @@
                     android:id="@+id/edtDataPlantio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="dd/MM/yyyy"
-                    android:inputType="date"
+                    android:hint="ddMMaaaa"
+                    android:inputType="number"
                     android:maxLength="8"/>
 
-                <!-- Foi regado -->
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"/>
-
                 <!-- Plantada como -->
-
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -110,7 +92,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" ⭐ Opcional"
+                        android:text="  Opcional"
                         android:textSize="12sp"
                         android:textColor="#757575"/>
                 </LinearLayout>
@@ -118,7 +100,8 @@
                 <RadioGroup
                     android:id="@+id/radioPlantadaComo"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <RadioButton
                         android:id="@+id/rbSemente"
@@ -130,18 +113,19 @@
                         android:id="@+id/rbMuda"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Muda"/>
+                        android:text="Muda"
+                        android:layout_marginStart="8dp"/>
 
                     <RadioButton
                         android:id="@+id/rbEstaca"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Estaca"/>
+                        android:text="Estaca"
+                        android:layout_marginStart="8dp"/>
 
                 </RadioGroup>
 
                 <!-- Tamanho atual -->
-
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -157,7 +141,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" ⭐ Opcional"
+                        android:text="  Opcional"
                         android:textSize="12sp"
                         android:textColor="#757575"/>
                 </LinearLayout>
@@ -169,10 +153,17 @@
                     android:hint="Ex: 12.5"
                     android:inputType="numberDecimal"/>
 
-
+                <!-- Foi regado hoje -->
+                <CheckBox
+                    android:id="@+id/checkFoiRegadoHoje"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foi regado hoje?"
+                    android:textStyle="bold"
+                    android:layout_marginTop="18dp"
+                    android:buttonTint="#2E7D32"/>
 
                 <!-- Salvar -->
-
                 <Button
                     android:id="@+id/btnSalvarPlanta"
                     android:layout_width="match_parent"
@@ -182,7 +173,7 @@
                     android:onClick="CadastrarPlanta"
                     android:text="Salvar Planta"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 

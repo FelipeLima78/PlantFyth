@@ -21,10 +21,13 @@ public class Especime {
     @Column(name = "perenual_id")
     private Integer perenualId;
 
-    @Column(name = "periodo_irrigacao")
-    private String periodoIrrigacao;
-    @Column(name = "unidade_irrigacao")
-    private String unidadeIrrigacao;
+    @JsonProperty("periodoIrrigacao")
+@Column(name = "periodo_irrigacao")
+private String periodoIrrigacao;
+
+@JsonProperty("unidadeIrrigacao")
+@Column(name = "unidade_irrigacao")
+private String unidadeIrrigacao;
 
     @Column(name = "exposicao_a_luz")
     private String exposicaoALuz;
@@ -32,7 +35,7 @@ public class Especime {
     @Column(name = "periodo_poda")
     private String periodoPoda;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", columnDefinition = "TEXT")
     @JsonProperty("descricao")
     private String descricao;
 
@@ -60,7 +63,7 @@ public class Especime {
     @JsonProperty("crescimento")
     private String crescimento;
 
-    @Column(name = "nome_cientifico")
+    @Column(name = "nome_cientifico", columnDefinition = "TEXT")
     @JsonProperty("nome_cientifico")
     private String nomeCientifico;
 

@@ -23,14 +23,14 @@ public interface PlantFythAPI {
     @GET("especimes")
     Call<List<Especime>> listarEspecimes();
 
-    //esse é pra puxar os detalhes
-    @GET("especimes/indoor/{id}") Call<List<Especime>>
-    buscarEspecimesUsuario (@Path("id") Integer perenual_id);
     //plantios
     @GET("plantios")
     Call<List<Plantio>> listarPlantios();
     @GET("api/plants/indoor")
     Call<List<Especime>> listarIndoorPlants();
+
+    @GET("especimes/indoor/{perenualId}")
+    Call<Especime> buscarDetalhes(@Path("perenualId")int perenualId);
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
 
@@ -42,8 +42,7 @@ public interface PlantFythAPI {
     Call<ResponseBody> LoginUsuario(@Body Usuario request);
 
     @GET("usuarios/email/{email}")
-    Call<Usuario> buscarUsuarioPorEmail(
-            @Path("email") String email);
+    Call<Usuario> buscarUsuarioPorEmail(@Path("email") String email);
     @POST("usuarios/inserir")
     Call<Usuario> saveUsuario(@Body Usuario usuario);
 

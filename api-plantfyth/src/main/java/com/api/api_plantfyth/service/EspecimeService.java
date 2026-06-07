@@ -26,16 +26,11 @@ public class EspecimeService {
         return especimeRepository.findAll();
     }
 
+        public Especime buscarPorId(int id) {
+            return especimeRepository.findById(id).orElse(null);
+        }
 
-    // SALVAR
-    public Especime salvar(Especime especime) {
-
-        return especimeRepository.save(especime);
-    }
-
-    // DELETAR
     public void deletar(Integer id) {
-
         especimeRepository.deleteById(id);
     }
 }

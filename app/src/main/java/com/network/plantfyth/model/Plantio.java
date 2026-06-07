@@ -1,5 +1,7 @@
     package com.network.plantfyth.model;
 
+    import android.util.Log;
+
     import com.google.gson.annotations.SerializedName;
 
     import java.time.LocalDateTime;
@@ -9,7 +11,7 @@
         public Plantio() {
         }
 
-        public Plantio(Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, Date dataAdubo, LocalDateTime horario_ate_irrigar, Date previsao_proxima_irrigacao,  Date previsao_proxima_poda, float tamanho_atual_cm, float previsaoTamanho, String plantada_como, String imagem_personalizada) {
+        public Plantio(Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, Date horario_ate_irrigar, String previsao_proxima_irrigacao,  String previsao_proxima_poda, float tamanho_atual_cm, float previsaoTamanho, String plantada_como, String imagem_personalizada) {
             this.id = id;
             this.nome = nome;
             this.data_que_foi_plantado = data_que_foi_plantado;
@@ -18,9 +20,9 @@
             this.previsao_proxima_irrigacao = previsao_proxima_irrigacao;
             this.previsao_proxima_poda = previsao_proxima_poda;
             this.tamanho_atual_cm = tamanho_atual_cm;
-            this.previsao_tamanho_cm = previsao_tamanho_cm;
-            this.plantada_como = plantada_como;
-            this.imagem_personalizada = imagem_personalizada;
+                this.previsao_tamanho_cm = previsao_tamanho_cm;
+                this.plantada_como = plantada_como;
+                this.imagem_personalizada = imagem_personalizada;
         }
 
         @SerializedName("especimeId")
@@ -44,26 +46,36 @@
 
         @SerializedName("usuarioId")
         private Integer usuarioId;
-
+        @SerializedName("usuario")
         private Usuario usuario;
+        @SerializedName("especime")
         private Especime especime;
+        @SerializedName("id")
         private Integer id;
+        @SerializedName("nome")
         private String nome;
+        @SerializedName("data_que_foi_Plantado")
         private String data_que_foi_plantado;
+        @SerializedName("foiRegadoHoje")
         private boolean foi_regado_hoje;
 
-        //datas importantes
-        private Date dataAdubo;
-        private LocalDateTime horario_ate_irrigar;
 
+        //datas importantes
+        @SerializedName("horarioAteIrrigar")
+        private Date horario_ate_irrigar;
         //previsoes automaticas
-        private Date previsao_proxima_irrigacao;
-        private Date previsaoProximaAdubacao;
-        private Date previsao_proxima_poda;
+        @SerializedName("previsaoProximaIrrigacao")
+        private String previsao_proxima_irrigacao;
+        @SerializedName("previsaoProximaPoda")
+        private String previsao_proxima_poda;
         //Informações dinâmicas do app
+        @SerializedName("tamanhoAtualCM")
         private float tamanho_atual_cm;
+        @SerializedName("previsaoTamanhoCM")
         private float previsao_tamanho_cm;
+        @SerializedName("plantadaComo")
         private String plantada_como;
+        @SerializedName("imagemPersonalizada")
         private String imagem_personalizada;
         //getters e setters
 
@@ -91,51 +103,36 @@
             this.data_que_foi_plantado = data_que_foi_plantado;
         }
 
-        public Boolean getFoiRegado() {
+        public boolean isFoi_regado_hoje() {
             return foi_regado_hoje;
         }
 
-        public void setFoiRegado(Boolean foi_regado_hoje) {
+        public void setFoi_regado_hoje(boolean foi_regado_hoje) {
             this.foi_regado_hoje = foi_regado_hoje;
         }
 
-        public Date getDataAdubo() {
-            return dataAdubo;
-        }
 
-        public void setDataAdubo(Date dataAdubo) {
-            this.dataAdubo = dataAdubo;
-        }
-
-        public LocalDateTime getHorarioAreIrrigar() {
+        public Date getHorarioAreIrrigar() {
             return horario_ate_irrigar;
         }
 
-        public void setHorarioAreIrrigar(LocalDateTime horario_ate_irrigar) {
+        public void setHorarioAreIrrigar(Date horario_ate_irrigar) {
             this.horario_ate_irrigar = horario_ate_irrigar;
         }
 
-        public Date getPrevisaoProximaIrrigacao() {
+        public String getPrevisaoProximaIrrigacao() {
             return previsao_proxima_irrigacao;
         }
 
-        public void setPrevisaoProximaIrrigacao(Date previsao_proxima_irrigacao) {
+        public void setPrevisaoProximaIrrigacao(String previsao_proxima_irrigacao) {
             this.previsao_proxima_irrigacao = previsao_proxima_irrigacao;
         }
 
-        public Date getPrevisaoProximaAdubacao() {
-            return previsaoProximaAdubacao;
-        }
-
-        public void setPrevisaoProximaAdubacao(Date previsaoProximaAdubacao) {
-            this.previsaoProximaAdubacao = previsaoProximaAdubacao;
-        }
-
-        public Date getPrevisaoProximaPoda() {
+        public String getPrevisaoProximaPoda() {
             return previsao_proxima_poda;
         }
 
-        public void setPrevisaoProximaPoda(Date previsao_proxima_poda) {
+        public void setPrevisaoProximaPoda(String previsao_proxima_poda) {
             this.previsao_proxima_poda = previsao_proxima_poda;
         }
         public float getTamanhoAtualCM() {

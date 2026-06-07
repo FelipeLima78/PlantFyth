@@ -8,7 +8,7 @@ public class Especime {
 
     @Override
     public String toString() {
-        return this.nome_popular != null ? this.nome_popular : "Planta sem nome";
+        return this.nome_popular != null ? this.nome_popular + " " + "( "+ nome_cientifico + " )": "Planta sem nome";
     }
     public Integer getId() {
         return id;
@@ -21,7 +21,6 @@ public class Especime {
     public String getPeriodo_rrigacao() {
         return periodo_irrigacao;
     }
-
     public void setPeriodo_rrigacao(String periodo_irrigacao) {
         this.periodo_irrigacao = periodo_irrigacao;
     }
@@ -160,34 +159,49 @@ public class Especime {
 
     private Integer id;
 
+    @SerializedName("periodoIrrigacao")
     private String periodo_irrigacao;
 
+    @SerializedName("unidadeIrrigacao")
     private String unidade_irrigacao;
 
+    @SerializedName("exposicaoALuz")
     private String exposicao_a_luz;
 
+    @SerializedName("periodoPoda")
     private String periodo_poda;
+
+    @SerializedName("descricao")
     private String descricao;
 
+    @SerializedName("tamanhoAdultoCM")
     private Float tamanho_adulto_cm;
 
+    @SerializedName("tamanhoMudaCM")
     private Float tamanho_muda_cm;
 
+    @SerializedName("caminhoImagemPadrao")
     private String caminho_imagem_padrao;
 
+    @SerializedName("familia")
     private String familia;
 
+    @SerializedName("crescimentoDiario")
     private Float crescimento_diario;
 
+    @SerializedName("ciclo")
     private String ciclo;
 
+    @SerializedName("crescimento")
     private String crescimento;
 
+    @SerializedName("nome_cientifico")
     private String nome_cientifico;
 
     @SerializedName("nome_popular")
     private String nome_popular;
 
+    @SerializedName("perenualId")
     private Integer perenual_id;
 
 
