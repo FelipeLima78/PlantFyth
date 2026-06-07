@@ -15,6 +15,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.PUT;
 
 public interface PlantFythAPI {
 
@@ -33,6 +34,9 @@ public interface PlantFythAPI {
     Call<List<Especime>> listarIndoorPlants();
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
+
+    @PUT("plantios/id/{id}")
+    Call<Plantio> atualizarPlantio(@Body Plantio plantio, @Path("id") Integer id);
 
     @GET("plantios/usuario/{id}") Call<List<Plantio>>
     buscarPlantasUsuario (@Path("id") Integer usuarioId);
