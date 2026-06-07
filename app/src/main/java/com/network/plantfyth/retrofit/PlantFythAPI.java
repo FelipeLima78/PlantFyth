@@ -3,7 +3,7 @@ package com.network.plantfyth.retrofit;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.model.Usuario;
-
+import retrofit2.http.PUT;
 import java.util.List;
 
 import okhttp3.RequestBody;
@@ -33,7 +33,8 @@ public interface PlantFythAPI {
     Call<Especime> buscarDetalhes(@Path("perenualId")int perenualId);
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
-
+    @PUT("plantios/id/{id}")
+    Call<Plantio> atualizarPlantio(@Body Plantio plantio, @Path("id") Integer id);
     @GET("plantios/usuario/{id}") Call<List<Plantio>>
     buscarPlantasUsuario (@Path("id") Integer usuarioId);
 
