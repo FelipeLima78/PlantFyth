@@ -126,7 +126,10 @@ public ResponseEntity<?> inserir(@RequestBody Plantio plantio) {
 		plantioAtualizar.setEspecime(plantio.getEspecime());
 		return plantioService.savePlantio(plantioAtualizar);
 	}
-	
+	@GetMapping("/usuario/{id}")
+	public ResponseEntity<List<Plantio>> buscarPlantiosUsuario(@PathVariable Integer id) {
+		return ResponseEntity.ok(plantioService.buscarPorUsuarioId(id));
+	}
 
  
 }
