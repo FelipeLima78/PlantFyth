@@ -81,6 +81,10 @@ public class TelaCadastroPlanta extends AppCompatActivity {
     public void CadastrarPlanta(View view){
         Especime especimeSelecionado = (Especime) spinnerEspecime.getSelectedItem();
         String data = String.valueOf(edtDataPlantio.getText());
+        if (edtNomePlanta.getText().toString().isEmpty() || edtDataPlantio.getText().toString().isEmpty()){
+            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(data.length() != 8){Toast.makeText(this, "Digite 8 números na data", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -196,6 +200,8 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                                 Log.e("API_ERROR", t.getMessage());
                             }
                         });
+
+
             }
         @Override
         public void onFailure(Call<Especime> call, Throwable t) {
