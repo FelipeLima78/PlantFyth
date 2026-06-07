@@ -41,7 +41,7 @@ public class PerenualService {
             }
         }
     }
-   public Especime parseDetalhe(String json) {
+  public Especime parseDetalhe(String json) {
     try {
         JsonNode node = mapper.readTree(json);
         Especime e = new Especime();
@@ -61,10 +61,13 @@ public class PerenualService {
         if (sunlight.isArray() && !sunlight.isEmpty())
             e.setExposicaoALuz(sunlight.get(0).asText(null));
 
-        JsonNode watering = node.path("watering_general_benchmark");
-        e.setPeriodoIrrigacao(watering.path("value").asText(null));
-        e.setUnidadeIrrigacao(watering.path("unit").asText(null));
-
+      JsonNode watering = node.path("watering_general_benchmark");
+if (!watering.isMissingNode()) {
+    String valor = watering.path("value").asText("0");
+    valor = valor.replace("\"", ""); 
+    e.setPeriodoIrrigacao(valor); 
+    e.setUnidadeIrrigacao(watering.path("unit").asText("days"));
+}
         JsonNode pruning = node.path("pruning_month");
         if (pruning.isArray()) {
             List<String> meses = new ArrayList<>();
@@ -83,8 +86,8 @@ public class PerenualService {
         }
 
         return e;
-    } catch (Exception e) {
-        throw new RuntimeException("Erro ao parsear detalhe da Perenual", e);
+    } catch (Exception ex) {
+        throw new RuntimeException("Erro ao parsear detalhe da Perenual", ex);
     }
 }
     public Especime buscarDetalhe(int id) {

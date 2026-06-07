@@ -3,6 +3,7 @@ package com.api.api_plantfyth.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,11 +40,10 @@ public class EspecimeController {
 	}
 
 	@GetMapping("/importar-automatico")
-public String importarAutomatico() {
-   perenualService.importarPlantasIndoor(1);
-    return "Importação automática da página 1 concluída!";
+public String importarAutomatico(@RequestParam int pagina) {
+   perenualService.importarPlantasIndoor(pagina);
+    return "Importação automática da página concluída!";
 }
-
 
 	@GetMapping("/indoor")
 	public List<Especime> listarIndoor(@RequestParam(defaultValue = "1") int page) {
@@ -61,17 +61,5 @@ public String importarAutomatico() {
 		return "Especime Deletado com Sucesso!!!";
 	}
 
-	@PostMapping
-	public Especime inserir(@RequestBody Especime especime){
-		return especimeService.salvar(especime);
-	}
-
-     @GetMapping("/especimes/{id}")
- public List<Plantio> buscarPorEspecime(
-        @PathVariable Integer id
-) {
-
-    return plantioService.buscarPorEspecimeId(id);
-}
     
 }

@@ -9,6 +9,7 @@ import org.springframework.cglib.core.Local;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +42,7 @@ public class Plantio {
             pattern = "dd/MM/yyyy"
     )
     @Column(name = "data_que_foi_plantado")
-    private LocalDate data_que_foi_Plantado;
+    private String data_que_foi_Plantado;
    
     @Column(name = "foi_regado_hoje")
     private Boolean foiRegadoHoje;
@@ -49,9 +50,11 @@ public class Plantio {
     @Column(name = "horario_ate_irrigar")
     private Date horarioAteIrrigar;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "previsao_proxima_irrigacao")
     private Date previsaoProximaIrrigacao;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "previsao_proxima_poda")
     private Date previsaoProximaPoda;
 
@@ -75,8 +78,10 @@ public class Plantio {
     @JsonIgnore
     private Usuario usuario;
 
-    @Column(name = "fk_especime_id")
-    private Integer especimeId;
+   
+@JsonProperty("especimeId") 
+@Column(name = "fk_especime_id")
+private Integer especimeId;
 
     @ManyToOne
     @JoinColumn(name = "fk_especime_id", insertable = false, updatable = false)
