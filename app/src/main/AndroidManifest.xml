@@ -16,10 +16,13 @@
         android:theme="@style/Theme.PlantFyth"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".TelaCadastroPlanta"
+            android:name=".TelaInformacoesPlanta"
             android:exported="false" />
         <activity
-            android:name=".EditPlantActivity"
+            android:name=".TelaEditarPlanta"
+            android:exported="false" />
+        <activity
+            android:name=".TelaCadastroPlanta"
             android:exported="false" />
         <!--
          <activity
@@ -33,9 +36,9 @@
             android:theme="@style/Theme.App.NoActionBar" />
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
             android:exported="false"
-            android:theme="@style/Theme.App.NoActionBar" />
+            android:theme="@style/Theme.App.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".TelaDeLogin"
             android:exported="true"

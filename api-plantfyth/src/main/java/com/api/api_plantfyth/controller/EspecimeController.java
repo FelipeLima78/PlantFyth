@@ -60,6 +60,9 @@ public String importarAutomatico(@RequestParam int pagina) {
 		especimeService.deletar(id);
 		return "Especime Deletado com Sucesso!!!";
 	}
-
+	@GetMapping("/id/{id}")
+public Especime buscarPorId(@PathVariable Integer id) {
+    return especimeRepository.findById(id).orElse(null);
+}
     
 }

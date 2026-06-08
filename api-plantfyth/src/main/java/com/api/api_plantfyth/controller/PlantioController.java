@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.service.annotation.GetExchange;
 
 import com.api.api_plantfyth.model.Especime;
 import com.api.api_plantfyth.model.Plantio;
@@ -95,8 +96,6 @@ public ResponseEntity<?> inserir(@RequestBody Plantio plantio) {
     if (especime == null) {
         return ResponseEntity.notFound().build();
     }
-
-    // achou no banco mas está incompleto
     if (especime.getDescricao() == null) {
         Especime completo = perenualService.buscarDetalhe(especime.getPerenualId());
         if (completo != null) {
@@ -127,9 +126,7 @@ public ResponseEntity<?> inserir(@RequestBody Plantio plantio) {
 		return plantioService.savePlantio(plantioAtualizar);
 	}
 	@GetMapping("/usuario/{id}")
-	public ResponseEntity<List<Plantio>> buscarPlantiosUsuario(@PathVariable Integer id) {
-		return ResponseEntity.ok(plantioService.buscarPorUsuarioId(id));
-	}
-
- 
+public List<Plantio> buscarPlantiosUsuario(@PathVariable Integer id) {
+    return plantioService.buscarPorUsuarioId(id);
+}		
 }
