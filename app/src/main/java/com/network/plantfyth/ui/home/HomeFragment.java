@@ -1,17 +1,25 @@
 package com.network.plantfyth.ui.home;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -19,6 +27,7 @@ import com.network.plantfyth.TelaCadastroPlanta;
 import com.network.plantfyth.databinding.FragmentHomeBinding;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
+import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
@@ -44,6 +53,26 @@ public class HomeFragment extends Fragment {
     private PlantFythAPI api;
     private PlantioHomeAdapter adapter;
     private final List<PlantioHomeItem> itens = new ArrayList<>();
+    private final List<Plantio> ultimasPlantasCarregadas = new ArrayList<>();
+    private ActivityResultLauncher<String> notificationPermissionLauncher;
+    private boolean notificarDepoisDaPermissao = false;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        notificationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                permitido -> {
+                    if (permitido && notificarDepoisDaPermissao && isAdded()) {
+                        PlantNotificationScheduler.notifyDuePlants(
+                                requireContext(),
+                                ultimasPlantasCarregadas
+                        );
+                    }
+                    notificarDepoisDaPermissao = false;
+                }
+        );
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -117,6 +146,7 @@ public class HomeFragment extends Fragment {
         adapter.notifyDataSetChanged();
         mostrarEstadoVazio(itens.isEmpty());
         atualizarAviso();
+        verificarNotificacoesDaHome(plantas);
     }
 
     private PlantioHomeItem criarItem(Plantio plantio) {
@@ -219,6 +249,7 @@ public class HomeFragment extends Fragment {
                     preservarDataNaoRetornada(atualizado, tipoAcao, proximaData);
 
                     itemAtual.plantio = atualizado;
+                    PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), atualizado);
                     recalcularStatus(itemAtual);
                     adapter.notifyItemChanged(posicao);
                     atualizarAviso();
@@ -435,6 +466,29 @@ public class HomeFragment extends Fragment {
             binding.cardAvisos.setVisibility(View.GONE);
         }
     }
+
+    private void verificarNotificacoesDaHome(List<Plantio> plantas) {
+        if (!isAdded()) return;
+
+        ultimasPlantasCarregadas.clear();
+        ultimasPlantasCarregadas.addAll(plantas);
+
+        PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), plantas);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED) {
+            notificarDepoisDaPermissao = true;
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            return;
+        }
+
+        notificarDepoisDaPermissao = false;
+        PlantNotificationScheduler.notifyDuePlants(requireContext(), plantas);
+    }
+
     private Date parseDataPlantio(String dataTexto) {
         if (dataTexto == null || dataTexto.trim().isEmpty()) return null;
 

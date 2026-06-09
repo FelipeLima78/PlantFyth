@@ -23,6 +23,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.model.Usuario;
+import com.network.plantfyth.notifications.NotificationPermissionHelper;
+import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 import com.network.plantfyth.ui.dashboard.DashboardFragment;
@@ -178,6 +180,13 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                                     Toast.makeText(TelaCadastroPlanta.this,
                                             "Cadastro realizado!",
                                             Toast.LENGTH_SHORT).show();
+
+                                    NotificationPermissionHelper.requestIfNeeded(TelaCadastroPlanta.this);
+                                    PlantNotificationScheduler.refreshPlantCareAlarmsAndNotifyDue(
+                                            getApplicationContext(),
+                                            usuarioId,
+                                            true
+                                    );
 
                                     startActivity(new Intent(TelaCadastroPlanta.this,
                                             MainActivity.class));

@@ -16,6 +16,9 @@ import androidx.core.view.WindowInsetsCompat;
 import com.network.plantfyth.ui.dashboard.DashboardFragment;
 import com.network.plantfyth.ui.home.HomeFragment;
 import com.network.plantfyth.model.Usuario;
+import com.network.plantfyth.notifications.NotificationPermissionHelper;
+import com.network.plantfyth.notifications.PlantCareDailyWorker;
+import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
@@ -103,6 +106,13 @@ public class TelaDeLogin extends AppCompatActivity {
                             Usuario usuario = response.body();
                             Integer idUsuario = usuario.getId();
                             getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().putInt("usuario_id", idUsuario).apply();
+                            NotificationPermissionHelper.requestIfNeeded(TelaDeLogin.this);
+                            PlantCareDailyWorker.scheduleDailyChecks(TelaDeLogin.this, idUsuario);
+                            PlantNotificationScheduler.refreshPlantCareAlarmsAndNotifyDue(
+                                    getApplicationContext(),
+                                    idUsuario,
+                                    true
+                            );
                             Intent intent = new Intent(TelaDeLogin.this, MainActivity.class);
                             startActivity(intent);
                             finish();
