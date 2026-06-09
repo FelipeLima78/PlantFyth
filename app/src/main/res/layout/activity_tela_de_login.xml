@@ -18,8 +18,8 @@
             android:id="@+id/textView3"
             android:layout_width="198dp"
             android:layout_height="33dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="496dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="564dp"
             android:fontFamily="@font/amita"
             android:text="Não possui Cadastro?"
             android:textColor="#FFFFFF"
@@ -73,21 +73,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="170dp"
-            android:layout_height="39dp"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="556dp"
-            android:fontFamily="@font/amita"
-            android:text="Esqueceu a senha?"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <Button
             android:id="@+id/btnEntrarLogin"
             android:layout_width="302dp"
@@ -105,26 +90,12 @@
             android:id="@+id/btnCadastroLogin"
             android:layout_width="122dp"
             android:layout_height="42dp"
-            android:layout_marginStart="248dp"
-            android:layout_marginTop="496dp"
+            android:layout_marginStart="244dp"
+            android:layout_marginTop="564dp"
             android:backgroundTint="#8BC34A"
             android:fontFamily="@font/amita"
             android:onClick="irParaCadastro"
             android:text="Cadastrar"
-            android:textSize="12sp"
-            app:cornerRadius="100px"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btnEsqueciASenhaLogin"
-            android:layout_width="149dp"
-            android:layout_height="45dp"
-            android:layout_marginStart="221dp"
-            android:layout_marginTop="554dp"
-            android:backgroundTint="#8BC34A"
-            android:fontFamily="@font/amita"
-            android:text="Esqueci a senha"
             android:textSize="12sp"
             app:cornerRadius="100px"
             app:layout_constraintStart_toStartOf="parent"
