@@ -115,7 +115,6 @@ public ResponseEntity<?> inserir(@RequestBody Plantio plantio) {
 		plantioAtualizar.setNome(plantio.getNome());
         plantioAtualizar.setData_que_foi_Plantado(plantio.getData_que_foi_Plantado());
         plantioAtualizar.setFoiRegadoHoje(plantio.getFoiRegadoHoje());
-        plantioAtualizar.setHorarioAteIrrigar(plantio.getHorarioAteIrrigar());
         plantioAtualizar.setPrevisaoProximaIrrigacao(plantio.getPrevisaoProximaIrrigacao());
         plantioAtualizar.setPrevisaoProximaPoda(plantio.getPrevisaoProximaPoda());
         plantioAtualizar.setTamanhoAtualCM(plantio.getTamanhoAtualCM());

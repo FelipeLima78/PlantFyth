@@ -47,8 +47,6 @@ public class Plantio {
     @Column(name = "foi_regado_hoje")
     private Boolean foiRegadoHoje;
 
-    @Column(name = "horario_ate_irrigar")
-    private Date horarioAteIrrigar;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "previsao_proxima_irrigacao")

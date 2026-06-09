@@ -11,12 +11,11 @@ public class Plantio {
     public Plantio() {
     }
 
-    public Plantio(Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, Date horario_ate_irrigar, String previsao_proxima_irrigacao,  String previsao_proxima_poda, float tamanho_atual_cm, float previsaoTamanho, String plantada_como, String imagem_personalizada) {
+    public Plantio(Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, String previsao_proxima_irrigacao,  String previsao_proxima_poda, float tamanho_atual_cm, float previsaoTamanho, String plantada_como, String imagem_personalizada) {
         this.id = id;
         this.nome = nome;
         this.data_que_foi_plantado = data_que_foi_plantado;
         this.foi_regado_hoje = foi_regado_hoje;
-        this.horario_ate_irrigar = horario_ate_irrigar;
         this.previsao_proxima_irrigacao = previsao_proxima_irrigacao;
         this.previsao_proxima_poda = previsao_proxima_poda;
         this.tamanho_atual_cm = tamanho_atual_cm;
@@ -60,9 +59,6 @@ public class Plantio {
     private boolean foi_regado_hoje;
 
 
-    //datas importantes
-    @SerializedName("horarioAteIrrigar")
-    private Date horario_ate_irrigar;
     //previsoes automaticas
     @SerializedName("previsaoProximaIrrigacao")
     private String previsao_proxima_irrigacao;
@@ -109,15 +105,6 @@ public class Plantio {
 
     public void setFoi_regado_hoje(boolean foi_regado_hoje) {
         this.foi_regado_hoje = foi_regado_hoje;
-    }
-
-
-    public Date getHorarioAreIrrigar() {
-        return horario_ate_irrigar;
-    }
-
-    public void setHorarioAreIrrigar(Date horario_ate_irrigar) {
-        this.horario_ate_irrigar = horario_ate_irrigar;
     }
 
     public String getPrevisaoProximaIrrigacao() {

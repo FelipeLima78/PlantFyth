@@ -35,8 +35,7 @@ public class Usuario {
 
     @Column(name = "hash_senha")
       private String hash_senha;
-    
-    private String foto_perfil;
+
     private LocalDateTime data_criacao;
     private LocalDateTime ultimo_login;
 

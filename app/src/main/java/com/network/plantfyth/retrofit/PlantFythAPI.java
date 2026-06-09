@@ -33,15 +33,14 @@ public interface PlantFythAPI {
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
     @PUT("plantios/id/{id}")
-    Call<Plantio> atualizarPlantio(@Body Plantio plantio, @Path("id") Integer id);
+    Call<Plantio> atualizarPlanta (@Path("id") Integer id, @Body Plantio plantio);
     @GET("plantios/usuario/{id}") Call<List<Plantio>>
     buscarPlantasUsuario (@Path("id") Integer usuarioId);
     @DELETE("plantios/{id}")
     Call<Void> deletarPlantio (@Path("id") Integer plantioId);
     @GET("plantios/id/{id}")
     Call<Plantio> buscarPlantaPorId (@Path("id") Integer plantioId);
-    @PUT("plantios/id/{id}")
-    Call<Plantio> atualizarPlanta (@Path("id") Integer id, @Body Plantio plantio);
+
 
     //especimes
     @GET("especimes/indoor/{perenualId}")
@@ -53,11 +52,12 @@ public interface PlantFythAPI {
     //usuario
     @POST("usuarios/login")
     Call<ResponseBody> LoginUsuario(@Body Usuario request);
-
     @GET("usuarios/email/{email}")
     Call<Usuario> buscarUsuarioPorEmail(@Path("email") String email);
     @POST("usuarios/inserir")
     Call<Usuario> saveUsuario(@Body Usuario usuario);
+    @PUT("usuarios/id/{id}")
+    Call<Usuario> atualizarUsuario ( @Body Usuario usuario, @Path("id") Integer id);
 
     @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
