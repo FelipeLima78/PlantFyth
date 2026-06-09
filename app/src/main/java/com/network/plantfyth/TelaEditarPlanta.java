@@ -1,5 +1,6 @@
 package com.network.plantfyth;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -60,6 +62,20 @@ public class TelaEditarPlanta extends AppCompatActivity {
         int plantioId = getIntent().getIntExtra("plantio_id", -1);
         PegarDados(plantioId);
     }
+    public void AbrirCalendario(View view){
+        Calendar calendario = Calendar.getInstance();
+        int ano = calendario.get(Calendar.YEAR);
+        int mes = calendario.get(Calendar.MONTH);
+        int dia = calendario.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(this,(v, anoSelecionado, mesSelecionado, diaSelecionado)-> {
+            String data = String.format("%02d/%02d/%04d", diaSelecionado, mesSelecionado + 1, anoSelecionado);
+            edtDataPlantioEditar.setText(data);
+        }, ano, mes, dia);
+
+        dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        dialog.show();
+    }
 
     public void PegarDados(int id){
         Ap.buscarPlantaPorId(id).enqueue(new Callback<Plantio>() {
@@ -68,7 +84,7 @@ public class TelaEditarPlanta extends AppCompatActivity {
                 Plantio plantio = response.body();
                 edtNomePlantaEditar.setText(plantio.getNome());
                 String data = plantio.getDataQueFoiPlantado();
-                edtDataPlantioEditar.setText(data.replace("/",""));
+                edtDataPlantioEditar.setText(data);
                 edtTamanhoAtualEditar.setText(String.valueOf(plantio.getTamanhoAtualCM()));
 
                 if (plantio.getPlantadaComo() != null){
@@ -98,17 +114,14 @@ public class TelaEditarPlanta extends AppCompatActivity {
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(edtDataPlantioEditar.getText().toString().length() != 8){Toast.makeText(this, "Digite 8 números na data", Toast.LENGTH_SHORT).show();
-            return;
-        }
         String data = edtDataPlantioEditar.getText().toString();
-        String dataFormatada = data.substring(0, 2) + "/" + data.substring(2, 4) + "/" + data.substring(4, 8);
+        String dataformatada = data;
 
         int plantioId = getIntent().getIntExtra("plantio_id", -1);
 
         Plantio plantio = new Plantio();
         plantio.setNome(edtNomePlantaEditar.getText().toString());
-        plantio.setDataQueFoiPlantado(data);
+        plantio.setDataQueFoiPlantado(dataformatada);
         if (edtTamanhoAtualEditar.getText().toString() != null){
         plantio.setTamanhoAtualCM(Float.parseFloat(edtTamanhoAtualEditar.getText().toString()));
         }

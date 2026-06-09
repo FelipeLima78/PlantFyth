@@ -1,7 +1,9 @@
 package com.network.plantfyth;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -77,6 +79,20 @@ public class TelaCadastroPlanta extends AppCompatActivity {
         carregarEspecimes();
     }
 
+    public void AbrirCalendario(View view){
+        Calendar calendario = Calendar.getInstance();
+        int ano = calendario.get(Calendar.YEAR);
+        int mes = calendario.get(Calendar.MONTH);
+        int dia = calendario.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(this,(v, anoSelecionado, mesSelecionado, diaSelecionado)-> {
+                String data = String.format("%02d/%02d/%04d", diaSelecionado, mesSelecionado + 1, anoSelecionado);
+                edtDataPlantio.setText(data);
+    }, ano, mes, dia);
+
+        dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+    dialog.show();
+    }
 
 
     // a execução do especime deve ser feita antes da do save, lembra dissso
@@ -87,19 +103,15 @@ public class TelaCadastroPlanta extends AppCompatActivity {
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(data.length() != 8){Toast.makeText(this, "Digite 8 números na data", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        //chama ap de buscar detalhes
-        Log.d("DEBUG", "perenual_id: " + especimeSelecionado.getPerenual_id());
+
         Ap.buscarDetalhes(especimeSelecionado.getPerenual_id()).enqueue(new Callback<Especime>() {
             @Override
             public void onResponse(Call<Especime> call, Response<Especime> response) {
                 Especime especime = response.body();
                 Plantio plantio = new Plantio();
-                plantio.setNome(String.valueOf(edtNomePlanta.getText()));
-                String dataFormatada = data.substring(0, 2) + "/" + data.substring(2, 4) + "/" + data.substring(4, 8);
-                plantio.setDataQueFoiPlantado(dataFormatada);
+                plantio.setNome(edtNomePlanta.getText().toString());
+                plantio.setDataQueFoiPlantado(edtDataPlantio.getText().toString());
+
                 //tratamento do float
                 String textoTamanho = edtTamanhoAtual.getText().toString().trim();
                 float tamanho = 0;
@@ -188,8 +200,7 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                                             true
                                     );
 
-                                    startActivity(new Intent(TelaCadastroPlanta.this,
-                                            MainActivity.class));
+                                    finish();
 
                                 } else {
 

@@ -21,6 +21,9 @@ import com.network.plantfyth.model.Usuario;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,6 +64,9 @@ public class TelaCadastro extends AppCompatActivity {
         usuario.setNome(nome);
         usuario.setEmail(email);
         usuario.setHashSenha(senha);
+        Calendar DataCriacao = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        usuario.setDataCriacao(sdf.format(DataCriacao.getTime()));
         String Confirmacao = String.valueOf(edtConfirmeSenha.getText());
         if (email.isEmpty() || senha.isEmpty() || nome.isEmpty() || Confirmacao.isEmpty()) {
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();

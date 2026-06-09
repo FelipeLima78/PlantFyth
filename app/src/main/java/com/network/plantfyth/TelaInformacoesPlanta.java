@@ -114,7 +114,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                 if (previsaoStr != null) {
                     try {
                         SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                        SimpleDateFormat sdfExibir = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                        SimpleDateFormat sdfExibir = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                         Date previsao = sdfParse.parse(previsaoPoda);
                         txtProximaPoda.setText(sdfExibir.format(previsao));
                     } catch (ParseException e) {
@@ -133,9 +133,9 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                         txtCiclo.setText(especime.getCiclo()!= null ? especime.getCiclo() : "-");
                         txtCrescimento.setText(especime.getCiclo()!= null ? especime.getCrescimento() : "-");
                         float adulto = especime.getTamanho_adulto_cm() != null ? especime.getTamanho_adulto_cm() : 0;
-                        txtTamanhoAdulto.setText(adulto != 0 ? adulto + " cm" : "-");
+                        txtTamanhoAdulto.setText(adulto != -1 ? adulto + " cm" : "-");
                         float muda = especime.getTamanho_muda_cm() != null ? especime.getTamanho_muda_cm() : 0;
-                        txtTamanhoMuda.setText(muda != 0 ? muda + " cm" : "-");
+                        txtTamanhoMuda.setText(muda != -1 ? muda + " cm" : "-");
                         txtExposicaoLuz.setText(especime.getExposicao_A_Luz()!= null ? especime.getExposicao_A_Luz() : "-");
                         txtPeriodoIrrigacao.setText(especime.getPeriodo_irrigacao()!= null ? especime.getPeriodo_irrigacao() : "-");
                         txtUnidadeIrrigacao.setText(especime.getUnidade_irrigacao()!= null ? especime.getUnidade_irrigacao(): "-");
