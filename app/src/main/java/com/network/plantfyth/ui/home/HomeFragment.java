@@ -236,7 +236,7 @@ public class HomeFragment extends Fragment {
     ) {
         Plantio plantioLocal = item.plantio;
 
-        api.atualizarPlantio(plantioLocal, plantioLocal.getId()).enqueue(new Callback<Plantio>() {
+        api.atualizarPlanta(plantioLocal.getId(), plantioLocal).enqueue(new Callback<Plantio>() {
             @Override
             public void onResponse(@NonNull Call<Plantio> call, @NonNull Response<Plantio> response) {
                 if (!isAdded() || binding == null || posicao >= itens.size()) return;
