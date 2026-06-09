@@ -3,6 +3,7 @@ package com.api.api_plantfyth.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.api.api_plantfyth.model.Usuario;
@@ -13,6 +14,8 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+	private PasswordEncoder passwordEncoder;
 
     public List<Usuario> findAll() {
         return usuarioRepository.findAll();
@@ -27,6 +30,8 @@ public class UsuarioService {
     }
 
     public Usuario saveUsuario(Usuario usuario) {
+        String hash = passwordEncoder.encode(usuario.getHash_senha());
+   		usuario.setHash_senha(hash);
         return usuarioRepository.save(usuario);
     }
 

@@ -22,6 +22,10 @@ import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,7 +35,7 @@ import retrofit2.Response;
 public class TelaDeLogin extends AppCompatActivity {
 
     private EditText edtUsuario, edtSenha;
-    private Button btnEntrarLogin, btnCadastroLogin, btnEsqueciASenhaLogin;
+    private Button btnEntrarLogin, btnCadastroLogin;
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
 
@@ -50,7 +54,6 @@ public class TelaDeLogin extends AppCompatActivity {
         edtSenha = findViewById(R.id.edtSenha);
         btnEntrarLogin = findViewById(R.id.btnEntrarLogin);
         btnCadastroLogin = findViewById(R.id.btnCadastroLogin);
-        btnEsqueciASenhaLogin = findViewById(R.id.btnEsqueciASenhaLogin);
     }
     public void irParaCadastro(View view){
         Intent intent = new Intent(TelaDeLogin.this, TelaCadastro.class);
@@ -105,6 +108,8 @@ public class TelaDeLogin extends AppCompatActivity {
                         if(response.isSuccessful() && response.body() != null){
                             Usuario usuario = response.body();
                             Integer idUsuario = usuario.getId();
+                            String EmailUsuario= usuario.getEmail();
+                            getSharedPreferences("USER_EMAIL", MODE_PRIVATE).edit().putString("usuario_email", EmailUsuario).apply();
                             getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().putInt("usuario_id", idUsuario).apply();
                             NotificationPermissionHelper.requestIfNeeded(TelaDeLogin.this);
                             PlantCareDailyWorker.scheduleDailyChecks(TelaDeLogin.this, idUsuario);

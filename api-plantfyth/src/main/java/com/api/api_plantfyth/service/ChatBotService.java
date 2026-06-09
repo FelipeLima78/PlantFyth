@@ -68,7 +68,9 @@ public class ChatBotService {
                 faça um diagnóstico com base nos dados da API e sugira soluções.
                 
                 Se o usuário estiver buscando informações sobre uma planta,
-                traduza e apresente os dados de forma organizada.
+                traduza e apresente os dados de forma organizada e clara.
+                Não digite link de imagem.
+
                 
                 Pergunta do usuário: "%s"
                 Dados da API: %s

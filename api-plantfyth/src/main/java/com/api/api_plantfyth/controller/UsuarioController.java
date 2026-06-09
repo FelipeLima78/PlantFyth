@@ -1,6 +1,7 @@
 package com.api.api_plantfyth.controller;
 
-import java.time.LocalDateTime;
+import java.util.Date;
+import java.time.LocalDateTime;	
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,21 +63,16 @@ public class UsuarioController{
 	@PostMapping("/inserir")
 	public Usuario inserir(@RequestBody Usuario usuario){
 
-		String hash = passwordEncoder.encode(usuario.getHash_senha());
-
-   		 usuario.setHash_senha(hash);
-
 		return usuarioService.saveUsuario(usuario);
 	}
 
 	@PutMapping("/id/{id}")
 	public Usuario atualizar(@RequestBody Usuario usuario, @PathVariable Integer id){
 		Usuario usuarioAtualizar = usuarioService.buscarPorId(id);
-        usuarioAtualizar.setId(usuario.getId());
+        usuarioAtualizar.setId(id);
         usuarioAtualizar.setNome(usuario.getNome());
         usuarioAtualizar.setEmail(usuario.getEmail());
         usuarioAtualizar.setHash_senha(usuario.getHash_senha());
-        usuarioAtualizar.setFoto_perfil(usuario.getFoto_perfil());
 		return usuarioService.saveUsuario(usuarioAtualizar);
 	}
 
@@ -105,6 +101,8 @@ public class UsuarioController{
     if (!senhaOk) {
         return ResponseEntity.status(401).body("Senha inválida");
     }
+	dbUser.setUltimo_login(LocalDateTime.now());
+    usuarioRepository.save(dbUser);
 
     return ResponseEntity.ok("Login OK");
 } 
