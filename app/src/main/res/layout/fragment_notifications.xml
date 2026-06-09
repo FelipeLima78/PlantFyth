@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
+    android:background="#F4F6F3"
     android:fillViewport="true">
 
     <LinearLayout
@@ -14,19 +15,21 @@
 
         <!-- FOTO DO PERFIL -->
         <ImageView
-            android:id="@+id/imgPerfil"
+            android:id="@+id/imgLogo"
             android:layout_width="120dp"
             android:layout_height="120dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/circle_background"
             android:padding="10dp"
-            android:layout_marginTop="10dp" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo" />
 
         <!-- NOME DO USUÁRIO -->
         <TextView
             android:id="@+id/txtNomeUsuario"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="João Silva"
+            android:text=""
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginTop="12dp"/>
@@ -36,7 +39,7 @@
             android:id="@+id/txtEmailUsuario"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="joao.silva@example.com"
+            android:text=""
             android:textSize="16sp"
             android:layout_marginTop="4dp"
             android:textColor="#555555" />
@@ -56,50 +59,61 @@
                 android:orientation="vertical">
 
                 <TextView
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Informações da Conta"
                     android:textStyle="bold"
                     android:textSize="18sp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"/>
 
                 <TextView
+                    android:id="@+id/txtUltimoLogin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nome: João Silva"
+                    android:text=""
+                    android:layout_marginLeft="10dp"
                     android:layout_marginBottom="6dp"/>
 
                 <TextView
+                    android:id="@+id/txtDataConta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email: joao.silva@example.com"
-                    android:layout_marginBottom="6dp"/>
+                    android:text=""
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Conta criada em: 22/03/2026" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Botão para editar -->
-        <Button
-            android:id="@+id/btnEditar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Editar Informações"
-            android:layout_marginTop="20dp"/>
 
-        <!-- Botão trocar conta -->
         <Button
-            android:id="@+id/btnTrocarConta"
+            android:id="@+id/btnEditarUsuario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Trocar de Conta"
+            android:text="Editar usuário"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#4CAF50"
+           android:textColor="#FFFFFF" />
+        <Button
+            android:id="@+id/btnSairConta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Sair da conta"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF" />
+        <Button
+            android:id="@+id/btnExcluirConta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:backgroundTint="#B30000"
-            android:textColor="#FFFFFF"/>
+            android:text="Excluir a conta"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 </ScrollView>

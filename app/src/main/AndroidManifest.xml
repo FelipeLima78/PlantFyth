@@ -19,6 +19,9 @@
         android:theme="@style/Theme.PlantFyth"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".TelaEditarUsuario"
+            android:exported="false" />
+        <activity
             android:name=".TelaInformacoesPlanta"
             android:exported="false" />
         <activity
@@ -57,7 +60,6 @@
         <receiver
             android:name=".notifications.PlantCareAlarmReceiver"
             android:exported="false" />
-
         <receiver
             android:name=".notifications.PlantCareBootReceiver"
             android:exported="true">

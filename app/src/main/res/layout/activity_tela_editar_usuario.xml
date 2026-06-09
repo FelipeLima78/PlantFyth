@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6F3">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editar Usuário"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="#1B5E20"
+            android:layout_marginBottom="20dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- NOME -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nome"
+                    android:textStyle="bold"/>
+
+                <EditText
+                    android:id="@+id/edtNomeUsuarioEditar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ex: João Silva"
+                    android:inputType="textPersonName"/>
+
+                <!-- EMAIL -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"/>
+
+                <EditText
+                    android:id="@+id/edtEmailUsuarioEditar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ex: email@gmail.com"
+                    android:inputType="textEmailAddress"/>
+
+                <!-- SENHA -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Senha"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"/>
+
+                <EditText
+                    android:id="@+id/edtSenhaUsuarioEditar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nova senha"
+                    android:inputType="textPassword"/>
+
+                <EditText
+                    android:id="@+id/edtConfirmeSenhaEditar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Confirme a senha"
+                    android:inputType="textPassword"/>
+
+
+                <Button
+                    android:id="@+id/btnSalvarUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="#2E7D32"
+                    android:onClick="SalvarEdicao"
+                    android:text="Salvar Alterações"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+
+                <Button
+                    android:id="@+id/btnCancelarUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#757575"
+                    android:onClick="CancelarEdicaoUsuario"
+                    android:text="Cancelar"
+                    android:textColor="#FFFFFF"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>
