@@ -65,22 +65,6 @@ public class Especime {
         this.tamanho_adulto_cm = tamanho_adulto_cm;
     }
 
-    public Float getTamanho_muda_cm() {
-        return tamanho_muda_cm;
-    }
-
-    public void setTamanho_muda_cm(Float tamanho_muda_cm) {
-        this.tamanho_muda_cm = tamanho_muda_cm;
-    }
-
-    public String getCaminho_imagem_padrao() {
-        return caminho_imagem_padrao;
-    }
-
-    public void setCaminho_imagem_padrao(String caminho_imagem_padrao) {
-        this.caminho_imagem_padrao = caminho_imagem_padrao;
-    }
-
     public String getFamilia() {
         return familia;
     }
@@ -89,13 +73,6 @@ public class Especime {
         this.familia = familia;
     }
 
-    public Float getCrescimento_diario() {
-        return crescimento_diario;
-    }
-
-    public void setCrescimento_diario(Float crescimento_diario) {
-        this.crescimento_diario = crescimento_diario;
-    }
 
     public String getCiclo() {
         return ciclo;
@@ -177,17 +154,8 @@ public class Especime {
     @SerializedName("tamanhoAdultoCM")
     private Float tamanho_adulto_cm;
 
-    @SerializedName("tamanhoMudaCM")
-    private Float tamanho_muda_cm;
-
-    @SerializedName("caminhoImagemPadrao")
-    private String caminho_imagem_padrao;
-
     @SerializedName("familia")
     private String familia;
-
-    @SerializedName("crescimentoDiario")
-    private Float crescimento_diario;
 
     @SerializedName("ciclo")
     private String ciclo;

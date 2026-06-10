@@ -42,18 +42,9 @@ private String unidadeIrrigacao;
     @Column(name = "tamanho_adulto_cm")
     private Float tamanhoAdultoCM;
 
-    @Column(name = "tamanho_muda_cm")
-    private Float tamanhoMudaCM;
-
-    @Column(name = "caminho_imagem_padrao")
-    private String caminhoImagemPadrao;
-
     @Column(name = "familia")
     @JsonProperty("familia")
     private String familia;
-
-    @Column(name = "crescimento_diario")
-    private Float crescimentoDiario;
 
     @Column(name = "ciclo")
     @JsonProperty("ciclo")

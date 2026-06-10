@@ -1,6 +1,8 @@
 package com.network.plantfyth;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,8 +28,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TelaInformacoesPlanta extends AppCompatActivity {
-    private TextView txtNomePlanta, txtFoiRegado, txtDataPlantio, txtPlantadaComo, txtTamanhoAtual, txtPrevisaoTamanho, txtProximaIrrigacao, txtHorarioIrrigar, txtProximaPoda, txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,  txtTamanhoAdulto, txtTamanhoMuda, txtExposicaoLuz, txtPeriodoIrrigacao, txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao;
+    private TextView txtNomePlanta, txtFoiRegado, txtDataPlantio, txtPlantadaComo, txtTamanhoAtual, txtPrevisaoTamanho, txtProximaIrrigacao, txtHorarioIrrigar, txtProximaPoda, txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,  txtTamanhoAdulto,  txtExposicaoLuz, txtPeriodoIrrigacao, txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao;
     RetroFitService retroFitService = new RetroFitService();
+    private Button btnSairInformacao;
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +57,12 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
         txtCiclo = findViewById(R.id.txtCiclo);
         txtCrescimento = findViewById(R.id.txtCrescimento);
         txtTamanhoAdulto = findViewById(R.id.txtTamanhoAdulto);
-        txtTamanhoMuda = findViewById(R.id.txtTamanhoMuda);
         txtExposicaoLuz = findViewById(R.id.txtExposicaoLuz);
         txtPeriodoIrrigacao = findViewById(R.id.txtPeriodoIrrigacao);
         txtUnidadeIrrigacao = findViewById(R.id.txtUnidadeIrrigacao);
         txtPeriodoPoda = findViewById(R.id.txtPeriodoPoda);
         txtDescricao = findViewById(R.id.txtDescricao);
+        btnSairInformacao = findViewById(R.id.btnSairInformacao);
         PuxarDados();
     }
 
@@ -111,7 +114,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                     }
                 }
                 String previsaoPoda = plantio.getPrevisaoProximaPoda();
-                if (previsaoStr != null) {
+                if (previsaoPoda != null) {
                     try {
                         SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
                         SimpleDateFormat sdfExibir = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -121,6 +124,19 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                         txtProximaPoda.setText("—");
                     }
                 }
+                //por conta do delay
+                Toast.makeText(TelaInformacoesPlanta.this, "Buscando dados...",Toast.LENGTH_SHORT).show();
+                txtNomePopular.setText("Buscando dados...");
+                txtNomeCientifico.setText("Buscando dados...");
+                txtFamilia.setText("Buscando dados...");
+                txtCiclo.setText("Buscando dados...");
+                txtCrescimento.setText("Buscando dados...");
+                txtTamanhoAdulto.setText("Buscando dados...");
+                txtExposicaoLuz.setText("Buscando dados...");
+                txtPeriodoIrrigacao.setText("Buscando dados...");
+                txtUnidadeIrrigacao.setText("Buscando dados...");
+                txtPeriodoPoda.setText("Buscando dados...");
+                txtDescricao.setText("Buscando dados...");
                 Ap.buscarEspecimePorId(plantio.getEspecimeId()).enqueue(new Callback<Especime>() {
                     @Override
                     public void onResponse(Call<Especime> call, Response<Especime> response) {
@@ -133,9 +149,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                         txtCiclo.setText(especime.getCiclo()!= null ? especime.getCiclo() : "-");
                         txtCrescimento.setText(especime.getCiclo()!= null ? especime.getCrescimento() : "-");
                         float adulto = especime.getTamanho_adulto_cm() != null ? especime.getTamanho_adulto_cm() : 0;
-                        txtTamanhoAdulto.setText(adulto != -1 ? adulto + " cm" : "-");
-                        float muda = especime.getTamanho_muda_cm() != null ? especime.getTamanho_muda_cm() : 0;
-                        txtTamanhoMuda.setText(muda != -1 ? muda + " cm" : "-");
+                        txtTamanhoAdulto.setText(adulto != 0 ? adulto + " cm" : "-");
                         txtExposicaoLuz.setText(especime.getExposicao_A_Luz()!= null ? especime.getExposicao_A_Luz() : "-");
                         txtPeriodoIrrigacao.setText(especime.getPeriodo_irrigacao()!= null ? especime.getPeriodo_irrigacao() : "-");
                         txtUnidadeIrrigacao.setText(especime.getUnidade_irrigacao()!= null ? especime.getUnidade_irrigacao(): "-");
@@ -156,4 +170,9 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
         });
 
     }
+
+    public void SairInformacao(View view){
+        finish();
+    }
+
 }

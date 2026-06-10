@@ -65,9 +65,6 @@ public class Plantio {
     @Column(name = "plantada_como")
     private String plantadaComo;
 
-    @Column(name = "imagem_personalizada")
-    private String imagemPersonalizada;
-
     @Column(name = "fk_usuario_id")
     private Integer usuarioId;
     

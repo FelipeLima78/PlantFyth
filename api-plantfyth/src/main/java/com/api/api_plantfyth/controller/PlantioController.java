@@ -120,7 +120,6 @@ public ResponseEntity<?> inserir(@RequestBody Plantio plantio) {
         plantioAtualizar.setTamanhoAtualCM(plantio.getTamanhoAtualCM());
         plantioAtualizar.setPrevisaoTamanhoCM(plantio.getPrevisaoTamanhoCM());
         plantioAtualizar.setPlantadaComo(plantio.getPlantadaComo());
-        plantioAtualizar.setImagemPersonalizada(plantio.getImagemPersonalizada());
 		plantioAtualizar.setEspecime(plantio.getEspecime());
 		return plantioService.savePlantio(plantioAtualizar);
 	}
