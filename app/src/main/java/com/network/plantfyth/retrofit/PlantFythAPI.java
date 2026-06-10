@@ -22,13 +22,10 @@ public interface PlantFythAPI {
     //Listas
     @GET("plantios")
     Call<List<Plantio>> listarPlantios();
-    @GET("especimes")
-    Call<List<Especime>> listarEspecimes();
-
 
     //plantios
 
-    @GET("api/plants/indoor")
+    @GET("especimes/indoor")
     Call<List<Especime>> listarIndoorPlants();
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);

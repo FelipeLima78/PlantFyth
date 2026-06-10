@@ -113,8 +113,8 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                 plantio.setDataQueFoiPlantado(edtDataPlantio.getText().toString());
 
                 //tratamento do float
-                String textoTamanho = edtTamanhoAtual.getText().toString().trim();
                 float tamanho = 0;
+                String textoTamanho = edtTamanhoAtual.getText().toString().trim();
                 if (!textoTamanho.isEmpty()) {
                     tamanho = Float.parseFloat(textoTamanho);
                 }
@@ -137,8 +137,9 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                 plantio.setFoi_regado_hoje(checkFoiRegadoHoje.isChecked());
 
 
-                // dados pegos do especime
                 // dados ja pegos ate agr: data que foi plantado, como foi plantado , foiregadohoje, setplantadacomo, setamanhoatualcm, setusuarioid, nome
+                if(especime.getTamanho_adulto_cm() != null){
+               plantio.setPrevisaoTamanho(especime.getTamanho_adulto_cm());}
                 if (especime.getPeriodo_irrigacao() != null && especime.getUnidade_irrigacao() != null) {
                     String valorLimpo = especime.getPeriodo_irrigacao()
                             .replaceAll("[^0-9\\-]", "")
@@ -173,7 +174,7 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                     String[] meses = especime.getPeriodo_poda().toLowerCase().split(", ");
                     try {
                         String dataStr = "01/" + meses[0] + "/" + Calendar.getInstance().get(Calendar.YEAR);
-                        SimpleDateFormat sdfParse = new SimpleDateFormat("dd/MMMM/yyyy", Locale.ENGLISH);
+                        SimpleDateFormat sdfParse = new SimpleDateFormat("dd/MMMM/yyyy",new Locale("pt", "BR"));
                         SimpleDateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
                         Date dataPoda = sdfParse.parse(dataStr);
                         plantio.setPrevisaoProximaPoda(sdfISO.format(dataPoda));
@@ -232,7 +233,7 @@ public class TelaCadastroPlanta extends AppCompatActivity {
     }
 
     private void carregarEspecimes() {
-        Ap.listarEspecimes().enqueue(new Callback<List<Especime>>() {
+        Ap.listarIndoorPlants().enqueue(new Callback<List<Especime>>() {
             @Override
             public void onResponse(Call<List<Especime>> call, Response<List<Especime>> response) {
                 if (response.isSuccessful() && response.body() != null) {

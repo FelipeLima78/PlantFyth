@@ -22,8 +22,12 @@ import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,7 +42,7 @@ public class TelaEditarPlanta extends AppCompatActivity {
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
     private String plantadoComoEditar;
-
+    private Plantio planta;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,14 +85,14 @@ public class TelaEditarPlanta extends AppCompatActivity {
         Ap.buscarPlantaPorId(id).enqueue(new Callback<Plantio>() {
             @Override
             public void onResponse(Call<Plantio> call, Response<Plantio> response) {
-                Plantio plantio = response.body();
-                edtNomePlantaEditar.setText(plantio.getNome());
-                String data = plantio.getDataQueFoiPlantado();
+                planta = response.body();
+                edtNomePlantaEditar.setText(planta.getNome());
+                String data = planta.getDataQueFoiPlantado();
                 edtDataPlantioEditar.setText(data);
-                edtTamanhoAtualEditar.setText(String.valueOf(plantio.getTamanhoAtualCM()));
+                edtTamanhoAtualEditar.setText(String.valueOf(planta.getTamanhoAtualCM()));
 
-                if (plantio.getPlantadaComo() != null){
-                String plantadocomo = plantio.getPlantadaComo();
+                if (planta.getPlantadaComo() != null){
+                String plantadocomo = planta.getPlantadaComo();
                 switch(plantadocomo){
                     case "Muda":
                         rbMudaEditar.setChecked(true);
@@ -117,37 +121,90 @@ public class TelaEditarPlanta extends AppCompatActivity {
         String data = edtDataPlantioEditar.getText().toString();
         String dataformatada = data;
 
-        int plantioId = getIntent().getIntExtra("plantio_id", -1);
 
-        Plantio plantio = new Plantio();
-        plantio.setNome(edtNomePlantaEditar.getText().toString());
-        plantio.setDataQueFoiPlantado(dataformatada);
+        planta.setNome(edtNomePlantaEditar.getText().toString());
+        planta.setDataQueFoiPlantado(dataformatada);
         if (edtTamanhoAtualEditar.getText().toString() != null){
-        plantio.setTamanhoAtualCM(Float.parseFloat(edtTamanhoAtualEditar.getText().toString()));
+        planta.setTamanhoAtualCM(Float.parseFloat(edtTamanhoAtualEditar.getText().toString()));
         }
         if (rbSementeEditar.isChecked()) {
-            plantio.setPlantadaComo(rbSementeEditar.getText().toString());
+            planta.setPlantadaComo(rbSementeEditar.getText().toString());
         }
         if (rbEstacaEditar.isChecked()) {
-            plantio.setPlantadaComo(rbEstacaEditar.getText().toString());
+            planta.setPlantadaComo(rbEstacaEditar.getText().toString());
         }
         if (rbMudaEditar.isChecked()) {
-            plantio.setPlantadaComo(rbMudaEditar.getText().toString());
+            planta.setPlantadaComo(rbMudaEditar.getText().toString());
         }
-        Ap.atualizarPlanta(plantioId, plantio).enqueue(new Callback<Plantio>() {
+        Ap.buscarDetalhes(planta.getEspecime().getPerenual_id()).enqueue(new Callback<Especime>() {
             @Override
-            public void onResponse(Call<Plantio> call, Response<Plantio> response) {
-              if(response.isSuccessful()){
-                  Toast.makeText(TelaEditarPlanta.this, "Plantio Atualizado!", Toast.LENGTH_SHORT).show();
-                  finish();
-            } else {
-                Toast.makeText(TelaEditarPlanta.this, "Erro: " + response.code(), Toast.LENGTH_SHORT).show();
-            }}
-            @Override
-            public void onFailure(Call<Plantio> call, Throwable throwable) {
-                Toast.makeText(TelaEditarPlanta.this, "Falha: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            public void onResponse(Call<Especime> call, Response<Especime> response) {
+                Especime especime = response.body();
+                if (especime.getPeriodo_irrigacao() != null && especime.getUnidade_irrigacao() != null) {
+                    String valorLimpo = especime.getPeriodo_irrigacao()
+                            .replaceAll("[^0-9\\-]", "")
+                            .trim();
+
+                    if (valorLimpo.isEmpty()) return;
+
+                    int valor = Integer.parseInt(valorLimpo.split("-")[0]);
+                    long horasIrrigacao;
+
+                    switch (especime.getUnidade_irrigacao().toLowerCase()) {
+                        case "days":
+                            horasIrrigacao = valor * 24;
+                            break;
+                        case "weeks":
+                            horasIrrigacao = valor * 24 * 7;
+                            break;
+                        case "months":
+                            horasIrrigacao = valor * 24 * 30;
+                            break;
+                        default:
+                            horasIrrigacao = 24;
+                            break;
+                    }
+
+                    Calendar proxIrrigacao = Calendar.getInstance();
+                    proxIrrigacao.add(Calendar.HOUR, (int) horasIrrigacao);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                    planta.setPrevisaoProximaIrrigacao(sdf.format(proxIrrigacao.getTime()));
+                }
+                if (especime.getPeriodo_poda() != null) {
+                    String[] meses = especime.getPeriodo_poda().toLowerCase().split(", ");
+                    try {
+                        int anoAtual = Calendar.getInstance().get(Calendar.YEAR);
+                        String dataStr = "01/" + meses[0] + "/" + anoAtual;
+                        SimpleDateFormat sdfParse = new SimpleDateFormat("dd/MMMM/yyyy",new Locale("pt", "BR"));
+                        SimpleDateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                        Date dataPoda = sdfParse.parse(dataStr);
+                        Calendar calendarioPoda = Calendar.getInstance();
+                        calendarioPoda.setTime(dataPoda);
+                        if (calendarioPoda.getTime().before(new Date())) {calendarioPoda.add(Calendar.YEAR, 1);}
+                        planta.setPrevisaoProximaPoda(sdfISO.format(calendarioPoda.getTime()));
+                    } catch (ParseException e) {
+                        planta.setPrevisaoProximaPoda(null);
+                    }}
+                Ap.atualizarPlanta(planta.getId(), planta).enqueue(new Callback<Plantio>() {
+                    @Override
+                    public void onResponse(Call<Plantio> call, Response<Plantio> response) {
+                        if(response.isSuccessful()){
+                            Toast.makeText(TelaEditarPlanta.this, "Plantio Atualizado!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(TelaEditarPlanta.this, "Erro: " + response.code(), Toast.LENGTH_SHORT).show();
+                        }}
+                    @Override
+                    public void onFailure(Call<Plantio> call, Throwable throwable) {
+                        Toast.makeText(TelaEditarPlanta.this, "Falha: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });}
+                    @Override
+                    public void onFailure(Call<Especime> call, Throwable throwable) {
+                        Toast.makeText(TelaEditarPlanta.this, "Falha: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
     }
     public void CancelarEdicao(View view){
         finish();
