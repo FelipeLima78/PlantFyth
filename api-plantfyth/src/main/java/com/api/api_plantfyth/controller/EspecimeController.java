@@ -39,12 +39,6 @@ public class EspecimeController {
 		return especimeService.listarTodos();
 	}
 
-	@GetMapping("/importar-automatico")
-public String importarAutomatico(@RequestParam int pagina) {
-   perenualService.importarPlantasIndoor(pagina);
-    return "Importação automática da página concluída!";
-}
-
 	@GetMapping("/indoor")
 	public List<Especime> listarIndoor(@RequestParam(defaultValue = "1") int page) {
     return perenualService.buscarIndoor(page);
@@ -62,7 +56,13 @@ public String importarAutomatico(@RequestParam int pagina) {
 	}
 	@GetMapping("/id/{id}")
 public Especime buscarPorId(@PathVariable Integer id) {
-    return especimeRepository.findById(id).orElse(null);
+    Especime e = especimeRepository.findById(id).orElse(null);
+	
+    if (e != null && e.getDescricao() != null && e.getDescricao().matches(".*[a-zA-Z].*")) {
+        perenualService.traduzirEspecime(e);
+        especimeRepository.save(e);
+    }
+    return e;
 }
     
 }

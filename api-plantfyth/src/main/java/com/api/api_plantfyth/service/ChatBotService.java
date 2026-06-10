@@ -22,6 +22,8 @@ public class ChatBotService {
 
     @Autowired
     private PerenualService perenualService;
+    @Autowired
+    private GptService gptService;
 
     public String chat(String pergunta) {
         String intencao = detectarIntencao(pergunta);
@@ -31,14 +33,15 @@ public class ChatBotService {
 
     private String detectarIntencao(String pergunta) {
         String prompt = """
-                Você é um assistente de plantas. O usuário perguntou: "%s"
-                Responda APENAS com uma das opções abaixo, sem explicação:
-                - LISTAR
-                - BUSCAR_NOME:[nome da planta em inglês]
-                - BUSCAR_ID:[número]
-                - DIAGNOSTICO:[descrição do problema]
-                """.formatted(pergunta);
-        return chamarGpt(prompt).trim();
+        Você é um assistente de plantas. O usuário perguntou: "%s"
+        Responda APENAS com uma das opções abaixo, sem explicação:
+        - LISTAR
+        - BUSCAR_NOME:[nome Popular em inglês]
+        - BUSCAR_NOME_CIENTIFICO:[nome científico latino preferencial, ou nome cientifico em inglês se não souber]
+        - BUSCAR_ID:[número]
+        - DIAGNOSTICO:[descrição do problema]
+        """.formatted(pergunta);
+        return gptService.chamarGpt(prompt).trim();
     }
 
     private String buscarNaApi(String intencao) {
@@ -48,7 +51,7 @@ public class ChatBotService {
 
         } else if (intencao.startsWith("BUSCAR_NOME:")) {
             String nome = intencao.replace("BUSCAR_NOME:", "").trim();
-            return perenualService.buscarPorNome(nome);
+            return perenualService.buscarPorNomeCientifico(nome);
 
         } else if (intencao.startsWith("DIAGNOSTICO:")) {
             String problema = intencao.replace("DIAGNOSTICO:", "").trim();
@@ -69,33 +72,13 @@ public class ChatBotService {
                 
                 Se o usuário estiver buscando informações sobre uma planta,
                 traduza e apresente os dados de forma organizada e clara.
-                Não digite link de imagem.
+                Não digite link de imagem. Não use * ou # na resposta
 
                 
                 Pergunta do usuário: "%s"
                 Dados da API: %s
                 """.formatted(pergunta, dadosApi);
-        return chamarGpt(prompt);
+        return gptService.chamarGpt(prompt);
     }
 
-    private String chamarGpt(String prompt) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(openAiKey);
-
-        Map<String, Object> body = Map.of(
-            "model", "gpt-4o-mini",
-            "messages", List.of(Map.of("role", "user", "content", prompt)),
-            "max_tokens", 1000
-        );
-
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-            "https://api.openai.com/v1/chat/completions",
-            new HttpEntity<>(body, headers),
-            Map.class
-        );
-
-        List<Map> choices = (List<Map>) response.getBody().get("choices");
-        return (String) ((Map) choices.get(0).get("message")).get("content");
-    }
 }
