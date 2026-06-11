@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -49,6 +50,7 @@ public final class PlantNotificationScheduler {
     public static void refreshPlantCareAlarmsAndNotifyDue(Context context, int usuarioId, boolean notifyDueNow) {
         PlantFythAPI api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
         api.buscarPlantasUsuario(usuarioId).enqueue(new Callback<List<Plantio>>() {
+            @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
             @Override
             public void onResponse(@NonNull Call<List<Plantio>> call,
                                    @NonNull Response<List<Plantio>> response) {
@@ -86,6 +88,7 @@ public final class PlantNotificationScheduler {
         }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     public static void notifyDuePlants(Context context, List<Plantio> plantas) {
         if (!canPostNotifications(context)) return;
 
@@ -127,6 +130,7 @@ public final class PlantNotificationScheduler {
         NotificationManagerCompat.from(context).notify(SUMMARY_NOTIFICATION_ID, builder.build());
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     public static void showSingleCareNotification(Context context, int notificationId,
                                                   String plantName, String actionName) {
         if (!canPostNotifications(context)) return;
