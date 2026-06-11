@@ -174,5 +174,4 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
     public void SairInformacao(View view){
         finish();
     }
-
 }
