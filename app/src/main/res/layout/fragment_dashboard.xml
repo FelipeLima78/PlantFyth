@@ -53,7 +53,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:layout_marginBottom="85dp"
             android:paddingHorizontal="16dp"
             android:paddingTop="16dp"
             android:paddingBottom="88dp" />
@@ -67,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_marginRight="24dp"
-        android:layout_marginBottom="145dp"
+        android:layout_marginBottom="24dp"
         android:contentDescription="Adicionar"
         android:backgroundTint="#4CAF50"
         app:tint="#FFFFFF"

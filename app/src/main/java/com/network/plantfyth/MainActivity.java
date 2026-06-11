@@ -1,6 +1,9 @@
 package com.network.plantfyth;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -9,7 +12,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import android.view.WindowManager;
 import com.network.plantfyth.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,5 +36,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         NavigationUI.setupWithNavController(navView, navController);
+
+        View rootView = findViewById(R.id.container);
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect visibleFrame = new Rect();
+            rootView.getWindowVisibleDisplayFrame(visibleFrame);
+            int totalHeight = rootView.getRootView().getHeight();
+            int heightDiff = totalHeight - visibleFrame.height();
+            boolean keyboardVisible = heightDiff > totalHeight * 0.15;
+            navView.setVisibility(keyboardVisible ? View.GONE : View.VISIBLE);
+        });
     }
 }

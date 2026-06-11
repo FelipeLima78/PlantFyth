@@ -125,7 +125,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="24dp"
-        android:layout_marginBottom="145dp"
+        android:layout_marginBottom="24dp"
         android:contentDescription="Adicionar planta"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="#4CAF50"

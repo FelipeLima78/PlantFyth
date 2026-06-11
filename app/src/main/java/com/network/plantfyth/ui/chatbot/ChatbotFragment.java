@@ -1,15 +1,18 @@
 package com.network.plantfyth.ui.chatbot;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.network.plantfyth.R;
 import com.network.plantfyth.databinding.FragmentChatbotBinding;
 import com.network.plantfyth.model.ChatMessage;
 import com.network.plantfyth.retrofit.PlantFythAPI;
@@ -28,9 +31,10 @@ import retrofit2.Response;
 public class ChatbotFragment extends Fragment {
 
     private FragmentChatbotBinding binding;
-    private List<ChatMessage> mensagens = new ArrayList<>();
+    private final List<ChatMessage> mensagens = new ArrayList<>();
     private ChatAdapter adapter;
-    PlantFythAPI api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
+    private final PlantFythAPI api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
+    private ViewTreeObserver.OnGlobalLayoutListener keyboardLayoutListener;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -39,37 +43,72 @@ public class ChatbotFragment extends Fragment {
 
         binding = FragmentChatbotBinding.inflate(inflater, container, false);
 
-        // Configura RecyclerView
         adapter = new ChatAdapter(mensagens);
         binding.recyclerChat.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerChat.setAdapter(adapter);
 
-        // Mensagem de boas vindas
-        adicionarMensagem("Olá! Sou o PlantBot 🌿 Pergunte-me sobre suas plantas!", false);
+        adicionarMensagem("Ola! Sou o PlantBot. Pergunte-me sobre suas plantas!", false);
 
-        // Botão enviar
-        binding.btnSend.setOnClickListener(v -> {
-            // Adiciona isso dentro do onCreateView, depois do binding.btnSend.setOnClickListener:
-            binding.editMessage.setOnEditorActionListener((textView, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_SEND ||
-                        actionId == EditorInfo.IME_ACTION_DONE) {
-                    String texto = binding.editMessage.getText().toString().trim();
-                    if (!texto.isEmpty()) {
-                        enviarMensagem(texto);
-                        binding.editMessage.setText("");
-                    }
-                    return true;
-                }
-                return false;
-            });
-            String texto = binding.editMessage.getText().toString().trim();
-            if (!texto.isEmpty()) {
-                enviarMensagem(texto);
-                binding.editMessage.setText("");
+        binding.editMessage.setOnEditorActionListener((textView, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND ||
+                    actionId == EditorInfo.IME_ACTION_DONE) {
+                enviarTextoDigitado();
+                return true;
             }
+            return false;
         });
 
+        binding.btnSend.setOnClickListener(v -> enviarTextoDigitado());
+
+        configurarBarraAcimaDoTeclado();
+
         return binding.getRoot();
+    }
+
+    private void configurarBarraAcimaDoTeclado() {
+        View root = binding.getRoot();
+        View inputCard = binding.cardInputMessage;
+        View navView = requireActivity().findViewById(R.id.nav_view);
+
+        keyboardLayoutListener = () -> {
+            if (binding == null) return;
+
+            Rect visibleFrame = new Rect();
+            root.getWindowVisibleDisplayFrame(visibleFrame);
+
+            int[] inputLocation = new int[2];
+            inputCard.getLocationOnScreen(inputLocation);
+
+            int inputBottom = inputLocation[1] + inputCard.getHeight();
+            int overlap = inputBottom - visibleFrame.bottom;
+            boolean keyboardVisible = root.getRootView().getHeight() - visibleFrame.bottom > 180;
+
+            if (keyboardVisible && overlap > 0) {
+                inputCard.setTranslationY(-(overlap + dpToPx(12)));
+            } else {
+                inputCard.setTranslationY(0);
+            }
+
+            if (navView != null) {
+                navView.setVisibility(keyboardVisible ? View.GONE : View.VISIBLE);
+            }
+        };
+
+        root.getViewTreeObserver().addOnGlobalLayoutListener(keyboardLayoutListener);
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    private void enviarTextoDigitado() {
+        if (binding == null) return;
+
+        String texto = binding.editMessage.getText().toString().trim();
+        if (!texto.isEmpty()) {
+            enviarMensagem(texto);
+            binding.editMessage.setText("");
+        }
     }
 
     private void enviarMensagem(String texto) {
@@ -81,7 +120,7 @@ public class ChatbotFragment extends Fragment {
         api.chat(body).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                mensagens.remove(mensagens.size() - 1);
+                removerMensagemDigitando();
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         adicionarMensagem(response.body().string(), false);
@@ -91,17 +130,24 @@ public class ChatbotFragment extends Fragment {
                 } else {
                     adicionarMensagem("Erro ao conectar.", false);
                 }
-                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mensagens.remove(mensagens.size() - 1);
+                removerMensagemDigitando();
                 adicionarMensagem("Falha: " + t.getMessage(), false);
-                adapter.notifyDataSetChanged();
             }
         });
     }
+
+    private void removerMensagemDigitando() {
+        if (!mensagens.isEmpty()) {
+            int ultimaPosicao = mensagens.size() - 1;
+            mensagens.remove(ultimaPosicao);
+            adapter.notifyItemRemoved(ultimaPosicao);
+        }
+    }
+
     private void adicionarMensagem(String texto, boolean isUsuario) {
         mensagens.add(new ChatMessage(texto, isUsuario));
         adapter.notifyItemInserted(mensagens.size() - 1);
@@ -110,6 +156,10 @@ public class ChatbotFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (binding != null && keyboardLayoutListener != null) {
+            binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(keyboardLayoutListener);
+            keyboardLayoutListener = null;
+        }
         super.onDestroyView();
         binding = null;
     }

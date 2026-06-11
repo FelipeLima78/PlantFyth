@@ -72,6 +72,11 @@ public class ChatBotService {
                 
                 Se o usuário estiver buscando informações sobre uma planta,
                 traduza e apresente os dados de forma organizada e clara.
+             
+                Caso o usuário perguntar sobre uma planta,
+                apresente informações sobre os cuidados de maneira breve que se deve ter com a luz, 
+                regas, solo e temperatura.
+                
                 Não digite link de imagem. Não use * ou # na resposta
 
                 
