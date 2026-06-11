@@ -92,7 +92,7 @@
                 android:layout_height="42dp"
                 android:padding="10dp"
                 android:src="@android:drawable/ic_menu_send"
-                android:tint="#2E7D32" />
+                app:tint="#1FBD25" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
