@@ -21,7 +21,7 @@ public class RetroFitService {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.15.2:8080/")
+                .baseUrl("https://plantfyth-production.up.railway.app/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(new Gson()))
                 .build();
