@@ -77,16 +77,25 @@
                  .getInt("usuario_id", -1);
 
          if (usuarioId == -1) {
+             mostrarCarregando(false);
+             mostrarEstadoVazio(true);
              Toast.makeText(getContext(), "Usuário não identificado.", Toast.LENGTH_SHORT).show();
              return;
          }
 
+         mostrarCarregando(true);
          api.buscarPlantasUsuario(usuarioId).enqueue(new Callback<List<Plantio>>() {
              @Override
              public void onResponse(Call<List<Plantio>> call, Response<List<Plantio>> response) {
+                 if (binding == null) return;
+                 mostrarCarregando(false);
+
                  if (response.isSuccessful() && response.body() != null) {
-                     adapter.atualizarLista(response.body());
+                     List<Plantio> plantas = response.body();
+                     adapter.atualizarLista(plantas);
+                     mostrarEstadoVazio(plantas.isEmpty());
                  } else {
+                     mostrarEstadoVazio(true);
                      Log.e("DASHBOARD", "Resposta sem sucesso: " + response.code());
                      Toast.makeText(getContext(),
                              "Erro ao carregar plantas: " + response.code(),
@@ -96,12 +105,34 @@
 
              @Override
              public void onFailure(Call<List<Plantio>> call, Throwable t) {
+                 if (binding == null) return;
+                 mostrarCarregando(false);
+
+                 mostrarEstadoVazio(true);
                  Log.e("DASHBOARD", "Falha: " + t.getMessage());
                  Toast.makeText(getContext(),
                          "Falha de conexão: " + t.getMessage(),
                          Toast.LENGTH_SHORT).show();
              }
          });
+     }
+
+     private void mostrarCarregando(boolean carregando) {
+         if (binding == null) return;
+
+         binding.layoutCarregandoDashboard.setVisibility(carregando ? View.VISIBLE : View.GONE);
+         if (carregando) {
+             binding.layoutVazioDashboard.setVisibility(View.GONE);
+             binding.recyclerPlantas.setVisibility(View.GONE);
+         }
+     }
+
+     private void mostrarEstadoVazio(boolean vazio) {
+         if (binding == null) return;
+
+         binding.layoutCarregandoDashboard.setVisibility(View.GONE);
+         binding.layoutVazioDashboard.setVisibility(vazio ? View.VISIBLE : View.GONE);
+         binding.recyclerPlantas.setVisibility(vazio ? View.GONE : View.VISIBLE);
      }
 
      @Override
