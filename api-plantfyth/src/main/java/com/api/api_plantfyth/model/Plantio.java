@@ -35,48 +35,40 @@ public class Plantio {
     // atributos
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "nome")
     private String nome;
-
-    @JsonFormat(
-            pattern = "dd/MM/yyyy"
-    )
-    @Column(name = "data_que_foi_plantado")
-    private String data_que_foi_Plantado;
    
     @Column(name = "foi_regado_hoje")
     private Boolean foiRegadoHoje;
-
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "previsao_proxima_irrigacao")
     private Date previsaoProximaIrrigacao;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Sao_Paulo")
+    //@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "previsao_proxima_poda")
-    private Date previsaoProximaPoda;
+    private String previsaoProximaPoda;
 
-    @Column(name = "tamanho_atual_cm")
-    private Float tamanhoAtualCM;
-
-    @Column(name = "previsao_tamanho_cm")
-    private Float previsaoTamanhoCM;
-
-    @Column(name = "plantada_como")
-    private String plantadaComo;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "data_que_foi_plantado")
+    private String data_que_foi_Plantado;
 
     @Column(name = "fk_usuario_id")
     private Integer usuarioId;
     
+    @Column(name = "pegou_sol_hoje")
+    private Boolean pegouSolHoje;
+
     @ManyToOne
     @JoinColumn(name = "fk_usuario_id",insertable = false, updatable = false)
     @JsonIgnore
     private Usuario usuario;
 
    
-@JsonProperty("especimeId") 
-@Column(name = "fk_especime_id")
-private Integer especimeId;
+    @JsonProperty("especimeId") 
+    @Column(name = "fk_especime_id")
+    private Integer especimeId;
 
     @ManyToOne
     @JoinColumn(name = "fk_especime_id", insertable = false, updatable = false)

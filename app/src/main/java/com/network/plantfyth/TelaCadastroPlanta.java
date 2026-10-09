@@ -47,11 +47,11 @@ import retrofit2.Response;
 public class TelaCadastroPlanta extends AppCompatActivity {
 
     private Button btnSalvarPlanta;
-    private EditText edtNomePlanta, edtDataPlantio, edtTamanhoAtual;
+    private EditText edtNomePlanta, edtDataPlantio;
     private Spinner spinnerEspecime;
     private RadioGroup radioPlantadaComo;
     private RadioButton rbSemente, rbMuda, rbEstaca;
-    private CheckBox checkFoiRegadoHoje;
+    private CheckBox checkFoiRegadoHoje, checkPegouSolHoje;
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
     private List<Especime> listaEspecimes;
@@ -69,13 +69,9 @@ public class TelaCadastroPlanta extends AppCompatActivity {
         btnSalvarPlanta = findViewById(R.id.btnSalvarPlanta);
         edtNomePlanta = findViewById(R.id.edtNomePlanta);
         edtDataPlantio = findViewById(R.id.edtDataPlantio);
-        edtTamanhoAtual = findViewById(R.id.edtTamanhoAtual);
         spinnerEspecime = findViewById(R.id.spinnerEspecime);
-        radioPlantadaComo = findViewById(R.id.radioPlantadaComo);
-        rbSemente = findViewById(R.id.rbSemente);
-        rbMuda = findViewById(R.id.rbMuda);
-        rbEstaca = findViewById(R.id.rbEstaca);
         checkFoiRegadoHoje = findViewById(R.id.checkFoiRegadoHoje);
+        checkPegouSolHoje = findViewById(R.id.checkPegouSolHoje);
         carregarEspecimes();
     }
 
@@ -96,144 +92,144 @@ public class TelaCadastroPlanta extends AppCompatActivity {
 
 
     // a execução do especime deve ser feita antes da do save, lembra dissso
-    public void CadastrarPlanta(View view){
-        Especime especimeSelecionado = (Especime) spinnerEspecime.getSelectedItem();
-        String data = String.valueOf(edtDataPlantio.getText());
-        if (edtNomePlanta.getText().toString().isEmpty() || edtDataPlantio.getText().toString().isEmpty()){
+    public void CadastrarPlanta(View view) {
+
+        Especime especime = (Especime) spinnerEspecime.getSelectedItem();
+
+        if (especime == null) {
+            Toast.makeText(this, "Selecione uma espécie", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (edtNomePlanta.getText().toString().isEmpty()
+                || edtDataPlantio.getText().toString().isEmpty()) {
+
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Ap.buscarDetalhes(especimeSelecionado.getPerenual_id()).enqueue(new Callback<Especime>() {
-            @Override
-            public void onResponse(Call<Especime> call, Response<Especime> response) {
-                Especime especime = response.body();
-                Plantio plantio = new Plantio();
-                plantio.setNome(edtNomePlanta.getText().toString());
-                plantio.setDataQueFoiPlantado(edtDataPlantio.getText().toString());
+        Plantio plantio = new Plantio();
 
-                //tratamento do float
-                float tamanho = 0;
-                String textoTamanho = edtTamanhoAtual.getText().toString().trim();
-                if (!textoTamanho.isEmpty()) {
-                    tamanho = Float.parseFloat(textoTamanho);
-                }
-                String plantadoComo = null;
-                if (rbSemente.isChecked()) {
-                    plantadoComo = rbSemente.getText().toString();
-                }
-                if (rbEstaca.isChecked()) {
-                    plantadoComo = rbEstaca.getText().toString();
-                }
-                if (rbMuda.isChecked()) {
-                    plantadoComo = rbMuda.getText().toString();
-                }
-                // puxa o id la do login
-                int usuarioId = getSharedPreferences("USER_DATA", MODE_PRIVATE).getInt("usuario_id", -1);
-                plantio.setEspecimeId(especimeSelecionado.getPerenual_id());
-                plantio.setUsuarioId(usuarioId);
-                plantio.setTamanhoAtualCM(tamanho);
-                plantio.setPlantadaComo(plantadoComo);
-                plantio.setFoi_regado_hoje(checkFoiRegadoHoje.isChecked());
+        plantio.setNome(edtNomePlanta.getText().toString());
+        plantio.setDataQueFoiPlantado(edtDataPlantio.getText().toString());
 
 
-                // dados ja pegos ate agr: data que foi plantado, como foi plantado , foiregadohoje, setplantadacomo, setamanhoatualcm, setusuarioid, nome
-                if(especime.getTamanho_adulto_cm() != null){
-               plantio.setPrevisaoTamanho(especime.getTamanho_adulto_cm());}
-                if (especime.getPeriodo_irrigacao() != null && especime.getUnidade_irrigacao() != null) {
-                    String valorLimpo = especime.getPeriodo_irrigacao()
-                            .replaceAll("[^0-9\\-]", "")
-                            .trim();
+        int usuarioId = getSharedPreferences(
+                "USER_DATA",
+                MODE_PRIVATE
+        ).getInt("usuario_id", -1);
 
-                    if (valorLimpo.isEmpty()) return;
+        plantio.setEspecimeId(especime.getId());
+        plantio.setUsuarioId(usuarioId);
 
-                    int valor = Integer.parseInt(valorLimpo.split("-")[0]);
-                    long horasIrrigacao;
+        plantio.setFoi_regado_hoje(
+                checkFoiRegadoHoje.isChecked()
+        );
 
-                    switch (especime.getUnidade_irrigacao().toLowerCase()) {
-                        case "days":
-                            horasIrrigacao = valor * 24;
-                            break;
-                        case "weeks":
-                            horasIrrigacao = valor * 24 * 7;
-                            break;
-                        case "months":
-                            horasIrrigacao = valor * 24 * 30;
-                            break;
-                        default:
-                            horasIrrigacao = 24;
-                            break;
-                    }
+        plantio.setPegou_sol_hoje(
+                checkPegouSolHoje.isChecked()
+        );
 
-                    Calendar proxIrrigacao = Calendar.getInstance();
-                    proxIrrigacao.add(Calendar.HOUR, (int) horasIrrigacao);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                    plantio.setPrevisaoProximaIrrigacao(sdf.format(proxIrrigacao.getTime()));
-                }
-                if (especime.getPeriodo_poda() != null) {
-                    String[] meses = especime.getPeriodo_poda().toLowerCase().split(", ");
-                    try {
-                        String dataStr = "01/" + meses[0] + "/" + Calendar.getInstance().get(Calendar.YEAR);
-                        SimpleDateFormat sdfParse = new SimpleDateFormat("dd/MMMM/yyyy",new Locale("pt", "BR"));
-                        SimpleDateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                        Date dataPoda = sdfParse.parse(dataStr);
-                        plantio.setPrevisaoProximaPoda(sdfISO.format(dataPoda));
-                    } catch (ParseException e) {
-                        plantio.setPrevisaoProximaPoda(null);
-                    }
-                }
-                Ap.savePlantio(plantio)
-                        .enqueue(new Callback<Plantio>() {
+        if (especime.getPeriodo_irrigacao() != null) {
+            try{
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            formato.setLenient(false);
+            Date dataConvertida = formato.parse(edtDataPlantio.getText().toString());
+            Calendar proxIrrigacao = Calendar.getInstance();
+            proxIrrigacao.setTime(dataConvertida);
 
-                            @Override
-                            public void onResponse(Call<Plantio> call, Response<Plantio> response) {
+            if(plantio.isFoi_regado_hoje()){
+            proxIrrigacao.add(
+                    Calendar.HOUR_OF_DAY,
+                    especime.getPeriodo_irrigacao().intValue()
+            );
+            }
 
-                                if (response.isSuccessful()) {
+            SimpleDateFormat sdf =
+                    new SimpleDateFormat(
+                            "yyyy-MM-dd'T'HH:mm:ss",
+                            Locale.getDefault()
+                    );
 
-                                    Toast.makeText(TelaCadastroPlanta.this,
-                                            "Cadastro realizado!",
-                                            Toast.LENGTH_SHORT).show();
+            plantio.setPrevisaoProximaIrrigacao(
+                    sdf.format(proxIrrigacao.getTime())
+            );
+             }catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(
+                        this,
+                        "Data de plantio inválida",
+                        Toast.LENGTH_SHORT
+                ).show();
+                return;
+            }
+        }
 
-                                    NotificationPermissionHelper.requestIfNeeded(TelaCadastroPlanta.this);
-                                    PlantNotificationScheduler.refreshPlantCareAlarmsAndNotifyDue(
+        if (especime.getPeriodo_poda() != null) {
+            plantio.setPrevisaoProximaPoda(
+                    especime.getPeriodo_poda()
+            );
+        } else {
+            plantio.setPrevisaoProximaPoda("Não precisa de poda");
+        }
+
+        Ap.savePlantio(plantio)
+                .enqueue(new Callback<Plantio>() {
+
+                    @Override
+                    public void onResponse(
+                            Call<Plantio> call,
+                            Response<Plantio> response) {
+
+                        if (response.isSuccessful()) {
+
+                            Toast.makeText(
+                                    TelaCadastroPlanta.this,
+                                    "Cadastro realizado!",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            NotificationPermissionHelper.requestIfNeeded(
+                                    TelaCadastroPlanta.this
+                            );
+
+                            PlantNotificationScheduler
+                                    .refreshPlantCareAlarmsAndNotifyDue(
                                             getApplicationContext(),
                                             usuarioId,
                                             true
                                     );
 
-                                    finish();
+                            finish();
 
-                                } else {
+                        } else {
 
-                                    Toast.makeText(TelaCadastroPlanta.this,
-                                            "Erro: " + response.code(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
+                            Toast.makeText(
+                                    TelaCadastroPlanta.this,
+                                    "Erro: " + response.code(),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
 
-                            @Override
-                            public void onFailure(Call<Plantio> call, Throwable t) {
+                    @Override
+                    public void onFailure(
+                            Call<Plantio> call,
+                            Throwable t) {
 
-                                Toast.makeText(TelaCadastroPlanta.this,
-                                        "Falha: " + t.getMessage(),
-                                        Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                                TelaCadastroPlanta.this,
+                                "Falha: " + t.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show();
 
-                                Log.e("API_ERROR", t.getMessage());
-                            }
-                        });
-
-
-            }
-        @Override
-        public void onFailure(Call<Especime> call, Throwable t) {
-            Toast.makeText(TelaCadastroPlanta.this, "Erro ao buscar espécime", Toast.LENGTH_SHORT).show();
-        }
-    }
-    );
+                        Log.e("API_ERROR", t.getMessage());
+                    }
+                });
     }
 
     private void carregarEspecimes() {
-        Ap.listarIndoorPlants().enqueue(new Callback<List<Especime>>() {
+        Ap.listarEspecimes().enqueue(new Callback<List<Especime>>() {
             @Override
             public void onResponse(Call<List<Especime>> call, Response<List<Especime>> response) {
                 if (response.isSuccessful() && response.body() != null) {

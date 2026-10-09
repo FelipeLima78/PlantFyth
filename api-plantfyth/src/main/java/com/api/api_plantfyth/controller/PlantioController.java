@@ -10,9 +10,9 @@ import org.springframework.web.service.annotation.GetExchange;
 
 import com.api.api_plantfyth.model.Especime;
 import com.api.api_plantfyth.model.Plantio;
+import com.api.api_plantfyth.model.Usuario;
 import com.api.api_plantfyth.repository.EspecimeRepository;
 import com.api.api_plantfyth.repository.PlantioRepository;
-import com.api.api_plantfyth.service.PerenualService;
 import com.api.api_plantfyth.service.PlantioService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,14 +34,18 @@ public class PlantioController{
 	private PlantioRepository plantioRepository;
 	@Autowired
 	private EspecimeRepository especimeRepository;
-	@Autowired
-	private PerenualService perenualService;
+
 	
 	@GetMapping
 	public List<Plantio> listarTodos(){
 		return plantioService.findAll();
 	}
 
+	@PostMapping("/inserir")
+	public Plantio inserir(@RequestBody Plantio plantio){
+
+		return plantioService.savePlantio(plantio);
+	}
 	@GetMapping("/id/{id}")
 	public Plantio buscarPorId(@PathVariable int id){
 		Plantio plantio = plantioService.buscarPorId(id);
@@ -77,49 +81,16 @@ public class PlantioController{
 	}
 
 
-/* */
-@PostMapping("/inserir")
-public ResponseEntity<?> inserir(@RequestBody Plantio plantio) {
-    if (plantio.getEspecimeId() == null) {
-        return ResponseEntity.badRequest().body("Especime ID é nulo");
-    }
-
-    Especime especime = especimeRepository.findByPerenualId(plantio.getEspecimeId())
-        .orElseGet(() -> {
-            Especime nova = perenualService.buscarDetalhe(plantio.getEspecimeId());
-            if (nova != null) {
-                return especimeRepository.save(nova);
-            }
-            return null;
-        });
-
-    if (especime == null) {
-        return ResponseEntity.notFound().build();
-    }
-    if (especime.getDescricao() == null) {
-        Especime completo = perenualService.buscarDetalhe(especime.getPerenualId());
-        if (completo != null) {
-            completo.setId(especime.getId());
-            especime = especimeRepository.save(completo);
-        }
-    }
-
-    plantio.setEspecime(especime);
-    plantio.setEspecimeId(especime.getId().intValue());
-    return ResponseEntity.ok(plantioService.savePlantio(plantio));
-}
 	@PutMapping("/id/{id}")
 	public Plantio atualizar(@RequestBody Plantio plantio, @PathVariable Integer id){
 		Plantio plantioAtualizar = plantioService.buscarPorId(id);
 		plantioAtualizar.setId(id);	
 		plantioAtualizar.setNome(plantio.getNome());
-        plantioAtualizar.setData_que_foi_Plantado(plantio.getData_que_foi_Plantado());
-        plantioAtualizar.setFoiRegadoHoje(plantio.getFoiRegadoHoje());
+		plantioAtualizar.setFoiRegadoHoje(plantio.getFoiRegadoHoje());
         plantioAtualizar.setPrevisaoProximaIrrigacao(plantio.getPrevisaoProximaIrrigacao());
         plantioAtualizar.setPrevisaoProximaPoda(plantio.getPrevisaoProximaPoda());
-        plantioAtualizar.setTamanhoAtualCM(plantio.getTamanhoAtualCM());
-        plantioAtualizar.setPrevisaoTamanhoCM(plantio.getPrevisaoTamanhoCM());
-        plantioAtualizar.setPlantadaComo(plantio.getPlantadaComo());
+		plantioAtualizar.setData_que_foi_Plantado(plantio.getData_que_foi_Plantado());
+        plantioAtualizar.setPegouSolHoje(plantio.getPegouSolHoje());
 		plantioAtualizar.setEspecime(plantio.getEspecime());
 		return plantioService.savePlantio(plantioAtualizar);
 	}

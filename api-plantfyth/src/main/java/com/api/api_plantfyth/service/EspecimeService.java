@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.api_plantfyth.model.Especime;
+import com.api.api_plantfyth.model.Plantio;
 import com.api.api_plantfyth.repository.EspecimeRepository;
 
 @Service
@@ -14,15 +15,15 @@ public class EspecimeService {
     private EspecimeRepository especimeRepository;
 
 
-    public void salvarListaEspecimes(List<Especime> lista) {
-        for (Especime e : lista) {
-            if (!especimeRepository.existsByPerenualId(e.getPerenualId())) {
-                especimeRepository.save(e);
-            }
-        }
-    }
+    public Especime saveEspecime(Especime especime) {
+		return especimeRepository.save(especime);
+	}
+
+    public void deleteEspecime(int id) {
+		especimeRepository.deleteById(id);
+	}
     
-    public List<Especime> listarTodos() {
+    public List<Especime> findAll() {
         return especimeRepository.findAll();
     }
 

@@ -4,7 +4,7 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class DatabaseConnection {
+public class    DatabaseConnection {
 
     private static DatabaseConnection instance;
     private RequestQueue requestQueue;

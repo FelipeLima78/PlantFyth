@@ -314,11 +314,11 @@ public class HomeFragment extends Fragment {
     private Date calcularProximaIrrigacao(Especime especime) {
         if (especime == null) return somarDias(new Date(), 1);
 
-        double periodo = extrairPrimeiroNumero(especime.getPeriodo_irrigacao(), 1);
+        Double periodo = extrairPrimeiroNumero(String.valueOf(especime.getPeriodo_irrigacao()), 1);
         String unidade = especime.getUnidade_irrigacao();
         Calendar calendar = Calendar.getInstance();
 
-        if (unidade != null && unidade.toLowerCase(Locale.ROOT).contains("hour")) {
+        if (unidade != null && unidade.toLowerCase(Locale.ROOT).contains("horas")) {
             calendar.add(Calendar.HOUR_OF_DAY, Math.max(1, (int) Math.ceil(periodo)));
         } else {
             calendar.add(Calendar.DAY_OF_YEAR, Math.max(1, (int) Math.ceil(periodo)));

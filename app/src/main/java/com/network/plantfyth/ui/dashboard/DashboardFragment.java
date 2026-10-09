@@ -1,6 +1,8 @@
  package com.network.plantfyth.ui.dashboard;
 
+ import android.content.Context;
  import android.content.Intent;
+ import android.content.SharedPreferences;
  import android.os.Bundle;
  import android.util.Log;
  import android.view.LayoutInflater;
@@ -15,6 +17,7 @@
 
  import com.google.android.material.floatingactionbutton.FloatingActionButton;
  import com.network.plantfyth.TelaCadastroPlanta;
+ import com.network.plantfyth.TermoDialog;
  import com.network.plantfyth.databinding.FragmentDashboardBinding;
  import com.network.plantfyth.model.Plantio;
  import com.network.plantfyth.retrofit.PlantFythAPI;
@@ -38,6 +41,7 @@
      public View onCreateView(@NonNull LayoutInflater inflater,
                               ViewGroup container,
                               Bundle savedInstanceState) {
+
 
          binding = FragmentDashboardBinding.inflate(inflater, container, false);
          Log.d("TESTE", String.valueOf(binding.btnAdicionarPlanta));

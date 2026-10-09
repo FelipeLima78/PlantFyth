@@ -43,7 +43,7 @@
                     android:id="@+id/edtNomePlantaEditar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Ex: Rosa do Jardim"
+                    android:hint=""
                     android:inputType="textCapWords"/>
 
                 <TextView
@@ -63,80 +63,7 @@
                     android:maxLength="10"
                     android:onClick="AbrirCalendario" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="18dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Plantada como"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="  Opcional"
-                        android:textSize="12sp"
-                        android:textColor="#757575"/>
-                </LinearLayout>
-
-                <RadioGroup
-                    android:id="@+id/radioPlantadaComoEditar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/rbSementeEditar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Semente"/>
-
-                    <RadioButton
-                        android:id="@+id/rbMudaEditar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Muda"
-                        android:layout_marginStart="8dp"/>
-
-                    <RadioButton
-                        android:id="@+id/rbEstacaEditar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Estaca"
-                        android:layout_marginStart="8dp"/>
-
-                </RadioGroup>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tamanho Atual (cm)"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="  Opcional"
-                        android:textSize="12sp"
-                        android:textColor="#757575"/>
-                </LinearLayout>
-
-                <EditText
-                    android:id="@+id/edtTamanhoAtualEditar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ex: 12.5"
-                    android:inputType="numberDecimal"/>
 
                 <Button
                     android:id="@+id/btnSalvarEdicao"

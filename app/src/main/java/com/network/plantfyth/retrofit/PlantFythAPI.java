@@ -25,8 +25,8 @@ public interface PlantFythAPI {
 
     //plantios
 
-    @GET("especimes/indoor")
-    Call<List<Especime>> listarIndoorPlants();
+    @GET("especimes")
+    Call<List<Especime>> listarEspecimes();
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
     @PUT("plantios/id/{id}")
@@ -60,7 +60,5 @@ public interface PlantFythAPI {
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
 
     //chatbot
-    @POST("chat")
-    @Headers("Content-Type: text/plain")
-    Call<ResponseBody> chat(@Body RequestBody pergunta);
+
 }

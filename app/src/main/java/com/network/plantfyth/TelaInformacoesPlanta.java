@@ -80,9 +80,6 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                 }
 
                 txtDataPlantio.setText(plantio.getDataQueFoiPlantado());
-                txtPlantadaComo.setText(plantio.getPlantadaComo() != null ? plantio.getPlantadaComo(): "-");
-                float tamanho = plantio.getTamanhoAtualCM();
-                txtTamanhoAtual.setText(tamanho != 0 ? tamanho + " cm" : "Não registrado");
                 String previsaoStr = plantio.getPrevisaoProximaIrrigacao();
                 if (previsaoStr != null) {
                     try {
@@ -150,8 +147,8 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                         txtCrescimento.setText(especime.getCiclo()!= null ? especime.getCrescimento() : "-");
                         float adulto = especime.getTamanho_adulto_cm() != null ? especime.getTamanho_adulto_cm() : 0;
                         txtTamanhoAdulto.setText(adulto != 0 ? adulto + " cm" : "-");
-                        txtExposicaoLuz.setText(especime.getExposicao_A_Luz()!= null ? especime.getExposicao_A_Luz() : "-");
-                        txtPeriodoIrrigacao.setText(especime.getPeriodo_irrigacao()!= null ? especime.getPeriodo_irrigacao() : "-");
+                        txtExposicaoLuz.setText(especime.getExposicao_a_luz()!= null ? especime.getExposicao_a_luz() : "-");
+                       // txtPeriodoIrrigacao.setText(especime.getPeriodo_irrigacao()!= null ? especime.getPeriodo_irrigacao() : "-");
                         txtUnidadeIrrigacao.setText(especime.getUnidade_irrigacao()!= null ? especime.getUnidade_irrigacao(): "-");
                         txtPeriodoPoda.setText(especime.getPeriodo_poda()!= null ? especime.getPeriodo_poda() : "-");
                         txtDescricao.setText(especime.getDescricao()!= null ? especime.getDescricao() : "-");

@@ -8,25 +8,24 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Plantio {
+    //construtor
     public Plantio() {
     }
 
-    public Plantio(Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, String previsao_proxima_irrigacao,  String previsao_proxima_poda, float tamanho_atual_cm, float previsaoTamanho, String plantada_como, String imagem_personalizada) {
+    public Plantio(Integer especimeId, Integer usuarioId, Usuario usuario, Especime especime, Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, boolean pegou_sol_hoje, String previsao_proxima_irrigacao, String previsao_proxima_poda) {
+        this.especimeId = especimeId;
+        this.usuarioId = usuarioId;
+        this.usuario = usuario;
+        this.especime = especime;
         this.id = id;
         this.nome = nome;
         this.data_que_foi_plantado = data_que_foi_plantado;
         this.foi_regado_hoje = foi_regado_hoje;
+        this.pegou_sol_hoje = pegou_sol_hoje;
         this.previsao_proxima_irrigacao = previsao_proxima_irrigacao;
         this.previsao_proxima_poda = previsao_proxima_poda;
-        this.tamanho_atual_cm = tamanho_atual_cm;
-        this.previsao_tamanho_cm = previsao_tamanho_cm;
-        this.plantada_como = plantada_como;
-        this.imagem_personalizada = imagem_personalizada;
     }
-
-    @SerializedName("especimeId")
-    private Integer especimeId;
-
+    //gettes e setters
     public Integer getEspecimeId() {
         return especimeId;
     }
@@ -42,38 +41,6 @@ public class Plantio {
     public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
-
-    @SerializedName("usuarioId")
-    private Integer usuarioId;
-    @SerializedName("usuario")
-    private Usuario usuario;
-    @SerializedName("especime")
-    private Especime especime;
-    @SerializedName("id")
-    private Integer id;
-    @SerializedName("nome")
-    private String nome;
-    @SerializedName("data_que_foi_Plantado")
-    private String data_que_foi_plantado;
-    @SerializedName("foiRegadoHoje")
-    private boolean foi_regado_hoje;
-
-
-    //previsoes automaticas
-    @SerializedName("previsaoProximaIrrigacao")
-    private String previsao_proxima_irrigacao;
-    @SerializedName("previsaoProximaPoda")
-    private String previsao_proxima_poda;
-    //Informações dinâmicas do app
-    @SerializedName("tamanhoAtualCM")
-    private float tamanho_atual_cm;
-    @SerializedName("previsaoTamanhoCM")
-    private float previsao_tamanho_cm;
-    @SerializedName("plantadaComo")
-    private String plantada_como;
-    @SerializedName("imagemPersonalizada")
-    private String imagem_personalizada;
-    //getters e setters
 
     public Integer getId() {
         return id;
@@ -107,6 +74,14 @@ public class Plantio {
         this.foi_regado_hoje = foi_regado_hoje;
     }
 
+    public boolean isPegou_sol_hoje() {
+        return pegou_sol_hoje;
+    }
+
+    public void setPegou_sol_hoje(boolean pegou_sol_hoje) {
+        this.pegou_sol_hoje = pegou_sol_hoje;
+    }
+
     public String getPrevisaoProximaIrrigacao() {
         return previsao_proxima_irrigacao;
     }
@@ -122,37 +97,7 @@ public class Plantio {
     public void setPrevisaoProximaPoda(String previsao_proxima_poda) {
         this.previsao_proxima_poda = previsao_proxima_poda;
     }
-    public float getTamanhoAtualCM() {
-        return tamanho_atual_cm;
-    }
 
-    public void setTamanhoAtualCM(float tamanho_atual_cm) {
-        this.tamanho_atual_cm = tamanho_atual_cm;
-    }
-
-    public float getPrevisaoTamanho() {
-        return previsao_tamanho_cm;
-    }
-
-    public void setPrevisaoTamanho(float previsao_tamanho_cm) {
-        this.previsao_tamanho_cm = previsao_tamanho_cm;
-    }
-
-    public String getPlantadaComo() {
-        return plantada_como;
-    }
-
-    public void setPlantadaComo(String plantada_como) {
-        this.plantada_como = plantada_como;
-    }
-
-    public String getImagemPersonalizada() {
-        return imagem_personalizada;
-    }
-
-    public void setImagemPersonalizada(String imagem_personalizada) {
-        this.imagem_personalizada = imagem_personalizada;
-    }
     public Usuario getUsuario() {
         return usuario;
     }
@@ -172,5 +117,34 @@ public class Plantio {
     ) {
         this.especime = especime;
     }
+
+    //atributos
+    @SerializedName("especimeId")
+    private Integer especimeId;
+    @SerializedName("usuarioId")
+    private Integer usuarioId;
+    @SerializedName("usuario")
+    private Usuario usuario;
+    @SerializedName("especime")
+    private Especime especime;
+    @SerializedName("id")
+    private Integer id;
+    @SerializedName("nome")
+    private String nome;
+    @SerializedName("data_que_foi_Plantado")
+    private String data_que_foi_plantado;
+    @SerializedName("foiRegadoHoje")
+    private boolean foi_regado_hoje;
+
+    @SerializedName("pegouSolHoje")
+    private boolean pegou_sol_hoje;
+
+    //previsoes automaticas
+    @SerializedName("previsaoProximaIrrigacao")
+    private String previsao_proxima_irrigacao;
+    @SerializedName("previsaoProximaPoda")
+    private String previsao_proxima_poda;
+    //Informações dinâmicas do app
+
 }
 
