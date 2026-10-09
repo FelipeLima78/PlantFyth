@@ -19,7 +19,6 @@ import com.network.plantfyth.retrofit.RetroFitService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -28,10 +27,24 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TelaInformacoesPlanta extends AppCompatActivity {
-    private TextView txtNomePlanta, txtFoiRegado, txtDataPlantio, txtPlantadaComo, txtTamanhoAtual, txtPrevisaoTamanho, txtProximaIrrigacao, txtHorarioIrrigar, txtProximaPoda, txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,  txtTamanhoAdulto,  txtExposicaoLuz, txtPeriodoIrrigacao, txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao;
-    RetroFitService retroFitService = new RetroFitService();
+
+    private static final String FORMATO_API = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String VAZIO = "—";
+
+    // Status
+    private TextView txtNomePlanta, txtFoiRegado, txtDataPlantio, txtRecebeuLuz, txtVaso;
+    // Previsões
+    private TextView txtProximaIrrigacao, txtHorarioIrrigar, txtProximaPoda, txtProximaAdubacao;
+    // Espécie
+    private TextView txtNomePopular, txtNomeCientifico, txtFamilia, txtCrescimento, txtCiclo,
+            txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal,
+            txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao;
+
     private Button btnSairInformacao;
-    PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
+
+    private final RetroFitService retroFitService = new RetroFitService();
+    private final PlantFythAPI Ap = retroFitService.getRetrofit().create(PlantFythAPI.class);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,133 +55,156 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         txtNomePlanta = findViewById(R.id.txtNomePlanta);
         txtFoiRegado = findViewById(R.id.txtFoiRegado);
         txtDataPlantio = findViewById(R.id.txtDataPlantio);
-        txtPlantadaComo = findViewById(R.id.txtPlantadaComo);
-        txtTamanhoAtual = findViewById(R.id.txtTamanhoAtual);
-      //  txtPrevisaoTamanho = findViewById(R.id.txtPrevisaoTamanho);
+        txtRecebeuLuz = findViewById(R.id.txtRecebeuLuz);
+        txtVaso = findViewById(R.id.txtVaso);
+
         txtProximaIrrigacao = findViewById(R.id.txtProximaIrrigacao);
         txtHorarioIrrigar = findViewById(R.id.txtHorarioIrrigar);
         txtProximaPoda = findViewById(R.id.txtProximaPoda);
+        txtProximaAdubacao = findViewById(R.id.txtProximaAdubacao);
+
         txtNomePopular = findViewById(R.id.txtNomePopular);
         txtNomeCientifico = findViewById(R.id.txtNomeCientifico);
         txtFamilia = findViewById(R.id.txtFamilia);
-        txtCiclo = findViewById(R.id.txtCiclo);
         txtCrescimento = findViewById(R.id.txtCrescimento);
+        txtCiclo = findViewById(R.id.txtCiclo);
         txtTamanhoAdulto = findViewById(R.id.txtTamanhoAdulto);
+        txtVolumeIrrigacao = findViewById(R.id.txtVolumeIrrigacao);
         txtExposicaoLuz = findViewById(R.id.txtExposicaoLuz);
-        txtPeriodoIrrigacao = findViewById(R.id.txtPeriodoIrrigacao);
+        txtTemperaturaIdeal = findViewById(R.id.txtTemperaturaIdeal);
         txtUnidadeIrrigacao = findViewById(R.id.txtUnidadeIrrigacao);
         txtPeriodoPoda = findViewById(R.id.txtPeriodoPoda);
         txtDescricao = findViewById(R.id.txtDescricao);
+
         btnSairInformacao = findViewById(R.id.btnSairInformacao);
+
         PuxarDados();
     }
 
-    public void PuxarDados(){
+    public void PuxarDados() {
         int plantaId = getIntent().getIntExtra("plantio_id", -1);
+
         Ap.buscarPlantaPorId(plantaId).enqueue(new Callback<Plantio>() {
             @Override
             public void onResponse(Call<Plantio> call, Response<Plantio> response) {
                 Plantio plantio = response.body();
-                txtNomePlanta.setText(plantio.getNome());
-                if (plantio.isFoi_regado_hoje()) {
-                    txtFoiRegado.setText("Sim");
-                } else {
-                    txtFoiRegado.setText("Não");
+                if (!response.isSuccessful() || plantio == null) {
+                    erro("Planta não encontrada (" + response.code() + ")");
+                    return;
                 }
 
-                txtDataPlantio.setText(plantio.getDataQueFoiPlantado());
-                String previsaoStr = plantio.getPrevisaoProximaIrrigacao();
-                if (previsaoStr != null) {
-                    try {
-                        SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                        SimpleDateFormat sdfExibir = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        Date previsao = sdfParse.parse(previsaoStr);
-                        txtProximaIrrigacao.setText(sdfExibir.format(previsao));
-                    } catch (ParseException e) {
-                        txtProximaIrrigacao.setText("—");
-                    }
-                }
-                String horarioStr = plantio.getPrevisaoProximaIrrigacao();
-                if (horarioStr != null) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                        Date previsao = sdf.parse(horarioStr);
-                        Date agora = new Date();
-                        long diferencaMs = previsao.getTime() - agora.getTime();
-                        long horasRestantes = diferencaMs / (1000 * 60 * 60);
+                // Status
+                txtNomePlanta.setText(textoOuVazio(plantio.getNome()));
+                txtFoiRegado.setText(plantio.isFoi_regado_hoje() ? "Sim" : "Não");
+                txtDataPlantio.setText(textoOuVazio(plantio.getDataQueFoiPlantado()));
+                txtRecebeuLuz.setText(plantio.isPegou_sol_hoje() ? "Sim" : "Não");
 
-                        if (horasRestantes >= 24) {
-                            long dias = horasRestantes / 24;
-                            txtHorarioIrrigar.setText(dias + " dias");
-                        } else {
-                            txtHorarioIrrigar.setText(horasRestantes + "h");
-                        }
-                    } catch (ParseException e) {
-                        txtHorarioIrrigar.setText("—");
-                    }
-                }
-                String previsaoPoda = plantio.getPrevisaoProximaPoda();
-                if (previsaoPoda != null) {
-                    try {
-                        SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                        SimpleDateFormat sdfExibir = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        Date previsao = sdfParse.parse(previsaoPoda);
-                        txtProximaPoda.setText(sdfExibir.format(previsao));
-                    } catch (ParseException e) {
-                        txtProximaPoda.setText("—");
-                    }
-                }
-                //por conta do delay
-                Toast.makeText(TelaInformacoesPlanta.this, "Buscando dados...",Toast.LENGTH_SHORT).show();
-                txtNomePopular.setText("Buscando dados...");
-                txtNomeCientifico.setText("Buscando dados...");
-                txtFamilia.setText("Buscando dados...");
-                txtCiclo.setText("Buscando dados...");
-                txtCrescimento.setText("Buscando dados...");
-                txtTamanhoAdulto.setText("Buscando dados...");
-                txtExposicaoLuz.setText("Buscando dados...");
-                txtPeriodoIrrigacao.setText("Buscando dados...");
-                txtUnidadeIrrigacao.setText("Buscando dados...");
-                txtPeriodoPoda.setText("Buscando dados...");
-                txtDescricao.setText("Buscando dados...");
-                Ap.buscarEspecimePorId(plantio.getEspecimeId()).enqueue(new Callback<Especime>() {
-                    @Override
-                    public void onResponse(Call<Especime> call, Response<Especime> response) {
-                        Especime especime = response.body();
-                        // txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento, txtCrescimentoDiario,
-                        // txtTamanhoAdulto, txtTamanhoMuda, txtExposicaoLuz, txtPeriodoIrrigacao, txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao
-                        txtNomePopular.setText(especime.getNome_popular()!= null ? especime.getNome_popular() : "-");
-                        txtNomeCientifico.setText(especime.getNome_cientifico()!= null ? especime.getNome_cientifico() : "-");
-                        txtFamilia.setText(especime.getFamilia()!= null ? especime.getFamilia() : "-");
-                        txtCiclo.setText(especime.getCiclo()!= null ? especime.getCiclo() : "-");
-                        txtCrescimento.setText(especime.getCiclo()!= null ? especime.getCrescimento() : "-");
-                        float adulto = especime.getTamanho_adulto_cm() != null ? especime.getTamanho_adulto_cm() : 0;
-                        txtTamanhoAdulto.setText(adulto != 0 ? adulto + " cm" : "-");
-                        txtExposicaoLuz.setText(especime.getExposicao_a_luz()!= null ? especime.getExposicao_a_luz() : "-");
-                       // txtPeriodoIrrigacao.setText(especime.getPeriodo_irrigacao()!= null ? especime.getPeriodo_irrigacao() : "-");
-                        txtUnidadeIrrigacao.setText(especime.getUnidade_irrigacao()!= null ? especime.getUnidade_irrigacao(): "-");
-                        txtPeriodoPoda.setText(especime.getPeriodo_poda()!= null ? especime.getPeriodo_poda() : "-");
-                        txtDescricao.setText(especime.getDescricao()!= null ? especime.getDescricao() : "-");
-                    }
+                // Previsões
+                String previsaoIrrigacao = plantio.getPrevisaoProximaIrrigacao();
+                txtProximaIrrigacao.setText(formatarData(previsaoIrrigacao));
+                txtHorarioIrrigar.setText(tempoRestante(previsaoIrrigacao));
+                txtProximaPoda.setText(formatarData(plantio.getPrevisaoProximaPoda()));
 
-                    @Override
-                    public void onFailure(Call<Especime> call, Throwable throwable) {
-                        Toast.makeText(TelaInformacoesPlanta.this, "Erro: "+throwable, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                // txtProximaAdubacao.setText(formatarData(plantio.getPrevisaoProximaAdubacao()));
+
+                carregandoEspecie();
+                buscarEspecime(plantio.getEspecimeId());
             }
+
             @Override
             public void onFailure(Call<Plantio> call, Throwable throwable) {
-                Toast.makeText(TelaInformacoesPlanta.this, "Erro: " + throwable, Toast.LENGTH_SHORT).show();
+                erro("Erro: " + throwable.getMessage());
             }
         });
-
     }
 
-    public void SairInformacao(View view){
+    private void buscarEspecime(int especimeId) {
+        Ap.buscarEspecimePorId(especimeId).enqueue(new Callback<Especime>() {
+            @Override
+            public void onResponse(Call<Especime> call, Response<Especime> response) {
+                Especime especime = response.body();
+                if (!response.isSuccessful() || especime == null) {
+                    erro("Espécie não encontrada (" + response.code() + ")");
+                    return;
+                }
+                txtVaso.setText(textoOuVazio(especime.getTroca_de_vaso()));
+                txtProximaAdubacao.setText(textoOuVazio(especime.getAdubacao()));
+                txtNomePopular.setText(textoOuVazio(especime.getNome_popular()));
+                txtNomeCientifico.setText(textoOuVazio(especime.getNome_cientifico()));
+                txtFamilia.setText(textoOuVazio(especime.getFamilia()));
+                txtCiclo.setText(textoOuVazio(especime.getCiclo()));
+                txtCrescimento.setText(textoOuVazio(especime.getCrescimento())); // antes checava getCiclo()
+
+                Float adulto = especime.getTamanho_adulto_cm();
+                txtTamanhoAdulto.setText(adulto != null && adulto != 0 ? adulto + " cm" : VAZIO);
+
+                txtExposicaoLuz.setText(textoOuVazio(especime.getExposicao_a_luz()));
+                txtUnidadeIrrigacao.setText(textoOuVazio(especime.getUnidade_irrigacao()));
+                txtPeriodoPoda.setText(textoOuVazio(especime.getPeriodo_poda()));
+                txtDescricao.setText(textoOuVazio(especime.getDescricao()));
+                txtVolumeIrrigacao.setText(textoOuVazio(especime.getVolume_irrigacao()));
+                txtTemperaturaIdeal.setText(textoOuVazio(especime.getTemperatura()));
+            }
+
+            @Override
+            public void onFailure(Call<Especime> call, Throwable throwable) {
+                limparEspecie();
+                erro("Erro: " + throwable.getMessage());
+            }
+        });
+    }
+
+
+    private void carregandoEspecie() {
+        TextView[] campos = {txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,
+                txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal,
+                txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao};
+        for (TextView t : campos) t.setText("Buscando dados...");
+    }
+
+    private void limparEspecie() {
+        TextView[] campos = {txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,
+                txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal,
+                txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao};
+        for (TextView t : campos) t.setText(VAZIO);
+    }
+
+    private String textoOuVazio(String s) {
+        return s != null && !s.isEmpty() ? s : VAZIO;
+    }
+
+    private Date parseData(String s) {
+        if (s == null) return null;
+        try {
+            return new SimpleDateFormat(FORMATO_API, Locale.getDefault()).parse(s);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    private String formatarData(String s) {
+        Date d = parseData(s);
+        return d != null ? new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(d) : VAZIO;
+    }
+
+    private String tempoRestante(String s) {
+        Date d = parseData(s);
+        if (d == null) return VAZIO;
+        long diffMs = d.getTime() - System.currentTimeMillis();
+        if (diffMs < 0) return "Atrasada";
+        long horas = diffMs / (1000 * 60 * 60);
+        return horas >= 24 ? (horas / 24) + " dias" : horas + "h";
+    }
+
+    private void erro(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public void SairInformacao(View view) {
         finish();
     }
 }

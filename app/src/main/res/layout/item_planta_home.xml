@@ -123,5 +123,46 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sol"
+                android:textColor="#424242"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txtTempoSol"
+                android:layout_width="92dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="Em 3d" />
+
+            <Button
+                android:id="@+id/btnExporSol"
+                android:layout_width="96dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="10dp"
+                android:minHeight="0dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="Expus ao Sol"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
