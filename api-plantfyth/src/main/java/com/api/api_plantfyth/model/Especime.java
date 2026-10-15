@@ -10,8 +10,8 @@ import java.util.List;
 @Table(name = "especime")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Especime {
 
     @Id

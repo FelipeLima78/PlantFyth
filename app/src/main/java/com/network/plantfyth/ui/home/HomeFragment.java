@@ -171,6 +171,12 @@ public class HomeFragment extends Fragment {
         item.adubo = statusCuidado(
                 e == null ? null : e.getAdubacao(),
                 plantio.getPrevisao_proxima_adubacao());
+        item.sol = criarStatusSol(plantio.isPegou_sol_hoje());
+    }
+    private PlantioHomeItem.AcaoStatus criarStatusSol(boolean pegou) {
+        return pegou
+                ? new PlantioHomeItem.AcaoStatus("Tomou sol hoje", PlantioHomeItem.COR_OK, false, false)
+                : new PlantioHomeItem.AcaoStatus("Sol pendente", PlantioHomeItem.COR_HOJE, false, true);
     }
 
     private PlantioHomeItem.AcaoStatus criarStatus(Date proximaData) {
@@ -203,6 +209,16 @@ public class HomeFragment extends Fragment {
     private void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao) {
         int posicao = itens.indexOf(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
+        if (tipoAcao == TipoAcao.SOL) {
+            if (item.plantio.isPegou_sol_hoje()) return;
+            item.plantio.setPegou_sol_hoje(true);
+            item.salvandoAcao = TipoAcao.SOL;
+            recalcularStatus(item);
+            adapter.notifyItemChanged(posicao);
+            salvarPlantioAtualizado(item, posicao, TipoAcao.SOL, null, null);
+            return;
+        }
+
 
         Plantio plantio = item.plantio;
         String dataAnterior = getDataAcao(plantio, tipoAcao);
@@ -228,7 +244,13 @@ public class HomeFragment extends Fragment {
 
         salvarPlantioAtualizado(item, posicao, tipoAcao, dataAnterior, proximaData);
     }
-
+    private void desfazerAcao(Plantio p, TipoAcao tipo, String dataAnterior) {
+        if (tipo == TipoAcao.SOL) {
+            p.setPegou_sol_hoje(false);
+        } else {
+            setDataAcao(p, tipo, dataAnterior);
+        }
+    }
     private void salvarPlantioAtualizado(
             PlantioHomeItem item,
             int posicao,
@@ -260,7 +282,7 @@ public class HomeFragment extends Fragment {
 
                     Toast.makeText(requireContext(), "Acao registrada.", Toast.LENGTH_SHORT).show();
                 } else {
-                    setDataAcao(itemAtual.plantio, tipoAcao, dataAnterior);
+                    desfazerAcao(itemAtual.plantio, tipoAcao, dataAnterior);
                     recalcularStatus(itemAtual);
                     adapter.notifyItemChanged(pos);
                     atualizarAviso();
@@ -280,7 +302,7 @@ public class HomeFragment extends Fragment {
                 PlantioHomeItem itemAtual = item;
                 itemAtual.salvandoAcao = null;
 
-                setDataAcao(itemAtual.plantio, tipoAcao, dataAnterior);
+                desfazerAcao(itemAtual.plantio, tipoAcao, dataAnterior);
                 recalcularStatus(itemAtual);
                 adapter.notifyItemChanged(posicao);
                 atualizarAviso();
@@ -501,7 +523,8 @@ public class HomeFragment extends Fragment {
     public enum TipoAcao {
         IRRIGAR,
         ADUBAR,
-        PODAR
+        PODAR,
+        SOL
     }
 
     public interface OnAcaoListener {

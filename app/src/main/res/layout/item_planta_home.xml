@@ -188,7 +188,7 @@
                 tools:text="Em 3d" />
 
             <Button
-                android:id="@+id/btnExporSol"
+                android:id="@+id/btnSol"
                 android:layout_width="96dp"
                 android:layout_height="38dp"
                 android:layout_marginStart="10dp"

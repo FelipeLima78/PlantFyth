@@ -49,7 +49,7 @@ public class PlantioHomeItem {
 
         public static AcaoStatus naoNecessario() {
             return new AcaoStatus("Nao precisa", COR_INDISPONIVEL,
-                    false, false, false, false);
+                    false, false, false, true);
         }
     }
 }

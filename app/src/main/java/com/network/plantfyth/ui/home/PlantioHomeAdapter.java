@@ -52,6 +52,9 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
                 HomeFragment.TipoAcao.PODAR, "Podei");
         configurarAcao(holder.txtTempoAdubar, holder.btnAdubar, item, item.adubo,
                 HomeFragment.TipoAcao.ADUBAR, "Adubei");
+        configurarAcao(holder.txtTempoSol, holder.btnSol, item, item.sol,
+                HomeFragment.TipoAcao.SOL, item.plantio.isPegou_sol_hoje() ? "Feito" : "Expus ao sol");
+
     }
 
     @Override
@@ -110,9 +113,11 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
         TextView txtTempoIrrigar;
         TextView txtTempoAdubar;
         TextView txtTempoPodar;
+        TextView txtTempoSol;
         Button btnIrrigar;
         Button btnAdubar;
         Button btnPodar;
+        Button btnSol;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -121,9 +126,11 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
             txtTempoIrrigar = itemView.findViewById(R.id.txtTempoIrrigar);
             txtTempoPodar = itemView.findViewById(R.id.txtTempoPodar);
             txtTempoAdubar = itemView.findViewById(R.id.txtTempoAdubar);
+            txtTempoSol = itemView.findViewById(R.id.txtTempoSol);
             btnIrrigar = itemView.findViewById(R.id.btnIrrigar);
             btnPodar = itemView.findViewById(R.id.btnPodar);
             btnAdubar = itemView.findViewById(R.id.btnAdubar);
+            btnSol = itemView.findViewById(R.id.btnSol);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.api.api_plantfyth.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +23,8 @@ public interface PlantioRepository extends JpaRepository<Plantio, Integer>{
      List<Plantio> findByEspecimeId(Integer especime_id);
 
     List<Plantio> findByNomeContaining(String nome);
+    @Modifying
+    @Query("UPDATE Plantio p SET p.pegouSolHoje = false, p.foiRegadoHoje = false")
+    void resetarFlagsDiarias();
 
 }
