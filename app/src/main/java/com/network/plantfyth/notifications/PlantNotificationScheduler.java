@@ -15,6 +15,9 @@ import androidx.annotation.RequiresPermission;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.util.Log;
 
 import com.network.plantfyth.MainActivity;
 import com.network.plantfyth.R;
@@ -43,6 +46,8 @@ public final class PlantNotificationScheduler {
     private static final int SUMMARY_NOTIFICATION_ID = 8800;
     private static final int ACTION_IRRIGAR = 1;
     private static final int ACTION_PODAR = 2;
+    private static final int ACTION_SOL = 3;
+    private static final int ACTION_ADUBAR = 4;
 
     private PlantNotificationScheduler() {
     }
@@ -50,7 +55,6 @@ public final class PlantNotificationScheduler {
     public static void refreshPlantCareAlarmsAndNotifyDue(Context context, int usuarioId, boolean notifyDueNow) {
         PlantFythAPI api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
         api.buscarPlantasUsuario(usuarioId).enqueue(new Callback<List<Plantio>>() {
-            @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
             @Override
             public void onResponse(@NonNull Call<List<Plantio>> call,
                                    @NonNull Response<List<Plantio>> response) {
@@ -78,7 +82,7 @@ public final class PlantNotificationScheduler {
     public static void schedulePlantCareAlarms(Context context, Plantio plantio) {
         Date irrigacao = parsePlantDate(plantio.getPrevisaoProximaIrrigacao());
         Date poda = parsePlantDate(plantio.getPrevisaoProximaPoda());
-
+        Date adubacao = parsePlantDate(plantio.getPrevisao_proxima_adubacao());
         if (irrigacao != null && irrigacao.after(new Date())) {
             scheduleAlarm(context, plantio, ACTION_IRRIGAR, "regar", irrigacao);
         }
@@ -86,9 +90,13 @@ public final class PlantNotificationScheduler {
         if (poda != null && poda.after(new Date())) {
             scheduleAlarm(context, plantio, ACTION_PODAR, "podar", poda);
         }
+
+        if (adubacao != null && adubacao.after(new Date())) {
+            scheduleAlarm(context, plantio, ACTION_ADUBAR, "adubar", adubacao);
+        }
+
     }
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     public static void notifyDuePlants(Context context, List<Plantio> plantas) {
         if (!canPostNotifications(context)) return;
 
@@ -98,6 +106,8 @@ public final class PlantNotificationScheduler {
         for (Plantio plantio : plantas) {
             Date irrigacao = parsePlantDate(plantio.getPrevisaoProximaIrrigacao());
             Date poda = parsePlantDate(plantio.getPrevisaoProximaPoda());
+            Date adubacao = parsePlantDate(plantio.getPrevisao_proxima_adubacao());
+
             String plantName = plantName(plantio);
 
             if (irrigacao != null && !irrigacao.after(now)) {
@@ -106,6 +116,9 @@ public final class PlantNotificationScheduler {
 
             if (poda != null && !poda.after(now)) {
                 messages.add("Podar: " + plantName);
+            }
+            if (adubacao != null && !adubacao.after(now)) {
+                messages.add("Adubar: " + plantName);
             }
         }
 
@@ -127,10 +140,9 @@ public final class PlantNotificationScheduler {
                 .setAutoCancel(true)
                 .setContentIntent(openAppIntent(context));
 
-        NotificationManagerCompat.from(context).notify(SUMMARY_NOTIFICATION_ID, builder.build());
+        postar(context, SUMMARY_NOTIFICATION_ID, builder.build());
     }
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     public static void showSingleCareNotification(Context context, int notificationId,
                                                   String plantName, String actionName) {
         if (!canPostNotifications(context)) return;
@@ -142,13 +154,13 @@ public final class PlantNotificationScheduler {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle("Hora de " + safeActionName)
-                .setContentText("A planta " + safePlantName + " precisa de cuidado.")
+                .setContentTitle("Talvez seja hora de " + safeActionName)
+                .setContentText("A planta " + safePlantName + " talvez precise de cuidado.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(openAppIntent(context));
 
-        NotificationManagerCompat.from(context).notify(notificationId, builder.build());
+        postar(context, notificationId, builder.build());
     }
 
     private static void scheduleAlarm(Context context, Plantio plantio, int actionType,
@@ -252,4 +264,19 @@ public final class PlantNotificationScheduler {
         }
         return builder.toString();
     }
+
+    @SuppressLint("MissingPermission")
+    private static void postar(Context context, int id, Notification notificacao) {
+        if (!canPostNotifications(context)) {
+            Log.w("PlantNotif", "Sem permissao POST_NOTIFICATIONS");
+            return;
+        }
+        try {
+            NotificationManagerCompat.from(context).notify(id, notificacao);
+        } catch (SecurityException e) {
+            Log.w("PlantNotif", "Notificacao bloqueada", e);
+        }
+    }
+
+
 }

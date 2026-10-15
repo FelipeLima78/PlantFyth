@@ -92,6 +92,7 @@ public class PlantioController{
 		plantioAtualizar.setData_que_foi_Plantado(plantio.getData_que_foi_Plantado());
         plantioAtualizar.setPegouSolHoje(plantio.getPegouSolHoje());
 		plantioAtualizar.setEspecime(plantio.getEspecime());
+		plantioAtualizar.setPrevisaoProximaAdubacao(plantio.getPrevisaoProximaAdubacao());
 		return plantioService.savePlantio(plantioAtualizar);
 	}
 	@GetMapping("/usuario/{id}")

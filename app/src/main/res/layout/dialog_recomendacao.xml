@@ -14,7 +14,7 @@
         android:textStyle="bold"
         android:textColor="#2E7D32"
         android:gravity="center"
-        android:layout_marginBottom="60dp"/>
+        android:layout_marginBottom="50dp"/>
 
 
     <ScrollView
@@ -26,16 +26,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="4dp"
-            android:text="As informações de manejo do Plantfyth são recomendações com fontes acadêmicas de regiões diferentes, entenda que são recomendações do que seria mais próximo do ideal para o seu plantio. Os valores deirrigação, exposição a luz e adubação podem variar de acordo com a região que você cultiva seu plantio."
+            android:text="As informações de manejo do Plantfyth são recomendações com fontes acadêmicas de regiões diferentes,
+ entenda que são recomendações do que seria mais próximo do ideal para o seu plantio. Os valores de
+ irrigação, exposição a luz, poda e adubação podem variar de acordo com a região que você cultiva seu plantio.
+ Sempre preste atenção aos cuidados de seu espécime.
+
+
+"
             android:textColor="#555555"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
     </ScrollView>
 
     <Button
         android:id="@+id/btnContinuar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="25dp"
         android:backgroundTint="#2E7D32"
         android:text="Prosseguir" />
 

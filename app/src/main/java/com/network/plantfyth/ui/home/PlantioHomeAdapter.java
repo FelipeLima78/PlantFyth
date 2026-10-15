@@ -21,9 +21,14 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
     private final List<PlantioHomeItem> itens;
     private final HomeFragment.OnAcaoListener listener;
 
-    public PlantioHomeAdapter(List<PlantioHomeItem> itens, HomeFragment.OnAcaoListener listener) {
+    private final HomeFragment.OnInfoListener infoListener;
+
+    public PlantioHomeAdapter(List<PlantioHomeItem> itens,
+                              HomeFragment.OnAcaoListener listener,
+                              HomeFragment.OnInfoListener infoListener) {
         this.itens = itens;
         this.listener = listener;
+        this.infoListener = infoListener;
     }
 
     @NonNull
@@ -45,6 +50,8 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
                 HomeFragment.TipoAcao.IRRIGAR, "Irriguei");
         configurarAcao(holder.txtTempoPodar, holder.btnPodar, item, item.poda,
                 HomeFragment.TipoAcao.PODAR, "Podei");
+        configurarAcao(holder.txtTempoAdubar, holder.btnAdubar, item, item.adubo,
+                HomeFragment.TipoAcao.ADUBAR, "Adubei");
     }
 
     @Override
@@ -55,11 +62,30 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
     private void configurarAcao(TextView txtTempo, Button botao, PlantioHomeItem item,
                                 PlantioHomeItem.AcaoStatus status,
                                 HomeFragment.TipoAcao tipoAcao, String textoBotao) {
+        txtTempo.setText(status.textoTempo);
+        txtTempo.setTextColor(status.cor);
+
+        // cuidado que a espécie não precisa: só texto
+        if (status.semBotao) {
+            botao.setVisibility(View.GONE);
+            return;
+        }
+        botao.setVisibility(View.VISIBLE);   // obrigatório: o RecyclerView reaproveita a view
+
+        // sem previsão (estação, mês, texto ilegível): vai para as informações
+        if (status.abrirInfo) {
+            botao.setText("Ver informações");
+            botao.setEnabled(true);
+            botao.setAlpha(1f);
+            botao.setBackgroundTintList(ColorStateList.valueOf(status.cor));
+            botao.setOnClickListener(v -> infoListener.onAbrirInfo(item));
+            return;
+        }
+
+        // 3) caminho normal (o que você já tinha)
         boolean salvandoEstaAcao = item.salvandoAcao == tipoAcao;
         boolean habilitado = status.disponivel && item.salvandoAcao == null;
 
-        txtTempo.setText(status.textoTempo);
-        txtTempo.setTextColor(status.cor);
         botao.setText(salvandoEstaAcao ? "Salvando" : textoBotao);
         botao.setEnabled(habilitado);
         botao.setAlpha(habilitado || salvandoEstaAcao ? 1f : 0.55f);
@@ -94,8 +120,10 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
             txtNomeEspecime = itemView.findViewById(R.id.txtNomeEspecime);
             txtTempoIrrigar = itemView.findViewById(R.id.txtTempoIrrigar);
             txtTempoPodar = itemView.findViewById(R.id.txtTempoPodar);
+            txtTempoAdubar = itemView.findViewById(R.id.txtTempoAdubar);
             btnIrrigar = itemView.findViewById(R.id.btnIrrigar);
             btnPodar = itemView.findViewById(R.id.btnPodar);
+            btnAdubar = itemView.findViewById(R.id.btnAdubar);
         }
     }
 }

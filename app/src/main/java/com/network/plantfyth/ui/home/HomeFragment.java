@@ -11,6 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.app.AlarmManager;
+import android.net.Uri;
+import android.provider.Settings;
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,14 +26,18 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.appcompat.app.AlertDialog;
 
 import com.network.plantfyth.TelaCadastroPlanta;
+import com.network.plantfyth.TelaInformacoesPlanta;
 import com.network.plantfyth.databinding.FragmentHomeBinding;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
+import com.network.plantfyth.notifications.PlantCareDailyWorker;
 import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
+import com.network.plantfyth.CuidadoCalculator;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,31 +55,19 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
-    private static final int DIAS_PADRAO_ADUBACAO = 30;
-
     private FragmentHomeBinding binding;
     private PlantFythAPI api;
     private PlantioHomeAdapter adapter;
     private final List<PlantioHomeItem> itens = new ArrayList<>();
-    private final List<Plantio> ultimasPlantasCarregadas = new ArrayList<>();
+    //private final List<Plantio> ultimasPlantasCarregadas = new ArrayList<>();
     private ActivityResultLauncher<String> notificationPermissionLauncher;
-    private boolean notificarDepoisDaPermissao = false;
+    //private boolean notificarDepoisDaPermissao = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notificationPermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                permitido -> {
-                    if (permitido && notificarDepoisDaPermissao && isAdded()) {
-                        PlantNotificationScheduler.notifyDuePlants(
-                                requireContext(),
-                                ultimasPlantasCarregadas
-                        );
-                    }
-                    notificarDepoisDaPermissao = false;
-                }
-        );
+        notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                permitido -> {if (isAdded()) pedirAlarmeExatoSeNecessario();});
     }
 
     @Override
@@ -86,11 +82,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = new PlantioHomeAdapter(itens, this::onAcaoMarcada);
+        adapter = new PlantioHomeAdapter(itens, this::onAcaoMarcada, this::abrirInfo);;
         binding.recyclerPlantasHome.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerPlantasHome.setAdapter(adapter);
         binding.fabAdicionarPlanta.setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), TelaCadastroPlanta.class)));
+    }
+    private void abrirInfo(PlantioHomeItem item) {
+        Intent intent = new Intent(requireActivity(), TelaInformacoesPlanta.class);
+        intent.putExtra("plantio_id", item.plantio.getId());
+        startActivity(intent);
     }
 
     @Override
@@ -107,6 +108,7 @@ public class HomeFragment extends Fragment {
             Toast.makeText(requireContext(), "Usuario nao identificado.", Toast.LENGTH_SHORT).show();
             return;
         }
+        PlantCareDailyWorker.scheduleDailyChecks(requireContext(), usuarioId);
 
         mostrarCarregando(true);
         api.buscarPlantasUsuario(usuarioId).enqueue(new Callback<List<Plantio>>() {
@@ -158,10 +160,17 @@ public class HomeFragment extends Fragment {
 
     private void recalcularStatus(PlantioHomeItem item) {
         Plantio plantio = item.plantio;
+        Especime e = plantio.getEspecime();
 
         item.irrigacao = criarStatus(parseDataPlantio(plantio.getPrevisaoProximaIrrigacao()));
 
-        item.poda = criarStatus(parseDataPlantio(plantio.getPrevisaoProximaPoda()));
+        item.poda = statusCuidado(
+                e == null ? null : e.getPeriodo_poda(),
+                plantio.getPrevisaoProximaPoda());
+
+        item.adubo = statusCuidado(
+                e == null ? null : e.getAdubacao(),
+                plantio.getPrevisao_proxima_adubacao());
     }
 
     private PlantioHomeItem.AcaoStatus criarStatus(Date proximaData) {
@@ -194,13 +203,6 @@ public class HomeFragment extends Fragment {
     private void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao) {
         int posicao = itens.indexOf(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
-
-        if (tipoAcao == TipoAcao.ADUBAR) {
-            Toast.makeText(requireContext(),
-                    "Adubacao ainda nao tem previsao no banco.",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         Plantio plantio = item.plantio;
         String dataAnterior = getDataAcao(plantio, tipoAcao);
@@ -241,7 +243,9 @@ public class HomeFragment extends Fragment {
             public void onResponse(@NonNull Call<Plantio> call, @NonNull Response<Plantio> response) {
                 if (!isAdded() || binding == null || posicao >= itens.size()) return;
 
-                PlantioHomeItem itemAtual = itens.get(posicao);
+                int pos = itens.indexOf(item);
+                if (pos == -1) return;
+                PlantioHomeItem itemAtual = item;
                 itemAtual.salvandoAcao = null;
 
                 if (response.isSuccessful() && response.body() != null) {
@@ -251,14 +255,14 @@ public class HomeFragment extends Fragment {
                     itemAtual.plantio = atualizado;
                     PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), atualizado);
                     recalcularStatus(itemAtual);
-                    adapter.notifyItemChanged(posicao);
+                    adapter.notifyItemChanged(pos);
                     atualizarAviso();
 
                     Toast.makeText(requireContext(), "Acao registrada.", Toast.LENGTH_SHORT).show();
                 } else {
                     setDataAcao(itemAtual.plantio, tipoAcao, dataAnterior);
                     recalcularStatus(itemAtual);
-                    adapter.notifyItemChanged(posicao);
+                    adapter.notifyItemChanged(pos);
                     atualizarAviso();
 
                     Toast.makeText(requireContext(),
@@ -271,7 +275,9 @@ public class HomeFragment extends Fragment {
             public void onFailure(@NonNull Call<Plantio> call, @NonNull Throwable t) {
                 if (!isAdded() || binding == null || posicao >= itens.size()) return;
 
-                PlantioHomeItem itemAtual = itens.get(posicao);
+                int pos = itens.indexOf(item);
+                if (pos == -1) return;
+                PlantioHomeItem itemAtual = item;
                 itemAtual.salvandoAcao = null;
 
                 setDataAcao(itemAtual.plantio, tipoAcao, dataAnterior);
@@ -291,6 +297,8 @@ public class HomeFragment extends Fragment {
             atualizado.setPrevisaoProximaIrrigacao(proximaData);
         } else if (tipoAcao == TipoAcao.PODAR && atualizado.getPrevisaoProximaPoda() == null) {
             atualizado.setPrevisaoProximaPoda(proximaData);
+        } else if (tipoAcao == TipoAcao.ADUBAR && atualizado.getPrevisao_proxima_adubacao() == null) {
+            atualizado.setPrevisao_proxima_adubacao(proximaData);
         }
     }
 
@@ -302,12 +310,11 @@ public class HomeFragment extends Fragment {
                 return formatarDataParaBackend(calcularProximaIrrigacao(especime));
 
             case PODAR:
-                Date proximaPoda = calcularProximaPoda(especime);
-                return proximaPoda == null ? null : formatarDataParaBackend(proximaPoda);
+                return formatarDataParaBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getPeriodo_poda()));
 
             case ADUBAR:
-            default:
-                return null;
+                return formatarDataParaBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getAdubacao()));
+            default: return null;
         }
     }
 
@@ -327,75 +334,6 @@ public class HomeFragment extends Fragment {
         return calendar.getTime();
     }
 
-    private Date calcularProximaPoda(Especime especime) {
-        if (especime == null || especime.getPeriodo_poda() == null) return null;
-
-        String periodoPoda = especime.getPeriodo_poda();
-        if (contemNumero(periodoPoda)) {
-            int dias = Math.max(1, (int) Math.ceil(extrairPrimeiroNumero(periodoPoda, 180)));
-            return somarDias(new Date(), dias);
-        }
-
-        Date proximaPorMes = calcularProximaPodaPorMes(periodoPoda);
-        return proximaPorMes != null ? proximaPorMes : null;
-    }
-
-    private Date calcularProximaPodaPorMes(String periodoPoda) {
-        List<Integer> meses = extrairMeses(periodoPoda);
-        if (meses.isEmpty()) return null;
-
-        Calendar agora = Calendar.getInstance();
-        Calendar candidato = Calendar.getInstance();
-        candidato.set(Calendar.DAY_OF_MONTH, 1);
-        candidato.set(Calendar.HOUR_OF_DAY, 9);
-        candidato.set(Calendar.MINUTE, 0);
-        candidato.set(Calendar.SECOND, 0);
-        candidato.set(Calendar.MILLISECOND, 0);
-
-        for (int i = 0; i < 24; i++) {
-            candidato.set(Calendar.YEAR, agora.get(Calendar.YEAR));
-            candidato.set(Calendar.MONTH, agora.get(Calendar.MONTH));
-            candidato.add(Calendar.MONTH, i);
-
-            if (meses.contains(candidato.get(Calendar.MONTH)) && candidato.after(agora)) {
-                return candidato.getTime();
-            }
-        }
-        return null;
-    }
-
-    private List<Integer> extrairMeses(String texto) {
-        String normalizado = texto.toLowerCase(Locale.ROOT);
-        List<Integer> meses = new ArrayList<>();
-        String[][] nomes = {
-                {"january", "janeiro"},
-                {"february", "fevereiro"},
-                {"march", "marco", "marco", "mar."},
-                {"april", "abril"},
-                {"may", "maio"},
-                {"june", "junho"},
-                {"july", "julho"},
-                {"august", "agosto"},
-                {"september", "setembro"},
-                {"october", "outubro"},
-                {"november", "novembro"},
-                {"december", "dezembro"}
-        };
-
-        for (int mes = 0; mes < nomes.length; mes++) {
-            for (String nome : nomes[mes]) {
-                if (normalizado.contains(nome) && !meses.contains(mes)) {
-                    meses.add(mes);
-                    break;
-                }
-            }
-        }
-        return meses;
-    }
-
-    private boolean contemNumero(String texto) {
-        return texto != null && Pattern.compile("\\d+").matcher(texto).find();
-    }
 
     private double extrairPrimeiroNumero(String texto, double padrao) {
         if (texto == null) return padrao;
@@ -418,6 +356,7 @@ public class HomeFragment extends Fragment {
                 return plantio.getPrevisaoProximaPoda();
 
             case ADUBAR:
+                return plantio.getPrevisao_proxima_adubacao();
             default:
                 return null;
         }
@@ -434,6 +373,7 @@ public class HomeFragment extends Fragment {
                 break;
 
             case ADUBAR:
+                plantio.setPrevisao_proxima_adubacao(data);
                 break;
         }
     }
@@ -452,7 +392,7 @@ public class HomeFragment extends Fragment {
     private void atualizarAviso() {
         int atrasadas = 0;
         for (PlantioHomeItem item : itens) {
-            if (item.irrigacao.atrasada || item.poda.atrasada) {
+            if (item.irrigacao.atrasada || item.poda.atrasada || item.adubo.atrasada) {
                 atrasadas++;
             }
         }
@@ -467,7 +407,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void verificarNotificacoesDaHome(List<Plantio> plantas) {
+    /*private void verificarNotificacoesDaHome(List<Plantio> plantas) {
         if (!isAdded()) return;
 
         ultimasPlantasCarregadas.clear();
@@ -487,6 +427,20 @@ public class HomeFragment extends Fragment {
 
         notificarDepoisDaPermissao = false;
         PlantNotificationScheduler.notifyDuePlants(requireContext(), plantas);
+    } */
+
+    private void verificarNotificacoesDaHome(List<Plantio> plantas) {
+        if (!isAdded()) return;
+
+        PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), plantas);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            return;
+        }
+        pedirAlarmeExatoSeNecessario();
     }
 
     private Date parseDataPlantio(String dataTexto) {
@@ -552,5 +506,45 @@ public class HomeFragment extends Fragment {
 
     public interface OnAcaoListener {
         void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao);
+    }
+    public interface OnInfoListener {
+        void onAbrirInfo(PlantioHomeItem item);
+    }
+
+    private PlantioHomeItem.AcaoStatus statusCuidado(String periodo, String dataTexto) {
+        if (CuidadoCalculator.naoPrecisa(periodo)) {
+            return PlantioHomeItem.AcaoStatus.naoNecessario();
+        }
+        if (CuidadoCalculator.proximaPorPeriodo(periodo) == null) {
+            return PlantioHomeItem.AcaoStatus.consultarInfo();
+        }
+        Date data = parseDataPlantio(dataTexto);
+        if (data == null) {
+            return new PlantioHomeItem.AcaoStatus(
+                    "Sem registro", PlantioHomeItem.COR_HOJE, false, true);
+        }
+        return criarStatus(data);
+    }
+
+    //  notificação alarme
+    private void pedirAlarmeExatoSeNecessario() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return;
+
+        AlarmManager am = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+        if (am == null || am.canScheduleExactAlarms()) return;
+
+        android.content.SharedPreferences prefs =
+                requireContext().getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
+        if (prefs.getBoolean("alarme_exato_perguntado", false)) return;
+        prefs.edit().putBoolean("alarme_exato_perguntado", true).apply();
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Lembretes no horário certo")
+                .setMessage("Para avisar na hora de cuidar das plantas, permita 'Alarmes e lembretes'.")
+                .setPositiveButton("Permitir", (d, w) -> startActivity(new Intent(
+                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                        Uri.parse("package:" + requireContext().getPackageName()))))
+                .setNegativeButton("Agora não", null)
+                .show();
     }
 }

@@ -171,7 +171,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Vaso necessário"
+                            android:text="Período que deve trocar o vaso"
                             android:textAllCaps="true"
                             android:textColor="#7A8A7A"
                             android:textSize="11sp"
@@ -323,7 +323,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Próxima adubação"
+                            android:text="Intervalo adubação"
                             android:textAllCaps="true"
                             android:textColor="#7A8A7A"
                             android:textSize="11sp"

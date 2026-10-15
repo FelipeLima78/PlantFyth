@@ -60,6 +60,9 @@ public class Plantio {
     @Column(name = "pegou_sol_hoje")
     private Boolean pegouSolHoje;
 
+    @Column(name = "previsao_proxima_adubacao")
+    private String previsaoProximaAdubacao;
+
     @ManyToOne
     @JoinColumn(name = "fk_usuario_id",insertable = false, updatable = false)
     @JsonIgnore

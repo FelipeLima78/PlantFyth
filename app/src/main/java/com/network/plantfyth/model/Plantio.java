@@ -12,7 +12,7 @@ public class Plantio {
     public Plantio() {
     }
 
-    public Plantio(Integer especimeId, Integer usuarioId, Usuario usuario, Especime especime, Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, boolean pegou_sol_hoje, String previsao_proxima_irrigacao, String previsao_proxima_poda) {
+    public Plantio(Integer especimeId, Integer usuarioId, Usuario usuario, Especime especime, Integer id, String nome, String data_que_foi_plantado, boolean foi_regado_hoje, boolean pegou_sol_hoje, String previsao_proxima_irrigacao, String previsao_proxima_poda, String previsao_proxima_adubacao) {
         this.especimeId = especimeId;
         this.usuarioId = usuarioId;
         this.usuario = usuario;
@@ -24,6 +24,7 @@ public class Plantio {
         this.pegou_sol_hoje = pegou_sol_hoje;
         this.previsao_proxima_irrigacao = previsao_proxima_irrigacao;
         this.previsao_proxima_poda = previsao_proxima_poda;
+        this.previsao_proxima_adubacao = previsao_proxima_adubacao;
     }
     //gettes e setters
     public Integer getEspecimeId() {
@@ -108,6 +109,14 @@ public class Plantio {
         this.usuario = usuario;
     }
 
+    public String getPrevisao_proxima_adubacao() {
+        return previsao_proxima_adubacao;
+    }
+
+    public void setPrevisao_proxima_adubacao(String previsao_proxima_adubacao) {
+        this.previsao_proxima_adubacao = previsao_proxima_adubacao;
+    }
+
     public Especime getEspecime() {
         return especime;
     }
@@ -144,7 +153,8 @@ public class Plantio {
     private String previsao_proxima_irrigacao;
     @SerializedName("previsaoProximaPoda")
     private String previsao_proxima_poda;
-    //Informações dinâmicas do app
+    @SerializedName("previsaoProximaAdubacao")
+    private String previsao_proxima_adubacao;
 
 }
 

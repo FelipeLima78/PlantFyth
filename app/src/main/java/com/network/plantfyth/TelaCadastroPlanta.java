@@ -130,48 +130,16 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                 checkPegouSolHoje.isChecked()
         );
 
-        if (especime.getPeriodo_irrigacao() != null) {
-            try{
-            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-            formato.setLenient(false);
-            Date dataConvertida = formato.parse(edtDataPlantio.getText().toString());
-            Calendar proxIrrigacao = Calendar.getInstance();
-            proxIrrigacao.setTime(dataConvertida);
+        Date irrigacao = plantio.isFoi_regado_hoje()
+                ? CuidadoCalculator.proximaIrrigacao(especime)
+                : new Date();
+        plantio.setPrevisaoProximaIrrigacao(CuidadoCalculator.paraBackend(irrigacao));
 
-            if(plantio.isFoi_regado_hoje()){
-            proxIrrigacao.add(
-                    Calendar.HOUR_OF_DAY,
-                    especime.getPeriodo_irrigacao().intValue()
-            );
-            }
+        plantio.setPrevisaoProximaPoda(CuidadoCalculator.paraBackend(
+                CuidadoCalculator.proximaPorPeriodo(especime.getPeriodo_poda())));
 
-            SimpleDateFormat sdf =
-                    new SimpleDateFormat(
-                            "yyyy-MM-dd'T'HH:mm:ss",
-                            Locale.getDefault()
-                    );
-
-            plantio.setPrevisaoProximaIrrigacao(
-                    sdf.format(proxIrrigacao.getTime())
-            );
-             }catch (ParseException e) {
-                e.printStackTrace();
-                Toast.makeText(
-                        this,
-                        "Data de plantio inválida",
-                        Toast.LENGTH_SHORT
-                ).show();
-                return;
-            }
-        }
-
-        if (especime.getPeriodo_poda() != null) {
-            plantio.setPrevisaoProximaPoda(
-                    especime.getPeriodo_poda()
-            );
-        } else {
-            plantio.setPrevisaoProximaPoda("Não precisa de poda");
-        }
+        plantio.setPrevisao_proxima_adubacao(CuidadoCalculator.paraBackend(
+                CuidadoCalculator.proximaPorPeriodo(especime.getAdubacao())));
 
         Ap.savePlantio(plantio)
                 .enqueue(new Callback<Plantio>() {

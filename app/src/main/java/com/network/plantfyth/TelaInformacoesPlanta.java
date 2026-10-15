@@ -28,7 +28,7 @@ import retrofit2.Response;
 
 public class TelaInformacoesPlanta extends AppCompatActivity {
 
-    private static final String FORMATO_API = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String FORMATO = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String VAZIO = "—";
 
     // Status
@@ -109,7 +109,6 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                 txtHorarioIrrigar.setText(tempoRestante(previsaoIrrigacao));
                 txtProximaPoda.setText(formatarData(plantio.getPrevisaoProximaPoda()));
 
-                // txtProximaAdubacao.setText(formatarData(plantio.getPrevisaoProximaAdubacao()));
 
                 carregandoEspecie();
                 buscarEspecime(plantio.getEspecimeId());
@@ -132,6 +131,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                     return;
                 }
                 txtVaso.setText(textoOuVazio(especime.getTroca_de_vaso()));
+
                 txtProximaAdubacao.setText(textoOuVazio(especime.getAdubacao()));
                 txtNomePopular.setText(textoOuVazio(especime.getNome_popular()));
                 txtNomeCientifico.setText(textoOuVazio(especime.getNome_cientifico()));
@@ -180,7 +180,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
     private Date parseData(String s) {
         if (s == null) return null;
         try {
-            return new SimpleDateFormat(FORMATO_API, Locale.getDefault()).parse(s);
+            return new SimpleDateFormat(FORMATO, Locale.getDefault()).parse(s);
         } catch (ParseException e) {
             return null;
         }
