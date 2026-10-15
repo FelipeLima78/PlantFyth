@@ -70,14 +70,14 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
 
         // cuidado que a espécie não precisa: só texto
         if (status.semBotao) {
-            botao.setVisibility(View.GONE);
+            botao.setVisibility(View.INVISIBLE);
             return;
         }
         botao.setVisibility(View.VISIBLE);   // obrigatório: o RecyclerView reaproveita a view
 
         // sem previsão (estação, mês, texto ilegível): vai para as informações
         if (status.abrirInfo) {
-            botao.setText("Ver informações");
+            botao.setText("Ver Info");
             botao.setEnabled(true);
             botao.setAlpha(1f);
             botao.setBackgroundTintList(ColorStateList.valueOf(status.cor));

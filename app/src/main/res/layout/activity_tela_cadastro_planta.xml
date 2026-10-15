@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Cabeçalho -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -75,12 +74,37 @@
                     android:textSize="14sp"
                     android:textStyle="bold"/>
 
-                <Spinner
-                    android:id="@+id/spinnerEspecime"
+                <EditText
+                    android:id="@+id/edtEspecie"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginTop="8dp"
-                    android:paddingHorizontal="8dp"/>
+                    android:drawableEnd="@android:drawable/ic_menu_search"
+                    android:focusable="false"
+                    android:hint="Toque para buscar a espécie"
+                    android:inputType="text"
+                    android:onClick="AbrirSeletorEspecie"
+                    android:paddingHorizontal="14dp"
+                    android:textColorHint="#9AA69A"
+                    android:textSize="15sp" />
+                <TextView
+                    android:id="@+id/txtVolumeIrrigacao"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Volume de irrigação: --"
+                    android:textColor="#33443A"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txtExposicaoLuz"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Exposição à luz: --"
+                    android:textColor="#33443A"
+                    android:textSize="14sp" />
+
 
                 <!-- Data do plantio -->
                 <TextView

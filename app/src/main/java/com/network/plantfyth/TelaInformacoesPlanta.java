@@ -38,7 +38,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
     // Espécie
     private TextView txtNomePopular, txtNomeCientifico, txtFamilia, txtCrescimento, txtCiclo,
             txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal,
-            txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao;
+            txtFrequenciaIrrigacao, txtPeriodoPoda, txtDescricao;
 
     private Button btnSairInformacao;
 
@@ -66,7 +66,7 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
         txtHorarioIrrigar = findViewById(R.id.txtHorarioIrrigar);
         txtProximaPoda = findViewById(R.id.txtProximaPoda);
         txtProximaAdubacao = findViewById(R.id.txtProximaAdubacao);
-
+        txtFrequenciaIrrigacao = findViewById(R.id.txtFrequenciaIrrigacao);
         txtNomePopular = findViewById(R.id.txtNomePopular);
         txtNomeCientifico = findViewById(R.id.txtNomeCientifico);
         txtFamilia = findViewById(R.id.txtFamilia);
@@ -76,10 +76,9 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
         txtVolumeIrrigacao = findViewById(R.id.txtVolumeIrrigacao);
         txtExposicaoLuz = findViewById(R.id.txtExposicaoLuz);
         txtTemperaturaIdeal = findViewById(R.id.txtTemperaturaIdeal);
-        txtUnidadeIrrigacao = findViewById(R.id.txtUnidadeIrrigacao);
         txtPeriodoPoda = findViewById(R.id.txtPeriodoPoda);
         txtDescricao = findViewById(R.id.txtDescricao);
-
+        txtFrequenciaIrrigacao = findViewById(R.id.txtFrequenciaIrrigacao);
         btnSairInformacao = findViewById(R.id.btnSairInformacao);
 
         PuxarDados();
@@ -131,7 +130,6 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                     return;
                 }
                 txtVaso.setText(textoOuVazio(especime.getTroca_de_vaso()));
-
                 txtProximaAdubacao.setText(textoOuVazio(especime.getAdubacao()));
                 txtNomePopular.setText(textoOuVazio(especime.getNome_popular()));
                 txtNomeCientifico.setText(textoOuVazio(especime.getNome_cientifico()));
@@ -142,11 +140,11 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
                 Float adulto = especime.getTamanho_adulto_cm();
                 txtTamanhoAdulto.setText(adulto != null && adulto != 0 ? adulto + " cm" : VAZIO);
 
-                txtExposicaoLuz.setText(textoOuVazio(especime.getExposicao_a_luz()));
-                txtUnidadeIrrigacao.setText(textoOuVazio(especime.getUnidade_irrigacao()));
+                txtFrequenciaIrrigacao.setText(intervaloLegivel(especime.getPeriodo_irrigacao()));
                 txtPeriodoPoda.setText(textoOuVazio(especime.getPeriodo_poda()));
                 txtDescricao.setText(textoOuVazio(especime.getDescricao()));
-                txtVolumeIrrigacao.setText(textoOuVazio(especime.getVolume_irrigacao()));
+                Glossario.aplicar(TelaInformacoesPlanta.this, txtExposicaoLuz, null, especime.getExposicao_a_luz());
+                Glossario.aplicar(TelaInformacoesPlanta.this, txtVolumeIrrigacao, null, especime.getVolume_irrigacao());
                 txtTemperaturaIdeal.setText(textoOuVazio(especime.getTemperatura()));
             }
 
@@ -161,15 +159,13 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
 
     private void carregandoEspecie() {
         TextView[] campos = {txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,
-                txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal,
-                txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao};
+                txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal, txtPeriodoPoda, txtDescricao};
         for (TextView t : campos) t.setText("Buscando dados...");
     }
 
     private void limparEspecie() {
         TextView[] campos = {txtNomePopular, txtNomeCientifico, txtFamilia, txtCiclo, txtCrescimento,
-                txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal,
-                txtUnidadeIrrigacao, txtPeriodoPoda, txtDescricao};
+                txtTamanhoAdulto, txtVolumeIrrigacao, txtExposicaoLuz, txtTemperaturaIdeal, txtPeriodoPoda, txtDescricao};
         for (TextView t : campos) t.setText(VAZIO);
     }
 
@@ -198,6 +194,14 @@ public class TelaInformacoesPlanta extends AppCompatActivity {
         if (diffMs < 0) return "Atrasada";
         long horas = diffMs / (1000 * 60 * 60);
         return horas >= 24 ? (horas / 24) + " dias" : horas + "h";
+    }
+    private String intervaloLegivel(Integer horas) {
+        if (horas == null || horas <= 0) return VAZIO;
+        if (horas % 24 == 0) {
+            int dias = horas / 24;
+            return "A cada " + dias + (dias == 1 ? " dia" : " dias");
+        }
+        return "A cada " + horas + " horas";
     }
 
     private void erro(String msg) {

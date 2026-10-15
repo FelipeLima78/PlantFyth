@@ -19,6 +19,9 @@
         android:theme="@style/Theme.PlantFyth"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".EscolherEspecieActivity"
+            android:exported="false" />
+        <activity
             android:name=".TelaEditarUsuario"
             android:exported="false" />
         <activity

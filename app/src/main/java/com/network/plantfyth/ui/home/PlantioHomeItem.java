@@ -43,7 +43,7 @@ public class PlantioHomeItem {
         }
 
         public static AcaoStatus consultarInfo() {
-            return new AcaoStatus("Consulte as informacoes", COR_INDISPONIVEL,
+            return new AcaoStatus("Sem previsão", COR_INDISPONIVEL,
                     false, true, true, false);
         }
 

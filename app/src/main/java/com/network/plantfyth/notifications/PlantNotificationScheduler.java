@@ -111,21 +111,21 @@ public final class PlantNotificationScheduler {
             String plantName = plantName(plantio);
 
             if (irrigacao != null && !irrigacao.after(now)) {
-                messages.add("Regar: " + plantName);
+                messages.add("Conferir rega: " + plantName);
             }
 
             if (poda != null && !poda.after(now)) {
-                messages.add("Podar: " + plantName);
+                messages.add("Conferir Poda: " + plantName);
             }
             if (adubacao != null && !adubacao.after(now)) {
-                messages.add("Adubar: " + plantName);
+                messages.add("Conferir Adubacao: " + plantName);
             }
         }
 
         if (messages.isEmpty()) return;
 
         createNotificationChannel(context);
-        String title = "Plantas precisam de cuidado";
+        String title = "Suas plantas precisam de atenção";
         String text = messages.size() == 1
                 ? messages.get(0)
                 : messages.size() + " cuidados pendentes";
@@ -151,7 +151,6 @@ public final class PlantNotificationScheduler {
 
         String safePlantName = plantName != null ? plantName : "sua planta";
         String safeActionName = actionName != null ? actionName : "cuidar";
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                 .setContentTitle("Talvez seja hora de " + safeActionName)
@@ -212,7 +211,7 @@ public final class PlantNotificationScheduler {
                 "Cuidados das plantas",
                 NotificationManager.IMPORTANCE_HIGH
         );
-        channel.setDescription("Avisos para regar e podar plantas");
+        channel.setDescription("Avisos para regar, podar e adubar plantas");
         manager.createNotificationChannel(channel);
     }
 

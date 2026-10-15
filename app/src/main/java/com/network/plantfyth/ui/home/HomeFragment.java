@@ -40,13 +40,13 @@ import com.network.plantfyth.retrofit.RetroFitService;
 import com.network.plantfyth.CuidadoCalculator;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+//import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = new PlantioHomeAdapter(itens, this::onAcaoMarcada, this::abrirInfo);;
+        adapter = new PlantioHomeAdapter(itens, this::onAcaoMarcada, this::abrirInfo);
         binding.recyclerPlantasHome.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerPlantasHome.setAdapter(adapter);
         binding.fabAdicionarPlanta.setOnClickListener(v ->
@@ -188,8 +188,8 @@ public class HomeFragment extends Fragment {
         if (diffMs <= 0) {
             long atrasoHoras = Math.max(1, TimeUnit.MILLISECONDS.toHours(Math.abs(diffMs)));
             String texto = atrasoHoras < 24
-                    ? "Atrasado hoje"
-                    : "Atrasado ha " + TimeUnit.HOURS.toDays(atrasoHoras) + "d";
+                    ? "Conferir solo hoje"
+                    : "Conferir há " + TimeUnit.HOURS.toDays(atrasoHoras) + "d";
             return new PlantioHomeItem.AcaoStatus(texto, PlantioHomeItem.COR_ATRASADO, true, true);
         }
 
@@ -207,6 +207,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao) {
+        Log.d("PLANTFYTH_DEBUG",
+                "CLIQUE RECEBIDO: ação=" + tipoAcao
+                        + " | plantaId=" + item.plantio.getId()
+                        + " | horário=" + System.currentTimeMillis());
         int posicao = itens.indexOf(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
         if (tipoAcao == TipoAcao.SOL) {
@@ -263,7 +267,7 @@ public class HomeFragment extends Fragment {
         api.atualizarPlanta(plantioLocal.getId(), plantioLocal).enqueue(new Callback<Plantio>() {
             @Override
             public void onResponse(@NonNull Call<Plantio> call, @NonNull Response<Plantio> response) {
-                if (!isAdded() || binding == null || posicao >= itens.size()) return;
+                if (!isAdded() || binding == null) return;
 
                 int pos = itens.indexOf(item);
                 if (pos == -1) return;
@@ -273,7 +277,9 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     Plantio atualizado = response.body();
                     preservarDataNaoRetornada(atualizado, tipoAcao, proximaData);
-
+                    if (atualizado.getEspecime() == null){
+                        atualizado.setEspecime(plantioLocal.getEspecime());
+                    }
                     itemAtual.plantio = atualizado;
                     PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), atualizado);
                     recalcularStatus(itemAtual);
@@ -295,7 +301,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<Plantio> call, @NonNull Throwable t) {
-                if (!isAdded() || binding == null || posicao >= itens.size()) return;
+                if (!isAdded() || binding == null) return;
 
                 int pos = itens.indexOf(item);
                 if (pos == -1) return;
@@ -304,7 +310,7 @@ public class HomeFragment extends Fragment {
 
                 desfazerAcao(itemAtual.plantio, tipoAcao, dataAnterior);
                 recalcularStatus(itemAtual);
-                adapter.notifyItemChanged(posicao);
+                adapter.notifyItemChanged(pos);
                 atualizarAviso();
 
                 Toast.makeText(requireContext(),
@@ -329,18 +335,18 @@ public class HomeFragment extends Fragment {
 
         switch (tipoAcao) {
             case IRRIGAR:
-                return formatarDataParaBackend(calcularProximaIrrigacao(especime));
+                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaIrrigacao(especime));
 
             case PODAR:
-                return formatarDataParaBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getPeriodo_poda()));
+                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getPeriodo_poda()));
 
             case ADUBAR:
-                return formatarDataParaBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getAdubacao()));
+                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getAdubacao()));
             default: return null;
         }
     }
 
-    private Date calcularProximaIrrigacao(Especime especime) {
+  /*  private Date calcularProximaIrrigacao(Especime especime) {
         if (especime == null) return somarDias(new Date(), 1);
 
         Double periodo = extrairPrimeiroNumero(String.valueOf(especime.getPeriodo_irrigacao()), 1);
@@ -354,10 +360,10 @@ public class HomeFragment extends Fragment {
         }
 
         return calendar.getTime();
-    }
+    }*/
 
 
-    private double extrairPrimeiroNumero(String texto, double padrao) {
+   /* private double extrairPrimeiroNumero(String texto, double padrao) {
         if (texto == null) return padrao;
         Matcher matcher = Pattern.compile("\\d+(?:[,.]\\d+)?").matcher(texto);
         if (!matcher.find()) return padrao;
@@ -366,7 +372,7 @@ public class HomeFragment extends Fragment {
         } catch (NumberFormatException ignored) {
             return padrao;
         }
-    }
+    } */
 
 
     private String getDataAcao(Plantio plantio, TipoAcao tipoAcao) {
@@ -400,12 +406,12 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private Date somarDias(Date base, int dias) {
+   /*  private Date somarDias(Date base, int dias) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(base);
         calendar.add(Calendar.DAY_OF_YEAR, dias);
         return calendar.getTime();
-    }
+    } */
 
     private long arredondarParaCima(long valor, long tamanhoUnidade) {
         return Math.max(1, (valor + tamanhoUnidade - 1) / tamanhoUnidade);
@@ -493,7 +499,7 @@ public class HomeFragment extends Fragment {
         binding.progressBarHome.setVisibility(carregando ? View.VISIBLE : View.GONE);
         binding.recyclerPlantasHome.setVisibility(carregando ? View.GONE : View.VISIBLE);
     }
-    private String formatarDataParaBackend(Date data) {
+ /*   private String formatarDataParaBackend(Date data) {
         if (data == null) return null;
 
         SimpleDateFormat formato = new SimpleDateFormat(
@@ -502,7 +508,7 @@ public class HomeFragment extends Fragment {
         );
 
         return formato.format(data);
-    }
+    } */
     private void mostrarEstadoVazio(boolean vazio) {
         binding.layoutVazio.setVisibility(vazio ? View.VISIBLE : View.GONE);
         binding.recyclerPlantasHome.setVisibility(vazio ? View.GONE : View.VISIBLE);
@@ -563,7 +569,7 @@ public class HomeFragment extends Fragment {
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Lembretes no horário certo")
-                .setMessage("Para avisar na hora de cuidar das plantas, permita 'Alarmes e lembretes'.")
+                .setMessage("Para avisar na hora de verificar das plantas, permita 'Alarmes e lembretes'.")
                 .setPositiveButton("Permitir", (d, w) -> startActivity(new Intent(
                         Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
                         Uri.parse("package:" + requireContext().getPackageName()))))

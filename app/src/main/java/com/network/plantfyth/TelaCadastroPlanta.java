@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -14,6 +13,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -21,6 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
@@ -47,15 +49,13 @@ import retrofit2.Response;
 public class TelaCadastroPlanta extends AppCompatActivity {
 
     private Button btnSalvarPlanta;
-    private EditText edtNomePlanta, edtDataPlantio;
-    private Spinner spinnerEspecime;
-    private RadioGroup radioPlantadaComo;
-    private RadioButton rbSemente, rbMuda, rbEstaca;
+    private EditText edtNomePlanta, edtDataPlantio, edtEspecie;
     private CheckBox checkFoiRegadoHoje, checkPegouSolHoje;
+    private TextView txtVolumeIrrigacao, txtExposicaoLuz;
+    private Especime especimeSelecionado;
+
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
-    private List<Especime> listaEspecimes;
-    private String plantadoComo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,12 +69,43 @@ public class TelaCadastroPlanta extends AppCompatActivity {
         btnSalvarPlanta = findViewById(R.id.btnSalvarPlanta);
         edtNomePlanta = findViewById(R.id.edtNomePlanta);
         edtDataPlantio = findViewById(R.id.edtDataPlantio);
-        spinnerEspecime = findViewById(R.id.spinnerEspecime);
         checkFoiRegadoHoje = findViewById(R.id.checkFoiRegadoHoje);
         checkPegouSolHoje = findViewById(R.id.checkPegouSolHoje);
-        carregarEspecimes();
+        txtVolumeIrrigacao = findViewById(R.id.txtVolumeIrrigacao);
+        txtExposicaoLuz = findViewById(R.id.txtExposicaoLuz);
+        edtEspecie = findViewById(R.id.edtEspecie);
     }
+        private final ActivityResultLauncher<Intent> seletorEspecie = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
+                int id = result.getData().getIntExtra("especime_id", -1);
+                if (id != -1) carregarEspecime(id);
+            });
+    public void AbrirSeletorEspecie(View view) {
+        seletorEspecie.launch(new Intent(this, EscolherEspecieActivity.class));
+    }
+    private void carregarEspecime(int id) {
+        Ap.buscarEspecimePorId(id).enqueue(new Callback<Especime>() {
+            @Override
+            public void onResponse(Call<Especime> call, Response<Especime> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    Toast.makeText(TelaCadastroPlanta.this, "Espécie não encontrada", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                especimeSelecionado = response.body();
+                edtEspecie.setText(EspecieAdapter.nomeExibicao(especimeSelecionado));
+                Glossario.aplicar(TelaCadastroPlanta.this, txtVolumeIrrigacao,
+                        "Volume de irrigação", especimeSelecionado.getVolume_irrigacao());
+                Glossario.aplicar(TelaCadastroPlanta.this, txtExposicaoLuz,
+                        "Exposição à luz", especimeSelecionado.getExposicao_a_luz());
+            }
 
+            @Override
+            public void onFailure(Call<Especime> call, Throwable t) {
+                Toast.makeText(TelaCadastroPlanta.this, "Falha: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     public void AbrirCalendario(View view){
         Calendar calendario = Calendar.getInstance();
         int ano = calendario.get(Calendar.YEAR);
@@ -93,9 +124,7 @@ public class TelaCadastroPlanta extends AppCompatActivity {
 
     // a execução do especime deve ser feita antes da do save, lembra dissso
     public void CadastrarPlanta(View view) {
-
-        Especime especime = (Especime) spinnerEspecime.getSelectedItem();
-
+        Especime especime = especimeSelecionado;
         if (especime == null) {
             Toast.makeText(this, "Selecione uma espécie", Toast.LENGTH_SHORT).show();
             return;
@@ -140,7 +169,7 @@ public class TelaCadastroPlanta extends AppCompatActivity {
 
         plantio.setPrevisao_proxima_adubacao(CuidadoCalculator.paraBackend(
                 CuidadoCalculator.proximaPorPeriodo(especime.getAdubacao())));
-
+        btnSalvarPlanta.setEnabled(false);
         Ap.savePlantio(plantio)
                 .enqueue(new Callback<Plantio>() {
 
@@ -157,9 +186,6 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                                     Toast.LENGTH_SHORT
                             ).show();
 
-                            NotificationPermissionHelper.requestIfNeeded(
-                                    TelaCadastroPlanta.this
-                            );
 
                             PlantNotificationScheduler
                                     .refreshPlantCareAlarmsAndNotifyDue(
@@ -171,12 +197,8 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                             finish();
 
                         } else {
-
-                            Toast.makeText(
-                                    TelaCadastroPlanta.this,
-                                    "Erro: " + response.code(),
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                            btnSalvarPlanta.setEnabled(true);
+                            Toast.makeText(TelaCadastroPlanta.this, "Erro: " + response.code(), Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -184,40 +206,12 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                     public void onFailure(
                             Call<Plantio> call,
                             Throwable t) {
-
-                        Toast.makeText(
-                                TelaCadastroPlanta.this,
-                                "Falha: " + t.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show();
-
+                        btnSalvarPlanta.setEnabled(false);
+                        Toast.makeText(TelaCadastroPlanta.this, "Falha: " + t.getMessage(), Toast.LENGTH_LONG).show();
                         Log.e("API_ERROR", t.getMessage());
                     }
                 });
     }
 
-    private void carregarEspecimes() {
-        Ap.listarEspecimes().enqueue(new Callback<List<Especime>>() {
-            @Override
-            public void onResponse(Call<List<Especime>> call, Response<List<Especime>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    listaEspecimes = response.body();
-                    ArrayAdapter<Especime> adapter = new ArrayAdapter<>(
-                            TelaCadastroPlanta.this,
-                            android.R.layout.simple_spinner_item,
-                            listaEspecimes
-                    );
 
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerEspecime.setAdapter(adapter);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Especime>> call, Throwable t) {
-                Toast.makeText(TelaCadastroPlanta.this, "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("API_ERRO", "Falha: " + t.getMessage());
-            }
-        });
-    }
 }

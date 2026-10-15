@@ -78,6 +78,11 @@ public class TelaEditarPlanta extends AppCompatActivity {
             @Override
             public void onResponse(Call<Plantio> call, Response<Plantio> response) {
                 planta = response.body();
+                if (!response.isSuccessful() || response.body() == null) {
+                    Toast.makeText(TelaEditarPlanta.this, "Planta não encontrada", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
                 edtNomePlantaEditar.setText(planta.getNome());
                 String data = planta.getDataQueFoiPlantado();
                 edtDataPlantioEditar.setText(data);
@@ -90,48 +95,32 @@ public class TelaEditarPlanta extends AppCompatActivity {
         });
     }
 
-    public void SalvarEdicao(View view){
-        if (edtNomePlantaEditar.getText().toString().isEmpty() || edtDataPlantioEditar.getText().toString().isEmpty()){
+    public void SalvarEdicao(View view) {
+        if (planta == null) return;
+        if (edtNomePlantaEditar.getText().toString().trim().isEmpty()
+                || edtDataPlantioEditar.getText().toString().isEmpty()) {
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
-        String data = edtDataPlantioEditar.getText().toString();
-        String dataformatada = data;
 
+        planta.setNome(edtNomePlantaEditar.getText().toString().trim());
+        planta.setDataQueFoiPlantado(edtDataPlantioEditar.getText().toString());
 
-        planta.setNome(edtNomePlantaEditar.getText().toString());
-        planta.setDataQueFoiPlantado(dataformatada);
-        Ap.buscarEspecimePorId(planta.getEspecime().getId()).enqueue(new Callback<Especime>() {
+        Ap.atualizarPlanta(planta.getId(), planta).enqueue(new Callback<Plantio>() {
             @Override
-            public void onResponse(Call<Especime> call, Response<Especime> response) {
-                Especime especime = response.body();
-                if (especime.getPeriodo_irrigacao() != null && especime.getUnidade_irrigacao() != null) {
-
-                    Calendar proxIrrigacao = Calendar.getInstance();
-                    proxIrrigacao.add(Calendar.HOUR, (int) especime.getPeriodo_irrigacao());
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                    planta.setPrevisaoProximaIrrigacao(sdf.format(proxIrrigacao.getTime()));
+            public void onResponse(Call<Plantio> call, Response<Plantio> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(TelaEditarPlanta.this, "Plantio atualizado!", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(TelaEditarPlanta.this, "Erro: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
-                Ap.atualizarPlanta(planta.getId(), planta).enqueue(new Callback<Plantio>() {
-                    @Override
-                    public void onResponse(Call<Plantio> call, Response<Plantio> response) {
-                        if(response.isSuccessful()){
-                            Toast.makeText(TelaEditarPlanta.this, "Plantio Atualizado!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            Toast.makeText(TelaEditarPlanta.this, "Erro: " + response.code(), Toast.LENGTH_SHORT).show();
-                        }}
-                    @Override
-                    public void onFailure(Call<Plantio> call, Throwable throwable) {
-                        Toast.makeText(TelaEditarPlanta.this, "Falha: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });}
-                    @Override
-                    public void onFailure(Call<Especime> call, Throwable throwable) {
-                        Toast.makeText(TelaEditarPlanta.this, "Falha: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+            }
+            @Override
+            public void onFailure(Call<Plantio> call, Throwable t) {
+                Toast.makeText(TelaEditarPlanta.this, "Falha: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     public void CancelarEdicao(View view){
         finish();

@@ -21,10 +21,8 @@ public final class CuidadoCalculator {
         if (texto == null || texto.trim().isEmpty()) return null;
 
         // tira acento e põe em minúsculas
-        String t = Normalizer.normalize(texto, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .toLowerCase(Locale.ROOT);
-        if (t.contains("vez")) return null;
+        String t = normalizar(texto);
+       if (t.contains("vez")) return null;
 
         Calendar cal = Calendar.getInstance();
         Matcher m = PERIODO.matcher(t);
@@ -62,21 +60,11 @@ public final class CuidadoCalculator {
     }
 
     public static Date proximaIrrigacao(Especime e) {
+        int horas = (e == null || e.getPeriodo_irrigacao() == null)
+                ? 24
+                : Math.max(1, e.getPeriodo_irrigacao().intValue());
         Calendar cal = Calendar.getInstance();
-
-        if (e == null || e.getPeriodo_irrigacao() == null) {
-            cal.add(Calendar.DAY_OF_YEAR, 1);
-            return cal.getTime();
-        }
-
-        int n = Math.max(1, (int) Math.ceil(e.getPeriodo_irrigacao().doubleValue()));
-        String unidade = e.getUnidade_irrigacao();
-
-        if (unidade != null && unidade.toLowerCase(Locale.ROOT).contains("horas")) {
-            cal.add(Calendar.HOUR_OF_DAY, n);
-        } else {
-            cal.add(Calendar.DAY_OF_YEAR, n);
-        }
+        cal.add(Calendar.HOUR_OF_DAY, horas);
         return cal.getTime();
     }
 
@@ -85,7 +73,7 @@ public final class CuidadoCalculator {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(data);
     }
 
-    private static String normalizar(String texto) {
+    public static String normalizar(String texto) {
         return Normalizer.normalize(texto, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase(Locale.ROOT);
