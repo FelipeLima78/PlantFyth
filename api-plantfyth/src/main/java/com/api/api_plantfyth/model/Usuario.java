@@ -42,7 +42,7 @@ public class Usuario {
     @Column(name = "hash_senha")
       private String hash_senha;
 
-    private boolean tipo;
+    private boolean admin;
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore

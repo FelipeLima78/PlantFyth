@@ -44,12 +44,17 @@ public class NotificationsFragment extends Fragment {
         Ap.buscarUsuarioPorEmail(usuarioEmail).enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
+                if (binding == null || !isAdded()) {
+                    return;
+                }
+                if (response.isSuccessful() && response.body() != null) {
+
                 Usuario usuario = response.body();
                 binding.txtNomeUsuario.setText(usuario.getNome());
                 binding.txtEmailUsuario.setText(usuario.getEmail());
 
                 binding.txtDataConta.setText("Sua conta foi criada em: "+usuario.getDataCriacao().substring(0,10));
-                  binding.txtUltimoLogin.setText("Você logou a última vez em: "+usuario.getUltimoLogin().substring(0,10));
+                  binding.txtUltimoLogin.setText("Você logou a última vez em: "+usuario.getUltimoLogin().substring(0,10));}
             }
             @Override
             public void onFailure(Call<Usuario> call, Throwable throwable) {

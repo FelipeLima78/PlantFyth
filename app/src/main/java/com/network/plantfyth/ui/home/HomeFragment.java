@@ -207,10 +207,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao) {
-        Log.d("PLANTFYTH_DEBUG",
-                "CLIQUE RECEBIDO: ação=" + tipoAcao
-                        + " | plantaId=" + item.plantio.getId()
-                        + " | horário=" + System.currentTimeMillis());
         int posicao = itens.indexOf(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
         if (tipoAcao == TipoAcao.SOL) {
@@ -420,7 +416,7 @@ public class HomeFragment extends Fragment {
     private void atualizarAviso() {
         int atrasadas = 0;
         for (PlantioHomeItem item : itens) {
-            if (item.irrigacao.atrasada || item.poda.atrasada || item.adubo.atrasada) {
+            if (item.irrigacao.atrasada || item.poda.atrasada || item.adubo.atrasada || item.sol.atrasada) {
                 atrasadas++;
             }
         }

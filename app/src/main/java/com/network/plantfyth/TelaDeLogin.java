@@ -111,15 +111,18 @@ public class TelaDeLogin extends AppCompatActivity {
                             String EmailUsuario= usuario.getEmail();
                             getSharedPreferences("USER_EMAIL", MODE_PRIVATE).edit().putString("usuario_email", EmailUsuario).apply();
                             getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().putInt("usuario_id", idUsuario).apply();
-                            NotificationPermissionHelper.requestIfNeeded(TelaDeLogin.this);
+                            if (idUsuario == null) {
+                                Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            getSharedPreferences("USER_EMAIL", MODE_PRIVATE).edit()
+                                    .putString("usuario_email", usuario.getEmail()).apply();
+                            getSharedPreferences("USER_DATA", MODE_PRIVATE).edit()
+                                    .putInt("usuario_id", idUsuario)
+                                    .putBoolean("usuario_admin", usuario.isAdmin()).apply();
+
                             PlantCareDailyWorker.scheduleDailyChecks(TelaDeLogin.this, idUsuario);
-                            PlantNotificationScheduler.refreshPlantCareAlarmsAndNotifyDue(
-                                    getApplicationContext(),
-                                    idUsuario,
-                                    true
-                            );
-                            Intent intent = new Intent(TelaDeLogin.this, MainActivity.class);
-                            startActivity(intent);
+                            startActivity(new Intent(TelaDeLogin.this, MainActivity.class));
                             finish();
                         } else {
                             Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();

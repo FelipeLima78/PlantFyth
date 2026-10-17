@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import com.api.api_plantfyth.model.Plantio;
@@ -24,7 +25,8 @@ public interface PlantioRepository extends JpaRepository<Plantio, Integer>{
 
     List<Plantio> findByNomeContaining(String nome);
     @Modifying
-    @Query("UPDATE Plantio p SET p.pegouSolHoje = false, p.foiRegadoHoje = false")
-    void resetarFlagsDiarias();
+@Transactional
+@Query("UPDATE Plantio p SET p.pegouSolHoje = false, p.foiRegadoHoje = false")
+void resetarFlagsDiarias();
 
 }

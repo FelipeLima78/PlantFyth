@@ -16,7 +16,7 @@ public class Especime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @JsonProperty("periodoIrrigacao")
     @Column(name = "periodo_irrigacao")

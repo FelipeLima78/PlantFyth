@@ -5,14 +5,14 @@ import java.time.LocalDateTime;
 public class Usuario {
     //construtor
 
-    public Usuario(Integer id, String nome, String email, String hash_senha, String data_criacao, String ultimo_login, boolean tipo) {
+    public Usuario(Integer id, String nome, String email, String hash_senha, String data_criacao, String ultimo_login, boolean admin) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.hash_senha = hash_senha;
         this.data_criacao = data_criacao;
         this.ultimo_login = ultimo_login;
-        this.tipo = tipo;
+        this.admin = admin;
     }
 
     public Usuario() {
@@ -67,12 +67,11 @@ public class Usuario {
         this.ultimo_login = ultimo_login;
     }
 
-    public boolean isTipo() {
-        return tipo;
+    public boolean isAdmin() {
+        return admin;
     }
 
-    public void setTipo(boolean tipo) {
-        this.tipo = tipo;
+    public void setAdmin(boolean admin) {this.admin = admin;
     }
 
 
@@ -86,5 +85,5 @@ public class Usuario {
     //do timestamp.
     private String ultimo_login;
 
-    private boolean tipo;
+    private boolean admin;
 }
