@@ -19,6 +19,12 @@
         android:theme="@style/Theme.PlantFyth"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".TelaCadastroEspecime"
+            android:exported="false" />
+        <activity
+            android:name=".TelaListaEspecimesAdmin"
+            android:exported="false" />
+        <activity
             android:name=".EscolherEspecieActivity"
             android:exported="false" />
         <activity
@@ -33,12 +39,7 @@
         <activity
             android:name=".TelaCadastroPlanta"
             android:exported="false" />
-        <!--
-         <activity
-            android:name=".TelaEsqueciASenha"
-            android:exported="false"
-            android:theme="@style/Theme.PlantFyth" />
-        -->
+
         <activity
             android:name=".TelaCadastro"
             android:exported="false"

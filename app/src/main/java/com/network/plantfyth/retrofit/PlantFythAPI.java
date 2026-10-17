@@ -3,7 +3,6 @@ package com.network.plantfyth.retrofit;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.model.Usuario;
-import retrofit2.http.PUT;
 import java.util.List;
 
 import okhttp3.RequestBody;
@@ -39,11 +38,16 @@ public interface PlantFythAPI {
     Call<Plantio> buscarPlantaPorId (@Path("id") Integer plantioId);
 
 
-    //especimes
-    @GET("especimes/indoor/{perenualId}")
-    Call<Especime> buscarDetalhes(@Path("perenualId")int perenualId);
     @GET("especimes/id/{id}")
     Call<Especime> buscarEspecimePorId(@Path("id") Integer id);
+    @POST("especimes")
+    Call<Especime> criarEspecime(@Body Especime especime);
+
+    @PUT("especimes/id/{id}")
+    Call<Especime> atualizarEspecime(
+            @Path("id") Integer id,
+            @Body Especime especime
+    );
 
 
     //usuario
@@ -59,6 +63,5 @@ public interface PlantFythAPI {
     @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
 
-    //chatbot
 
 }

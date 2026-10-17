@@ -121,6 +121,12 @@ public class TelaDeLogin extends AppCompatActivity {
                                     .putInt("usuario_id", idUsuario)
                                     .putBoolean("usuario_admin", usuario.isAdmin()).apply();
 
+                            if (usuario.isAdmin()) {
+                                startActivity(new Intent(TelaDeLogin.this, TelaListaEspecimesAdmin.class));
+                                finish();
+                                return;
+                            }
+
                             PlantCareDailyWorker.scheduleDailyChecks(TelaDeLogin.this, idUsuario);
                             startActivity(new Intent(TelaDeLogin.this, MainActivity.class));
                             finish();

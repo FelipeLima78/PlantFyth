@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#E1E9DE"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="match_parent"
+            android:background="#66A56B" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/txtPopularAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nome popular"
+                android:textColor="#214E27"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtCientificoAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Nome científico"
+                android:textColor="#788478"
+                android:textSize="13sp"
+                android:textStyle="italic" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginBottom="11dp"
+                android:background="#EDF1EA" />
+
+            <TextView
+                android:id="@+id/txtResumoAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Luz: — • Água: —"
+                android:textColor="#4F6050"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/txtFaltandoAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#A45A13"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditarEspecie"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="12dp"
+                android:minHeight="0dp"
+                android:text="Editar espécie"
+                android:textAllCaps="false"
+                android:textColor="#2E7D32"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="#B7D3B8"
+                app:strokeWidth="1dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
