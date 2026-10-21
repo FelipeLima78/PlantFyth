@@ -12,21 +12,29 @@ import java.util.regex.Pattern;
 
 public final class CuidadoCalculator {
 
-    private static final Pattern PERIODO = Pattern.compile(
-            "(\\d+(?:[.,]\\d+)?)\\s*(horas?|hrs?|h|dias?|semanas?|meses|mes|anos?)");
+    // O texto INTEIRO precisa ser um intervalo: "2 semanas", "a cada 3 meses", "12 horas".
+    // Frase com outras informações ("a floração dura 2 semanas") NÃO vira data.
+    private static final Pattern INTERVALO = Pattern.compile(
+            "^(?:a cada\\s+)?(\\d+(?:[.,]\\d+)?)\\s*(horas?|hrs?|h|dias?|semanas?|meses|mes|anos?)$");
 
-    private CuidadoCalculator() {}
+    private CuidadoCalculator() {
+    }
 
+    /**
+     * Poda e adubação. Aceita um intervalo ("2 semanas", "A cada 3 meses") ou um nome
+     * (Diária, Semanal, Quinzenal, Mensal, Bimestral, Trimestral, Semestral, Anual).
+     * Qualquer outro texto devolve null (o card mostra "Ver info").
+     */
     public static Date proximaPorPeriodo(String texto) {
-        if (texto == null || texto.trim().isEmpty()) return null;
+        if (texto == null) return null;
 
-        // tira acento e põe em minúsculas
-        String t = normalizar(texto);
-       if (t.contains("vez")) return null;
+        String t = normalizar(texto).trim();
+        if (t.isEmpty() || t.length() > 40) return null;
 
         Calendar cal = Calendar.getInstance();
-        Matcher m = PERIODO.matcher(t);
-        if (m.find()) {
+
+        Matcher m = INTERVALO.matcher(t);
+        if (m.matches()) {
             double n = Double.parseDouble(m.group(1).replace(",", "."));
             String u = m.group(2);
 
@@ -38,27 +46,44 @@ public final class CuidadoCalculator {
                 cal.add(Calendar.DAY_OF_YEAR, Math.max(1, (int) Math.round(n * 7)));
             } else if (u.startsWith("m")) {
                 cal.add(Calendar.MONTH, Math.max(1, (int) Math.ceil(n)));
-            } else if (u.startsWith("a")) {
-                cal.add(Calendar.YEAR, Math.max(1, (int) Math.ceil(n)));
             } else {
-                return null;
+                cal.add(Calendar.YEAR, Math.max(1, (int) Math.ceil(n)));
             }
             return cal.getTime();
         }
 
-
-        if (t.contains("diari"))       { cal.add(Calendar.DAY_OF_YEAR, 1);  return cal.getTime(); }
-        if (t.contains("semanal"))     { cal.add(Calendar.DAY_OF_YEAR, 7);  return cal.getTime(); }
-        if (t.contains("quinzenal"))   { cal.add(Calendar.DAY_OF_YEAR, 15); return cal.getTime(); }
-        if (t.contains("mensal"))      { cal.add(Calendar.MONTH, 1);        return cal.getTime(); }
-        if (t.contains("bimestral"))   { cal.add(Calendar.MONTH, 2);        return cal.getTime(); }
-        if (t.contains("trimestral"))  { cal.add(Calendar.MONTH, 3);        return cal.getTime(); }
-        if (t.contains("semestral"))   { cal.add(Calendar.MONTH, 6);        return cal.getTime(); }
-        if (t.contains("anual"))       { cal.add(Calendar.YEAR, 1);         return cal.getTime(); }
-
-        return null;
+        switch (t) {
+            case "diaria":
+            case "diariamente":
+                cal.add(Calendar.DAY_OF_YEAR, 1);
+                return cal.getTime();
+            case "semanal":
+                cal.add(Calendar.DAY_OF_YEAR, 7);
+                return cal.getTime();
+            case "quinzenal":
+                cal.add(Calendar.DAY_OF_YEAR, 15);
+                return cal.getTime();
+            case "mensal":
+                cal.add(Calendar.MONTH, 1);
+                return cal.getTime();
+            case "bimestral":
+                cal.add(Calendar.MONTH, 2);
+                return cal.getTime();
+            case "trimestral":
+                cal.add(Calendar.MONTH, 3);
+                return cal.getTime();
+            case "semestral":
+                cal.add(Calendar.MONTH, 6);
+                return cal.getTime();
+            case "anual":
+                cal.add(Calendar.YEAR, 1);
+                return cal.getTime();
+            default:
+                return null;
+        }
     }
 
+    /** Irrigação: o banco guarda o intervalo em HORAS. */
     public static Date proximaIrrigacao(Especime e) {
         int horas = (e == null || e.getPeriodo_irrigacao() == null)
                 ? 24
@@ -73,7 +98,9 @@ public final class CuidadoCalculator {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(data);
     }
 
+    /** Tira acento e põe em minúsculas. Nunca devolve null. */
     public static String normalizar(String texto) {
+        if (texto == null) return "";
         return Normalizer.normalize(texto, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase(Locale.ROOT);

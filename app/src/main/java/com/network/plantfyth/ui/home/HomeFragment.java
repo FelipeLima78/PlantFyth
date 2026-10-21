@@ -1,33 +1,30 @@
 package com.network.plantfyth.ui.home;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import android.app.AlarmManager;
-import android.net.Uri;
-import android.provider.Settings;
-
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.appcompat.app.AlertDialog;
 
+import com.network.plantfyth.CuidadoCalculator;
 import com.network.plantfyth.TelaCadastroPlanta;
 import com.network.plantfyth.TelaInformacoesPlanta;
 import com.network.plantfyth.databinding.FragmentHomeBinding;
@@ -37,16 +34,14 @@ import com.network.plantfyth.notifications.PlantCareDailyWorker;
 import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
-import com.network.plantfyth.CuidadoCalculator;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-//import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,19 +50,21 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
+
     private FragmentHomeBinding binding;
     private PlantFythAPI api;
     private PlantioHomeAdapter adapter;
     private final List<PlantioHomeItem> itens = new ArrayList<>();
-    //private final List<Plantio> ultimasPlantasCarregadas = new ArrayList<>();
     private ActivityResultLauncher<String> notificationPermissionLauncher;
-    //private boolean notificarDepoisDaPermissao = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
-                permitido -> {if (isAdded()) pedirAlarmeExatoSeNecessario();});
+        notificationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                permitido -> {
+                    if (isAdded()) pedirAlarmeExatoSeNecessario();
+                });
     }
 
     @Override
@@ -88,6 +85,7 @@ public class HomeFragment extends Fragment {
         binding.fabAdicionarPlanta.setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), TelaCadastroPlanta.class)));
     }
+
     private void abrirInfo(PlantioHomeItem item) {
         Intent intent = new Intent(requireActivity(), TelaInformacoesPlanta.class);
         intent.putExtra("plantio_id", item.plantio.getId());
@@ -100,17 +98,23 @@ public class HomeFragment extends Fragment {
         carregarPlantas();
     }
 
+    // ------------------------------------------------------------- carregar
+
     private void carregarPlantas() {
         int usuarioId = getUsuarioId();
         if (usuarioId == -1) {
             mostrarCarregando(false);
             mostrarEstadoVazio(true);
-            Toast.makeText(requireContext(), "Usuario nao identificado.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Usuário não identificado.", Toast.LENGTH_SHORT).show();
             return;
         }
         PlantCareDailyWorker.scheduleDailyChecks(requireContext(), usuarioId);
 
-        mostrarCarregando(true);
+        // só mostra a barra na primeira carga; senão a lista pisca toda vez que a tela volta
+        if (itens.isEmpty()) {
+            mostrarCarregando(true);
+        }
+
         api.buscarPlantasUsuario(usuarioId).enqueue(new Callback<List<Plantio>>() {
             @Override
             public void onResponse(@NonNull Call<List<Plantio>> call,
@@ -121,8 +125,9 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     atualizarLista(response.body());
                 } else {
+                    Log.e(TAG, "Falha ao carregar plantas: HTTP " + response.code());
                     Toast.makeText(requireContext(),
-                            "Erro ao carregar plantas: " + response.code(),
+                            "Não foi possível carregar as plantas.",
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -133,7 +138,7 @@ public class HomeFragment extends Fragment {
                 mostrarCarregando(false);
                 Log.e(TAG, "Falha ao carregar plantas", t);
                 Toast.makeText(requireContext(),
-                        "Falha de conexao: " + t.getMessage(),
+                        "Sem conexão com o servidor. Verifique a internet.",
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -158,11 +163,13 @@ public class HomeFragment extends Fragment {
         return item;
     }
 
+    // --------------------------------------------------------------- status
+
     private void recalcularStatus(PlantioHomeItem item) {
         Plantio plantio = item.plantio;
         Especime e = plantio.getEspecime();
 
-        item.irrigacao = criarStatus(parseDataPlantio(plantio.getPrevisaoProximaIrrigacao()));
+        item.irrigacao = statusIrrigacao(parseDataPlantio(plantio.getPrevisaoProximaIrrigacao()));
 
         item.poda = statusCuidado(
                 e == null ? null : e.getPeriodo_poda(),
@@ -171,26 +178,27 @@ public class HomeFragment extends Fragment {
         item.adubo = statusCuidado(
                 e == null ? null : e.getAdubacao(),
                 plantio.getPrevisao_proxima_adubacao());
+
         item.sol = criarStatusSol(plantio.isPegou_sol_hoje());
     }
+
     private PlantioHomeItem.AcaoStatus criarStatusSol(boolean pegou) {
         return pegou
                 ? new PlantioHomeItem.AcaoStatus("Tomou sol hoje", PlantioHomeItem.COR_OK, false, false)
                 : new PlantioHomeItem.AcaoStatus("Sol pendente", PlantioHomeItem.COR_HOJE, false, true);
     }
 
+    /** Poda e adubação: contagem regressiva e, vencido, "Atrasado". */
     private PlantioHomeItem.AcaoStatus criarStatus(Date proximaData) {
         if (proximaData == null) {
-            return new PlantioHomeItem.AcaoStatus("Nao definido", PlantioHomeItem.COR_INDISPONIVEL, false, false);
+            return new PlantioHomeItem.AcaoStatus(
+                    "Não definido", PlantioHomeItem.COR_INDISPONIVEL, false, false);
         }
 
-        long diffMs = proximaData.getTime() - new Date().getTime();
+        long diffMs = proximaData.getTime() - System.currentTimeMillis();
         if (diffMs <= 0) {
-            long atrasoHoras = Math.max(1, TimeUnit.MILLISECONDS.toHours(Math.abs(diffMs)));
-            String texto = atrasoHoras < 24
-                    ? "Conferir solo hoje"
-                    : "Conferir há " + TimeUnit.HOURS.toDays(atrasoHoras) + "d";
-            return new PlantioHomeItem.AcaoStatus(texto, PlantioHomeItem.COR_ATRASADO, true, true);
+            return new PlantioHomeItem.AcaoStatus(
+                    textoAtraso(-diffMs), PlantioHomeItem.COR_ATRASADO, true, true);
         }
 
         if (diffMs < TimeUnit.HOURS.toMillis(1)) {
@@ -206,58 +214,110 @@ public class HomeFragment extends Fragment {
         return new PlantioHomeItem.AcaoStatus("Em " + dias + "d", PlantioHomeItem.COR_OK, false, true);
     }
 
+    /**
+     * Rega: a fonte orienta regar pela necessidade do solo, não pelo calendário.
+     * Vencido, o texto pede para CONFERIR o solo (laranja), em vez de acusar atraso.
+     */
+    private PlantioHomeItem.AcaoStatus statusIrrigacao(Date proximaData) {
+        if (proximaData == null) return criarStatus(null);
+
+        long diffMs = proximaData.getTime() - System.currentTimeMillis();
+        if (diffMs > 0) return criarStatus(proximaData);
+
+        long atrasoMs = -diffMs;
+        String texto = TimeUnit.MILLISECONDS.toHours(atrasoMs) < 24
+                ? "Conferir solo"
+                : "Conferir há " + duracaoCurta(atrasoMs);
+        // atrasada = true para a rega continuar contando no card de aviso do topo
+        return new PlantioHomeItem.AcaoStatus(texto, PlantioHomeItem.COR_HOJE, true, true);
+    }
+
+    private String textoAtraso(long atrasoMs) {
+        if (TimeUnit.MILLISECONDS.toHours(atrasoMs) < 24) return "Atrasado hoje";
+        return "Atraso: " + duracaoCurta(atrasoMs);
+    }
+
+    private String duracaoCurta(long ms) {
+        long dias = TimeUnit.MILLISECONDS.toDays(ms);
+        if (dias < 7) return dias + "d";
+        if (dias < 30) return (dias / 7) + " sem";
+        return "30d+";
+    }
+
+    private PlantioHomeItem.AcaoStatus statusCuidado(String periodo, String dataTexto) {
+        if (CuidadoCalculator.naoPrecisa(periodo)) {
+            return PlantioHomeItem.AcaoStatus.naoNecessario();
+        }
+        if (CuidadoCalculator.proximaPorPeriodo(periodo) == null) {
+            return PlantioHomeItem.AcaoStatus.consultarInfo();
+        }
+        Date data = parseDataPlantio(dataTexto);
+        if (data == null) {
+            return new PlantioHomeItem.AcaoStatus(
+                    "Sem registro", PlantioHomeItem.COR_HOJE, false, true);
+        }
+        return criarStatus(data);
+    }
+
+    // ---------------------------------------------------------------- ações
+
     private void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao) {
         int posicao = itens.indexOf(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
+
+        Plantio plantio = item.plantio;
+        boolean regadoAnterior = plantio.isFoi_regado_hoje();
+        String dataAnterior = getDataAcao(plantio, tipoAcao);
+
         if (tipoAcao == TipoAcao.SOL) {
-            if (item.plantio.isPegou_sol_hoje()) return;
-            item.plantio.setPegou_sol_hoje(true);
-            item.salvandoAcao = TipoAcao.SOL;
-            recalcularStatus(item);
-            adapter.notifyItemChanged(posicao);
-            salvarPlantioAtualizado(item, posicao, TipoAcao.SOL, null, null);
+            if (plantio.isPegou_sol_hoje()) return;
+            plantio.setPegou_sol_hoje(true);
+            iniciarSalvamento(item, posicao, tipoAcao, dataAnterior, regadoAnterior, null);
             return;
         }
 
-
-        Plantio plantio = item.plantio;
-        String dataAnterior = getDataAcao(plantio, tipoAcao);
         String proximaData = calcularProximaData(plantio, tipoAcao);
-
         if (proximaData == null) {
             Toast.makeText(requireContext(),
-                    "Essa acao ainda nao tem previsao cadastrada.",
+                    "Esta espécie não tem previsão cadastrada para esse cuidado.",
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
         setDataAcao(plantio, tipoAcao, proximaData);
-
         if (tipoAcao == TipoAcao.IRRIGAR) {
             plantio.setFoi_regado_hoje(true);
         }
 
+        iniciarSalvamento(item, posicao, tipoAcao, dataAnterior, regadoAnterior, proximaData);
+    }
+
+    private void iniciarSalvamento(PlantioHomeItem item, int posicao, TipoAcao tipoAcao,
+                                   String dataAnterior, boolean regadoAnterior,
+                                   String proximaData) {
         item.salvandoAcao = tipoAcao;
         recalcularStatus(item);
         adapter.notifyItemChanged(posicao);
         atualizarAviso();
 
-        salvarPlantioAtualizado(item, posicao, tipoAcao, dataAnterior, proximaData);
+        salvarPlantioAtualizado(item, tipoAcao, dataAnterior, regadoAnterior, proximaData);
     }
-    private void desfazerAcao(Plantio p, TipoAcao tipo, String dataAnterior) {
+
+    /** Desfaz a alteração local se o servidor não confirmar. */
+    private void desfazerAcao(Plantio p, TipoAcao tipo, String dataAnterior, boolean regadoAnterior) {
         if (tipo == TipoAcao.SOL) {
             p.setPegou_sol_hoje(false);
-        } else {
-            setDataAcao(p, tipo, dataAnterior);
+            return;
+        }
+        setDataAcao(p, tipo, dataAnterior);
+        if (tipo == TipoAcao.IRRIGAR) {
+            p.setFoi_regado_hoje(regadoAnterior);
         }
     }
-    private void salvarPlantioAtualizado(
-            PlantioHomeItem item,
-            int posicao,
-            TipoAcao tipoAcao,
-            String dataAnterior,
-            String proximaData
-    ) {
+
+    private void salvarPlantioAtualizado(PlantioHomeItem item, TipoAcao tipoAcao,
+                                         String dataAnterior, boolean regadoAnterior,
+                                         String proximaData) {
         Plantio plantioLocal = item.plantio;
 
         api.atualizarPlanta(plantioLocal.getId(), plantioLocal).enqueue(new Callback<Plantio>() {
@@ -267,32 +327,29 @@ public class HomeFragment extends Fragment {
 
                 int pos = itens.indexOf(item);
                 if (pos == -1) return;
-                PlantioHomeItem itemAtual = item;
-                itemAtual.salvandoAcao = null;
+                item.salvandoAcao = null;
 
                 if (response.isSuccessful() && response.body() != null) {
                     Plantio atualizado = response.body();
                     preservarDataNaoRetornada(atualizado, tipoAcao, proximaData);
-                    if (atualizado.getEspecime() == null){
+                    if (atualizado.getEspecime() == null) {
                         atualizado.setEspecime(plantioLocal.getEspecime());
                     }
-                    itemAtual.plantio = atualizado;
+                    item.plantio = atualizado;
                     PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), atualizado);
-                    recalcularStatus(itemAtual);
-                    adapter.notifyItemChanged(pos);
-                    atualizarAviso();
 
-                    Toast.makeText(requireContext(), "Acao registrada.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Ação registrada.", Toast.LENGTH_SHORT).show();
                 } else {
-                    desfazerAcao(itemAtual.plantio, tipoAcao, dataAnterior);
-                    recalcularStatus(itemAtual);
-                    adapter.notifyItemChanged(pos);
-                    atualizarAviso();
-
+                    desfazerAcao(plantioLocal, tipoAcao, dataAnterior, regadoAnterior);
+                    Log.e(TAG, "PUT falhou: HTTP " + response.code());
                     Toast.makeText(requireContext(),
-                            "Nao foi possivel salvar: " + response.code(),
+                            "Não foi possível salvar. Tente novamente.",
                             Toast.LENGTH_SHORT).show();
                 }
+
+                recalcularStatus(item);
+                adapter.notifyItemChanged(pos);
+                atualizarAviso();
             }
 
             @Override
@@ -301,16 +358,17 @@ public class HomeFragment extends Fragment {
 
                 int pos = itens.indexOf(item);
                 if (pos == -1) return;
-                PlantioHomeItem itemAtual = item;
-                itemAtual.salvandoAcao = null;
+                item.salvandoAcao = null;
 
-                desfazerAcao(itemAtual.plantio, tipoAcao, dataAnterior);
-                recalcularStatus(itemAtual);
+                desfazerAcao(plantioLocal, tipoAcao, dataAnterior, regadoAnterior);
+                Log.e(TAG, "Falha de rede ao salvar", t);
+
+                recalcularStatus(item);
                 adapter.notifyItemChanged(pos);
                 atualizarAviso();
 
                 Toast.makeText(requireContext(),
-                        "Falha ao salvar: " + t.getMessage(),
+                        "Sem conexão com o servidor. Verifique a internet.",
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -334,51 +392,24 @@ public class HomeFragment extends Fragment {
                 return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaIrrigacao(especime));
 
             case PODAR:
-                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getPeriodo_poda()));
+                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaPorPeriodo(
+                        especime == null ? null : especime.getPeriodo_poda()));
 
             case ADUBAR:
-                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaPorPeriodo(especime == null ? null : especime.getAdubacao()));
-            default: return null;
+                return CuidadoCalculator.paraBackend(CuidadoCalculator.proximaPorPeriodo(
+                        especime == null ? null : especime.getAdubacao()));
+
+            default:
+                return null;
         }
     }
-
-  /*  private Date calcularProximaIrrigacao(Especime especime) {
-        if (especime == null) return somarDias(new Date(), 1);
-
-        Double periodo = extrairPrimeiroNumero(String.valueOf(especime.getPeriodo_irrigacao()), 1);
-        String unidade = especime.getUnidade_irrigacao();
-        Calendar calendar = Calendar.getInstance();
-
-        if (unidade != null && unidade.toLowerCase(Locale.ROOT).contains("horas")) {
-            calendar.add(Calendar.HOUR_OF_DAY, Math.max(1, (int) Math.ceil(periodo)));
-        } else {
-            calendar.add(Calendar.DAY_OF_YEAR, Math.max(1, (int) Math.ceil(periodo)));
-        }
-
-        return calendar.getTime();
-    }*/
-
-
-   /* private double extrairPrimeiroNumero(String texto, double padrao) {
-        if (texto == null) return padrao;
-        Matcher matcher = Pattern.compile("\\d+(?:[,.]\\d+)?").matcher(texto);
-        if (!matcher.find()) return padrao;
-        try {
-            return Double.parseDouble(matcher.group().replace(",", "."));
-        } catch (NumberFormatException ignored) {
-            return padrao;
-        }
-    } */
-
 
     private String getDataAcao(Plantio plantio, TipoAcao tipoAcao) {
         switch (tipoAcao) {
             case IRRIGAR:
                 return plantio.getPrevisaoProximaIrrigacao();
-
             case PODAR:
                 return plantio.getPrevisaoProximaPoda();
-
             case ADUBAR:
                 return plantio.getPrevisao_proxima_adubacao();
             default:
@@ -391,23 +422,16 @@ public class HomeFragment extends Fragment {
             case IRRIGAR:
                 plantio.setPrevisaoProximaIrrigacao(data);
                 break;
-
             case PODAR:
                 plantio.setPrevisaoProximaPoda(data);
                 break;
-
             case ADUBAR:
                 plantio.setPrevisao_proxima_adubacao(data);
                 break;
+            default:
+                break;
         }
     }
-
-   /*  private Date somarDias(Date base, int dias) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(base);
-        calendar.add(Calendar.DAY_OF_YEAR, dias);
-        return calendar.getTime();
-    } */
 
     private long arredondarParaCima(long valor, long tamanhoUnidade) {
         return Math.max(1, (valor + tamanhoUnidade - 1) / tamanhoUnidade);
@@ -416,7 +440,7 @@ public class HomeFragment extends Fragment {
     private void atualizarAviso() {
         int atrasadas = 0;
         for (PlantioHomeItem item : itens) {
-            if (item.irrigacao.atrasada || item.poda.atrasada || item.adubo.atrasada || item.sol.atrasada) {
+            if (item.irrigacao.atrasada || item.poda.atrasada || item.adubo.atrasada) {
                 atrasadas++;
             }
         }
@@ -424,34 +448,14 @@ public class HomeFragment extends Fragment {
         if (atrasadas > 0) {
             binding.cardAvisos.setVisibility(View.VISIBLE);
             binding.txtAviso.setText(atrasadas == 1
-                    ? "1 planta precisa de atencao hoje."
-                    : atrasadas + " plantas precisam de atencao hoje.");
+                    ? "1 planta precisa de atenção hoje."
+                    : atrasadas + " plantas precisam de atenção hoje.");
         } else {
             binding.cardAvisos.setVisibility(View.GONE);
         }
     }
 
-    /*private void verificarNotificacoesDaHome(List<Plantio> plantas) {
-        if (!isAdded()) return;
-
-        ultimasPlantasCarregadas.clear();
-        ultimasPlantasCarregadas.addAll(plantas);
-
-        PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), plantas);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                && ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.POST_NOTIFICATIONS
-        ) != PackageManager.PERMISSION_GRANTED) {
-            notificarDepoisDaPermissao = true;
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            return;
-        }
-
-        notificarDepoisDaPermissao = false;
-        PlantNotificationScheduler.notifyDuePlants(requireContext(), plantas);
-    } */
+    // --------------------------------------------------------- notificações
 
     private void verificarNotificacoesDaHome(List<Plantio> plantas) {
         if (!isAdded()) return;
@@ -466,6 +470,29 @@ public class HomeFragment extends Fragment {
         }
         pedirAlarmeExatoSeNecessario();
     }
+
+    private void pedirAlarmeExatoSeNecessario() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return;
+
+        AlarmManager am = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+        if (am == null || am.canScheduleExactAlarms()) return;
+
+        android.content.SharedPreferences prefs =
+                requireContext().getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
+        if (prefs.getBoolean("alarme_exato_perguntado", false)) return;
+        prefs.edit().putBoolean("alarme_exato_perguntado", true).apply();
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Lembretes no horário certo")
+                .setMessage("Para avisar na hora de conferir suas plantas, permita “Alarmes e lembretes”.")
+                .setPositiveButton("Permitir", (d, w) -> startActivity(new Intent(
+                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                        Uri.parse("package:" + requireContext().getPackageName()))))
+                .setNegativeButton("Agora não", null)
+                .show();
+    }
+
+    // ---------------------------------------------------------------- datas
 
     private Date parseDataPlantio(String dataTexto) {
         if (dataTexto == null || dataTexto.trim().isEmpty()) return null;
@@ -491,20 +518,14 @@ public class HomeFragment extends Fragment {
 
         return null;
     }
+
+    // ------------------------------------------------------------ visibilidade
+
     private void mostrarCarregando(boolean carregando) {
         binding.progressBarHome.setVisibility(carregando ? View.VISIBLE : View.GONE);
         binding.recyclerPlantasHome.setVisibility(carregando ? View.GONE : View.VISIBLE);
     }
- /*   private String formatarDataParaBackend(Date data) {
-        if (data == null) return null;
 
-        SimpleDateFormat formato = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-                Locale.US
-        );
-
-        return formato.format(data);
-    } */
     private void mostrarEstadoVazio(boolean vazio) {
         binding.layoutVazio.setVisibility(vazio ? View.VISIBLE : View.GONE);
         binding.recyclerPlantasHome.setVisibility(vazio ? View.GONE : View.VISIBLE);
@@ -532,44 +553,8 @@ public class HomeFragment extends Fragment {
     public interface OnAcaoListener {
         void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao);
     }
+
     public interface OnInfoListener {
         void onAbrirInfo(PlantioHomeItem item);
-    }
-
-    private PlantioHomeItem.AcaoStatus statusCuidado(String periodo, String dataTexto) {
-        if (CuidadoCalculator.naoPrecisa(periodo)) {
-            return PlantioHomeItem.AcaoStatus.naoNecessario();
-        }
-        if (CuidadoCalculator.proximaPorPeriodo(periodo) == null) {
-            return PlantioHomeItem.AcaoStatus.consultarInfo();
-        }
-        Date data = parseDataPlantio(dataTexto);
-        if (data == null) {
-            return new PlantioHomeItem.AcaoStatus(
-                    "Sem registro", PlantioHomeItem.COR_HOJE, false, true);
-        }
-        return criarStatus(data);
-    }
-
-    //  notificação alarme
-    private void pedirAlarmeExatoSeNecessario() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return;
-
-        AlarmManager am = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
-        if (am == null || am.canScheduleExactAlarms()) return;
-
-        android.content.SharedPreferences prefs =
-                requireContext().getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
-        if (prefs.getBoolean("alarme_exato_perguntado", false)) return;
-        prefs.edit().putBoolean("alarme_exato_perguntado", true).apply();
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Lembretes no horário certo")
-                .setMessage("Para avisar na hora de verificar das plantas, permita 'Alarmes e lembretes'.")
-                .setPositiveButton("Permitir", (d, w) -> startActivity(new Intent(
-                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                        Uri.parse("package:" + requireContext().getPackageName()))))
-                .setNegativeButton("Agora não", null)
-                .show();
     }
 }

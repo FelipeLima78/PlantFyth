@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Preencha os dados e os cuidados da planta."
+            android:text="Preencha os dados e os cuidados da planta. Campos com * são obrigatórios."
             android:textColor="#6B7A6B"
             android:textSize="13sp" />
 
@@ -67,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Nome popular *"
                     android:inputType="textCapSentences"
-                    android:singleLine="true" />
+                    android:maxLines="1" />
 
                 <EditText
                     android:id="@+id/edtNomeCientifico"
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Nome científico *"
                     android:inputType="textCapSentences"
-                    android:singleLine="true" />
+                    android:maxLines="1" />
 
                 <EditText
                     android:id="@+id/edtFamilia"
@@ -129,27 +129,36 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Digite só o número e escolha a unidade ao lado. “Sazonal” e “Não precisa” dispensam o número."
+                    android:textColor="#6B7A6B"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:text="Intervalo de irrigação *"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
+                    android:textColor="#374737"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/edtPeriodoIrrigacao"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:hint="Intervalo"
+                        android:hint="Ex.: 7"
                         android:inputType="number"
+                        android:maxLength="4"
                         android:maxLines="1" />
 
                     <Spinner
@@ -157,15 +166,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1" />
-
                 </LinearLayout>
-
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Volume de irrigação"
+                    android:text="Volume de irrigação *"
                     android:textColor="#374737"
                     android:textStyle="bold" />
 
@@ -196,8 +203,8 @@
                         android:layout_weight="1"
                         android:hint="Ex.: 1"
                         android:inputType="number"
-                        android:maxLength="5"
-                        android:singleLine="true" />
+                        android:maxLength="3"
+                        android:maxLines="1" />
 
                     <Spinner
                         android:id="@+id/spnUnidadeAdubacao"
@@ -226,30 +233,14 @@
                         android:layout_weight="1"
                         android:hint="Ex.: 2"
                         android:inputType="number"
-                        android:maxLength="5"
-                        android:singleLine="true" />
+                        android:maxLength="3"
+                        android:maxLines="1" />
 
                     <Spinner
                         android:id="@+id/spnUnidadePoda"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-
-                <CheckBox
-                    android:id="@+id/chkPodaComplicada"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="A poda exige cuidados específicos?" />
-
-                <EditText
-                    android:id="@+id/edtDetalhesPoda"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:hint="Descreva os cuidados necessários"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:minLines="2"
-                    android:visibility="gone" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -272,8 +263,8 @@
                         android:layout_weight="1"
                         android:hint="Ex.: 2"
                         android:inputType="number"
-                        android:maxLength="5"
-                        android:singleLine="true" />
+                        android:maxLength="3"
+                        android:maxLines="1" />
 
                     <Spinner
                         android:id="@+id/spnUnidadeVaso"
@@ -285,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Exposição à luz"
+                    android:text="Exposição à luz *"
                     android:textColor="#374737"
                     android:textStyle="bold" />
 
@@ -310,7 +301,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:gravity="top"
-                    android:hint="Descrição da espécie e observações adicionais"
+                    android:hint="Descrição da espécie e orientação de rega"
                     android:inputType="textCapSentences|textMultiLine"
                     android:minLines="3" />
 
@@ -321,13 +312,15 @@
                     android:layout_marginTop="24dp"
                     android:backgroundTint="#2E7D32"
                     android:text="Salvar espécie"
+                    android:textAllCaps="false"
                     android:textColor="#FFFFFF" />
 
                 <Button
                     android:id="@+id/btnCancelarEspecime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Cancelar" />
+                    android:text="Cancelar"
+                    android:textAllCaps="false" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

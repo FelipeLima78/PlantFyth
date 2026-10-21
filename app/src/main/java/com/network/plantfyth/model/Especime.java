@@ -7,7 +7,7 @@ public class Especime {
     //construtor
     public Especime() {
     }
-    public Especime(Integer id, Integer periodo_irrigacao, String exposicao_a_luz, String descricao, Float tamanho_adulto_cm, String familia, String ciclo, String crescimento, String nome_cientifico, String nome_popular, String periodo_poda, String adubacao, String troca_de_vaso, String volume_irrigacao, String temperatura, String unidade_irrigacao) {
+    public Especime(Integer id, Integer periodo_irrigacao, String exposicao_a_luz, String descricao, Float tamanho_adulto_cm, String familia, String ciclo, String crescimento, String nome_cientifico, String nome_popular, String periodo_poda, String adubacao, String troca_de_vaso, String volume_irrigacao, String temperatura) {
         this.id = id;
         this.periodo_irrigacao = periodo_irrigacao;
         this.exposicao_a_luz = exposicao_a_luz;
@@ -23,7 +23,6 @@ public class Especime {
         this.troca_de_vaso = troca_de_vaso;
         this.volume_irrigacao = volume_irrigacao;
         this.temperatura = temperatura;
-        this.unidade_irrigacao = unidade_irrigacao;
     }
     //getters e setters
     public Integer getId() {
@@ -146,13 +145,6 @@ public class Especime {
         this.temperatura = temperatura;
     }
 
-    public String getUnidade_irrigacao() {
-        return unidade_irrigacao;
-    }
-
-    public void setUnidade_irrigacao(String unidade_irrigacao) {
-        this.unidade_irrigacao = unidade_irrigacao;
-    }
 
 
     //atributos
@@ -190,7 +182,5 @@ public class Especime {
     private String volume_irrigacao;
     @SerializedName("temperatura")
     private String temperatura;
-    @SerializedName("unidade_irrigacao")
-    private String unidade_irrigacao;
 
 }

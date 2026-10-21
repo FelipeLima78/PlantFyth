@@ -3,16 +3,11 @@ package com.network.plantfyth;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,21 +21,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
-import com.network.plantfyth.model.Usuario;
-import com.network.plantfyth.notifications.NotificationPermissionHelper;
 import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
-import com.network.plantfyth.ui.dashboard.DashboardFragment;
-import com.network.plantfyth.ui.home.HomeFragment;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;

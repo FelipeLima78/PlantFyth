@@ -71,9 +71,6 @@ public class Especime {
     @Column(name = "temperatura")
     private String temperatura;
 
-    @JsonProperty("unidade_irrigacao")
-    @Column(name = "unidade_irrigacao")
-    private String unidade_irrigacao;
        
 
     

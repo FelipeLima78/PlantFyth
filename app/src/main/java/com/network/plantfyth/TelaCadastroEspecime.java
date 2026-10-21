@@ -1,11 +1,11 @@
-
 package com.network.plantfyth;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -13,13 +13,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,16 +36,31 @@ public class TelaCadastroEspecime extends AppCompatActivity {
 
     public static final String EXTRA_ID = "extra_id";
 
+    private static final String SELECIONE = "Selecione";
+
+    private static final String UN_HORAS = "Horas";
+    private static final String UN_DIAS = "Dias";
+    private static final String UN_SEMANAS = "Semanas";
+    private static final String UN_MESES = "Meses";
+    private static final String UN_ANOS = "Anos";
+    private static final String UN_SAZONAL = "Sazonal";
+    private static final String UN_NAO_PRECISA = "Não precisa";
+
+    private static final int HORAS_MAX = 8760; // 1 ano
+
+    // Só casa se o texto INTEIRO for um intervalo ("2 semanas", "a cada 3 meses").
+    // Aplicado sobre o texto sem acento e em minúsculas.
+    private static final Pattern PADRAO_PERIODO = Pattern.compile(
+            "^(?:a cada\\s+)?(\\d+)\\s*(dias?|semanas?|meses|mes|anos?)$");
+
     private EditText edtNomePopular, edtNomeCientifico, edtDescricao;
     private EditText edtFamilia, edtCiclo, edtTamanhoAdulto;
     private EditText edtPeriodoIrrigacao, edtAdubacao, edtPeriodoPoda;
-    private EditText edtDetalhesPoda, edtTrocaVaso, edtTemperatura;
+    private EditText edtTrocaVaso, edtTemperatura;
 
     private Spinner spnCrescimento, spnVolumeIrrigacao, spnLuz;
     private Spinner spnUnidadeIrrigacao, spnUnidadeAdubacao;
     private Spinner spnUnidadePoda, spnUnidadeVaso;
-
-    private CheckBox chkPodaComplicada;
 
     private Button btnSalvar, btnCancelar;
     private TextView txtTitulo;
@@ -51,29 +71,26 @@ public class TelaCadastroEspecime extends AppCompatActivity {
 
     private int especieId = -1;
 
-    private final String[] crescimentos = {
-            "Devagar", "Médio", "Rápido"
-    };
+    // Espécie carregada na edição: é ela que é alterada e enviada, para não apagar
+    // colunas que este formulário não mostra.
+    private Especime especimeAtual;
 
-    private final String[] volumes = {
-            "Baixa", "Moderada", "Alta"
-    };
+    // Nome científico como veio do banco: só checa duplicidade se ele mudar.
+    private String nomeCientificoOriginal;
 
-    private final String[] luzes = {
-            "Sol pleno", "Luz filtrada",
-            "Sombra Parcial", "Sombra Profunda"
-    };
+    // Valores antigos que o formulário não entendeu: ficam como estão se o campo não for mexido.
+    private final Map<Spinner, String> naoReconhecido = new HashMap<>();
 
-    private final String[] unidadesIrrigacao = {
-            "Dias", "Semanas"
-    };
+    private final String[] crescimentos = {"Devagar", "Médio", "Rápido"};
+    private final String[] volumes = {"Baixa", "Moderada", "Alta"};
+    private final String[] luzes = {"Sol pleno", "Luz filtrada", "Sombra Parcial", "Sombra Profunda"};
 
-    private final String[] unidadesTempo = {
-            "Dias", "Semanas", "Meses", "Anos", "Semestral"
-    };
+    // Irrigação: o banco guarda em HORAS (é o que o CuidadoCalculator soma).
+    private final String[] unidadesIrrigacao = {UN_DIAS, UN_SEMANAS, UN_HORAS};
 
-    private final String[] unidadesPoda = {
-            "Anos", "Meses", "Semestral"
+    // Poda, adubação e troca de vaso
+    private final String[] unidadesCuidado = {
+            UN_DIAS, UN_SEMANAS, UN_MESES, UN_ANOS, UN_SAZONAL, UN_NAO_PRECISA
     };
 
     @Override
@@ -111,7 +128,6 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         edtPeriodoIrrigacao = findViewById(R.id.edtPeriodoIrrigacao);
         edtAdubacao = findViewById(R.id.edtAdubacao);
         edtPeriodoPoda = findViewById(R.id.edtPeriodoPoda);
-        edtDetalhesPoda = findViewById(R.id.edtDetalhesPoda);
         edtTrocaVaso = findViewById(R.id.edtTrocaVaso);
         edtTemperatura = findViewById(R.id.edtTemperatura);
 
@@ -123,103 +139,144 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         spnUnidadePoda = findViewById(R.id.spnUnidadePoda);
         spnUnidadeVaso = findViewById(R.id.spnUnidadeVaso);
 
-        chkPodaComplicada = findViewById(R.id.chkPodaComplicada);
-
         btnSalvar = findViewById(R.id.btnSalvarEspecime);
         btnCancelar = findViewById(R.id.btnCancelarEspecime);
     }
 
+    // --------------------------------------------------------------- spinners
+
     private void configurarSpinners() {
-        configurarSpinner(spnCrescimento, crescimentos);
-        configurarSpinner(spnVolumeIrrigacao, volumes);
-        configurarSpinner(spnLuz, luzes);
+        configurarSpinner(spnCrescimento, comSelecione(crescimentos));
+        configurarSpinner(spnVolumeIrrigacao, comSelecione(volumes));
+        configurarSpinner(spnLuz, comSelecione(luzes));
         configurarSpinner(spnUnidadeIrrigacao, unidadesIrrigacao);
-        configurarSpinner(spnUnidadeAdubacao, unidadesTempo);
-        configurarSpinner(spnUnidadePoda, unidadesPoda);
-        configurarSpinner(spnUnidadeVaso, unidadesTempo);
+        configurarSpinner(spnUnidadeAdubacao, unidadesCuidado);
+        configurarSpinner(spnUnidadePoda, unidadesCuidado);
+        configurarSpinner(spnUnidadeVaso, unidadesCuidado);
+
+        ligarCampoPeriodo(edtAdubacao, spnUnidadeAdubacao);
+        ligarCampoPeriodo(edtPeriodoPoda, spnUnidadePoda);
+        ligarCampoPeriodo(edtTrocaVaso, spnUnidadeVaso);
+    }
+
+    private String[] comSelecione(String[] opcoes) {
+        String[] r = new String[opcoes.length + 1];
+        r[0] = SELECIONE;
+        System.arraycopy(opcoes, 0, r, 1, opcoes.length);
+        return r;
     }
 
     private void configurarSpinner(Spinner spinner, String[] opcoes) {
+        // lista própria (ArrayList) para poder inserir valores antigos fora do padrão
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
-                opcoes
+                new ArrayList<>(Arrays.asList(opcoes))
         );
-
-        adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-        );
-
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
+
+    /** "Sazonal" e "Não precisa" não têm número: o campo fica desabilitado. */
+    private void ligarCampoPeriodo(EditText campo, Spinner spinner) {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                boolean especial = ehEspecial(String.valueOf(parent.getItemAtPosition(position)));
+                campo.setEnabled(!especial);
+                if (especial) campo.setText("");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private boolean ehEspecial(String unidade) {
+        return UN_SAZONAL.equals(unidade) || UN_NAO_PRECISA.equals(unidade);
+    }
+
+    /** Seleciona o valor; se ele não estiver na lista, entra na lista em vez de ser trocado. */
+    @SuppressWarnings("unchecked")
+    private void selecionarSpinner(Spinner spinner, String valor) {
+        if (valor == null || valor.trim().isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(valor.trim())) {
+                spinner.setSelection(i);
+                return;
+            }
+        }
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinner.getAdapter();
+        adapter.insert(valor.trim(), 1);
+        spinner.setSelection(1);
+    }
+
+    private String valorSpinnerOpcional(Spinner spinner) {
+        if (spinner.getSelectedItemPosition() <= 0) return null; // "Selecione"
+        Object valor = spinner.getSelectedItem();
+        return valor == null ? null : valor.toString();
+    }
+
+    // --------------------------------------------------------------- carregar
 
     private void buscarEspecime() {
         mostrarCarregamento(true);
 
         api.buscarEspecimePorId(especieId).enqueue(new Callback<Especime>() {
             @Override
-            public void onResponse(
-                    @NonNull Call<Especime> call,
-                    @NonNull Response<Especime> response
-            ) {
+            public void onResponse(@NonNull Call<Especime> call, @NonNull Response<Especime> response) {
                 mostrarCarregamento(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    preencherFormulario(response.body());
+                    especimeAtual = response.body();
+                    preencherFormulario(especimeAtual);
                 } else {
-                    Toast.makeText(
-                            TelaCadastroEspecime.this,
+                    Toast.makeText(TelaCadastroEspecime.this,
                             "Erro ao carregar espécie: HTTP " + response.code(),
-                            Toast.LENGTH_LONG
-                    ).show();
+                            Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(
-                    @NonNull Call<Especime> call,
-                    @NonNull Throwable t
-            ) {
+            public void onFailure(@NonNull Call<Especime> call, @NonNull Throwable t) {
                 mostrarCarregamento(false);
-                Toast.makeText(
-                        TelaCadastroEspecime.this,
+                Toast.makeText(TelaCadastroEspecime.this,
                         "Falha na conexão: " + t.getMessage(),
-                        Toast.LENGTH_LONG
-                ).show();
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void preencherFormulario(Especime e) {
+        nomeCientificoOriginal = e.getNome_cientifico();
+
         edtNomePopular.setText(valorTexto(e.getNome_popular()));
         edtNomeCientifico.setText(valorTexto(e.getNome_cientifico()));
         edtDescricao.setText(valorTexto(e.getDescricao()));
         edtFamilia.setText(valorTexto(e.getFamilia()));
         edtCiclo.setText(valorTexto(e.getCiclo()));
-        edtAdubacao.setText(valorTexto(e.getAdubacao()));
-        edtPeriodoPoda.setText(valorTexto(e.getPeriodo_poda()));
-        edtDetalhesPoda.setText("");
-        edtTrocaVaso.setText(valorTexto(e.getTroca_de_vaso()));
         edtTemperatura.setText(valorTexto(e.getTemperatura()));
 
         if (e.getTamanho_adulto_cm() != null) {
-            edtTamanhoAdulto.setText(
-                    String.valueOf(e.getTamanho_adulto_cm())
-            );
+            edtTamanhoAdulto.setText(String.valueOf(e.getTamanho_adulto_cm()));
         }
 
-        // O banco armazena o intervalo de irrigação em dias.
-        // Se for divisível por 7 e tiver pelo menos 7 dias,
-        // exibe o valor em semanas.
+        // O banco guarda HORAS. Mostra na maior unidade que divide certinho.
         if (e.getPeriodo_irrigacao() != null) {
-            int dias = e.getPeriodo_irrigacao();
+            int horas = e.getPeriodo_irrigacao();
 
-            if (dias >= 7 && dias % 7 == 0) {
-                edtPeriodoIrrigacao.setText(String.valueOf(dias / 7));
-                spnUnidadeIrrigacao.setSelection(1);
+            if (horas >= 168 && horas % 168 == 0) {
+                edtPeriodoIrrigacao.setText(String.valueOf(horas / 168));
+                selecionarSpinner(spnUnidadeIrrigacao, UN_SEMANAS);
+            } else if (horas >= 24 && horas % 24 == 0) {
+                edtPeriodoIrrigacao.setText(String.valueOf(horas / 24));
+                selecionarSpinner(spnUnidadeIrrigacao, UN_DIAS);
             } else {
-                edtPeriodoIrrigacao.setText(String.valueOf(dias));
-                spnUnidadeIrrigacao.setSelection(0);
+                edtPeriodoIrrigacao.setText(String.valueOf(horas));
+                selecionarSpinner(spnUnidadeIrrigacao, UN_HORAS);
             }
         }
 
@@ -236,82 +293,150 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         return valor == null ? "" : valor;
     }
 
-    private void selecionarSpinner(Spinner spinner, String valor) {
-        if (valor == null || valor.trim().isEmpty()) {
-            return;
-        }
+    // ------------------------------------------------- períodos (poda, adubo...)
 
-        for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).toString()
-                    .equalsIgnoreCase(valor.trim())) {
-                spinner.setSelection(i);
-                return;
-            }
-        }
-    }
-
-    private void preencherPeriodo(
-            EditText campo,
-            Spinner spinner,
-            String periodo
-    ) {
+    /**
+     * Só entende o texto quando ele É um intervalo ("2 semanas", "A cada 3 meses", "Mensal",
+     * "Semestral"), "Sazonal" ou "Não precisa de ...". Uma frase com outras informações não é
+     * reescrita: aparece como dica e é mantida enquanto você não digitar um número novo.
+     */
+    private void preencherPeriodo(EditText campo, Spinner spinner, String periodo) {
+        naoReconhecido.remove(spinner);
         if (periodo == null || periodo.trim().isEmpty()) {
             return;
         }
 
-        Pattern pattern = Pattern.compile(
-                "^\\s*(\\d+)\\s*(dias?|semanas?|meses?|anos?|semestral)?\\s*$",
-                Pattern.CASE_INSENSITIVE
-        );
+        String t = CuidadoCalculator.normalizar(periodo).trim();
 
-        Matcher matcher = pattern.matcher(periodo.trim());
-
-        if (!matcher.matches()) {
-            campo.setText(periodo);
+        if (t.length() <= 32 && CuidadoCalculator.naoPrecisa(periodo)) {
+            selecionarSpinner(spinner, UN_NAO_PRECISA);
+            return;
+        }
+        if (t.length() <= 32 && t.contains("sazonal")) {
+            selecionarSpinner(spinner, UN_SAZONAL);
             return;
         }
 
-        campo.setText(matcher.group(1));
-
-        String unidade = matcher.group(2);
-
-        if (unidade == null) {
+        Matcher m = PADRAO_PERIODO.matcher(t);
+        if (m.matches()) {
+            campo.setText(m.group(1));
+            selecionarSpinner(spinner, unidadePorTexto(m.group(2)));
             return;
         }
 
-        String normalizada = unidade.toLowerCase(Locale.ROOT);
+        String[] palavra = periodoPorPalavra(t);
+        if (palavra != null) {
+            campo.setText(palavra[0]);
+            selecionarSpinner(spinner, palavra[1]);
+            return;
+        }
 
-        if (normalizada.startsWith("dia")) {
-            selecionarSpinner(spinner, "Dias");
-        } else if (normalizada.startsWith("semana")) {
-            selecionarSpinner(spinner, "Semanas");
-        } else if (normalizada.startsWith("mes")) {
-            selecionarSpinner(spinner, "Meses");
-        } else if (normalizada.startsWith("ano")) {
-            selecionarSpinner(spinner, "Anos");
-        } else if (normalizada.startsWith("semestral")) {
-            selecionarSpinner(spinner, "Semestral");
+        naoReconhecido.put(spinner, periodo);
+        campo.setHint("Valor atual: " + periodo);
+    }
+
+    private String unidadePorTexto(String u) {
+        if (u.startsWith("dia")) return UN_DIAS;
+        if (u.startsWith("sem")) return UN_SEMANAS;
+        if (u.startsWith("mes")) return UN_MESES;
+        return UN_ANOS;
+    }
+
+    // Comparação exata. Quinzenal = 15 dias, para o texto gravado depois ser igual ao lido.
+    private String[] periodoPorPalavra(String t) {
+        switch (t) {
+            case "diaria":
+            case "diariamente":
+                return new String[]{"1", UN_DIAS};
+            case "semanal":
+                return new String[]{"1", UN_SEMANAS};
+            case "quinzenal":
+                return new String[]{"15", UN_DIAS};
+            case "mensal":
+                return new String[]{"1", UN_MESES};
+            case "bimestral":
+                return new String[]{"2", UN_MESES};
+            case "trimestral":
+                return new String[]{"3", UN_MESES};
+            case "semestral":
+                return new String[]{"6", UN_MESES};
+            case "anual":
+                return new String[]{"1", UN_ANOS};
+            default:
+                return null;
         }
     }
 
-    private String montarPeriodo(EditText campo, Spinner spinner) {
-        String numero = campo.getText().toString().trim();
+    private String montarPeriodo(EditText campo, Spinner spinner, String textoNaoPrecisa) {
+        String unidade = String.valueOf(spinner.getSelectedItem());
 
+        if (UN_NAO_PRECISA.equals(unidade)) return textoNaoPrecisa;
+        if (UN_SAZONAL.equals(unidade)) return "Sazonal";
+
+        String numero = campo.getText().toString().trim();
         if (numero.isEmpty()) {
+            // campo vazio: mantém o valor antigo que o formulário não entendeu (ou null)
+            return naoReconhecido.get(spinner);
+        }
+
+        int n;
+        try {
+            n = Integer.parseInt(numero);
+        } catch (NumberFormatException ex) {
             return null;
         }
+        if (n <= 0) return null;
 
-        return numero + " " +
-                spinner.getSelectedItem().toString().toLowerCase(Locale.ROOT);
+        return textoPadrao(n, unidade);
     }
+
+    /** Nome quando existe (Semanal, Mensal...); senão dias, meses ou anos. */
+    private String textoPadrao(int n, String unidade) {
+        switch (unidade) {
+            case UN_DIAS:
+                if (n == 1) return "Diária";
+                if (n == 7) return "Semanal";
+                if (n == 15) return "Quinzenal";
+                if (n == 30) return "Mensal";
+                if (n == 60) return "Bimestral";
+                if (n == 90) return "Trimestral";
+                if (n == 180) return "Semestral";
+                if (n == 365) return "Anual";
+                return "A cada " + n + " dias";
+            case UN_SEMANAS:
+                if (n == 1) return "Semanal";
+                return textoPadrao(n * 7, UN_DIAS); // semanas viram dias
+            case UN_MESES:
+                if (n == 1) return "Mensal";
+                if (n == 2) return "Bimestral";
+                if (n == 3) return "Trimestral";
+                if (n == 6) return "Semestral";
+                if (n == 12) return "Anual";
+                return "A cada " + n + " meses";
+            case UN_ANOS:
+                if (n == 1) return "Anual";
+                return "A cada " + n + " anos";
+            default:
+                return null;
+        }
+    }
+
+    // ----------------------------------------------------------------- salvar
 
     private void salvarEspecime() {
         String nomePopular = edtNomePopular.getText().toString().trim();
+        String nomeCientifico = edtNomeCientifico.getText().toString().trim();
         String intervaloTexto = edtPeriodoIrrigacao.getText().toString().trim();
 
         if (nomePopular.isEmpty()) {
             edtNomePopular.setError("Informe o nome popular");
             edtNomePopular.requestFocus();
+            return;
+        }
+
+        if (nomeCientifico.isEmpty()) {
+            edtNomeCientifico.setError("Informe o nome científico");
+            edtNomeCientifico.requestFocus();
             return;
         }
 
@@ -322,7 +447,6 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         }
 
         int intervaloInformado;
-
         try {
             intervaloInformado = Integer.parseInt(intervaloTexto);
         } catch (NumberFormatException ex) {
@@ -337,61 +461,75 @@ public class TelaCadastroEspecime extends AppCompatActivity {
             return;
         }
 
-        long intervaloEmDias = intervaloInformado;
+        // Sempre salva em HORAS, qualquer que seja a unidade escolhida.
+        String unidadeRega = spnUnidadeIrrigacao.getSelectedItem().toString();
+        long fator = UN_SEMANAS.equals(unidadeRega) ? 168 : UN_DIAS.equals(unidadeRega) ? 24 : 1;
+        long horas = (long) intervaloInformado * fator;
 
-        if ("Semanas".equals(
-                spnUnidadeIrrigacao.getSelectedItem().toString())) {
-            intervaloEmDias *= 7;
-        }
-
-        if (intervaloEmDias > Integer.MAX_VALUE) {
-            edtPeriodoIrrigacao.setError("Intervalo muito grande");
+        if (horas > HORAS_MAX) {
+            edtPeriodoIrrigacao.setError("Máximo de 1 ano (" + HORAS_MAX + " horas)");
             edtPeriodoIrrigacao.requestFocus();
             return;
         }
 
-        Especime e = new Especime();
+        // Obrigatórios, validados na ordem em que aparecem na tela.
+        // Volume de água e luz sustentam o glossário e a orientação de rega.
+        if (spnVolumeIrrigacao.getSelectedItemPosition() <= 0) {
+            erroSpinner(spnVolumeIrrigacao, "Selecione o volume de irrigação");
+            return;
+        }
 
-        e.setNome_popular(nomePopular);
-        e.setNome_cientifico(textoOuNull(edtNomeCientifico));
-        e.setDescricao(textoOuNull(edtDescricao));
-        e.setFamilia(textoOuNull(edtFamilia));
-        e.setCiclo(textoOuNull(edtCiclo));
-        e.setCrescimento(valorSpinner(spnCrescimento));
-        e.setExposicao_a_luz(valorSpinner(spnLuz));
-        e.setVolume_irrigacao(valorSpinner(spnVolumeIrrigacao));
-
-        // Sempre salva em dias, independentemente da unidade selecionada.
-        e.setPeriodo_irrigacao((int) intervaloEmDias);
-
-        e.setAdubacao(montarPeriodo(edtAdubacao, spnUnidadeAdubacao));
-        e.setPeriodo_poda(montarPeriodo(edtPeriodoPoda, spnUnidadePoda));
-        e.setTroca_de_vaso(montarPeriodo(edtTrocaVaso, spnUnidadeVaso));
-        e.setTemperatura(textoOuNull(edtTemperatura));
+        if (spnLuz.getSelectedItemPosition() <= 0) {
+            erroSpinner(spnLuz, "Selecione a exposição à luz");
+            return;
+        }
 
         String tamanhoTexto = edtTamanhoAdulto.getText().toString().trim();
-
+        Float tamanho = null;
         if (!tamanhoTexto.isEmpty()) {
             try {
-                e.setTamanho_adulto_cm(Float.parseFloat(
-                        tamanhoTexto.replace(",", ".")
-                ));
+                tamanho = Float.parseFloat(tamanhoTexto.replace(",", "."));
             } catch (NumberFormatException ex) {
                 edtTamanhoAdulto.setError("Informe um tamanho válido");
                 edtTamanhoAdulto.requestFocus();
                 return;
             }
-        } else {
-            e.setTamanho_adulto_cm(null);
         }
+
+        // edição: altera a espécie carregada; cadastro: cria uma nova
+        Especime e = especimeAtual != null ? especimeAtual : new Especime();
+
+        e.setNome_popular(nomePopular);
+        e.setNome_cientifico(nomeCientifico);
+        e.setDescricao(textoOuNull(edtDescricao));
+        e.setFamilia(textoOuNull(edtFamilia));
+        e.setCiclo(textoOuNull(edtCiclo));
+        e.setCrescimento(valorSpinnerOpcional(spnCrescimento));
+        e.setExposicao_a_luz(valorSpinnerOpcional(spnLuz));
+        e.setVolume_irrigacao(valorSpinnerOpcional(spnVolumeIrrigacao));
+        e.setPeriodo_irrigacao((int) horas);
+
+        e.setAdubacao(montarPeriodo(edtAdubacao, spnUnidadeAdubacao, "Não precisa de adubação"));
+        e.setPeriodo_poda(montarPeriodo(edtPeriodoPoda, spnUnidadePoda, "Não precisa de poda"));
+        e.setTroca_de_vaso(montarPeriodo(edtTrocaVaso, spnUnidadeVaso, "Não precisa de troca de vaso"));
+        e.setTemperatura(textoOuNull(edtTemperatura));
+        e.setTamanho_adulto_cm(tamanho);
 
         mostrarCarregamento(true);
 
-        if (especieId == -1) {
-            criarEspecime(e);
+        // Só consulta duplicidade quando é espécie nova ou o nome científico mudou.
+        String novo = norm(nomeCientifico);
+        boolean checarDuplicidade = especieId == -1 || !novo.equals(norm(nomeCientificoOriginal));
+
+        if (checarDuplicidade) {
+            verificarDuplicidadeEEnviar(e, novo);
         } else {
-            atualizarEspecime(e);
+            enviar(e);
         }
+    }
+
+    private static String norm(String texto) {
+        return texto == null ? "" : CuidadoCalculator.normalizar(texto).trim();
     }
 
     private String textoOuNull(EditText campo) {
@@ -399,47 +537,84 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         return texto.isEmpty() ? null : texto;
     }
 
-    private String valorSpinner(Spinner spinner) {
-        Object valor = spinner.getSelectedItem();
-        return valor == null ? null : valor.toString();
+    private void erroSpinner(Spinner spinner, String mensagem) {
+        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
+        spinner.requestRectangleOnScreen(
+                new Rect(0, 0, spinner.getWidth(), spinner.getHeight()), false);
+        View v = spinner.getSelectedView();
+        if (v instanceof TextView) ((TextView) v).setError(mensagem);
+    }
+
+    private void verificarDuplicidadeEEnviar(Especime e, String novo) {
+        api.listarEspecimes().enqueue(new Callback<List<Especime>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Especime>> call,
+                                   @NonNull Response<List<Especime>> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    mostrarCarregamento(false);
+                    Toast.makeText(TelaCadastroEspecime.this,
+                            "Não foi possível verificar duplicidade. Tente novamente.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                for (Especime outra : response.body()) {
+                    boolean mesmoNome = norm(outra.getNome_cientifico()).equals(novo);
+                    boolean outroRegistro = especieId == -1 || outra.getId() != especieId;
+
+                    if (mesmoNome && outroRegistro) {
+                        mostrarCarregamento(false);
+                        new AlertDialog.Builder(TelaCadastroEspecime.this)
+                                .setTitle("Espécie já cadastrada")
+                                .setMessage("Já existe uma espécie com o nome científico \""
+                                        + outra.getNome_cientifico()
+                                        + "\". Edite a existente em vez de criar outra.")
+                                .setPositiveButton("Entendi", null)
+                                .show();
+                        return;
+                    }
+                }
+                enviar(e);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Especime>> call, @NonNull Throwable t) {
+                mostrarCarregamento(false);
+                Toast.makeText(TelaCadastroEspecime.this,
+                        "Falha na conexão: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void enviar(Especime e) {
+        if (especieId == -1) {
+            criarEspecime(e);
+        } else {
+            atualizarEspecime(e);
+        }
     }
 
     private void criarEspecime(Especime e) {
         api.criarEspecime(e).enqueue(new Callback<Especime>() {
             @Override
-            public void onResponse(
-                    @NonNull Call<Especime> call,
-                    @NonNull Response<Especime> response
-            ) {
+            public void onResponse(@NonNull Call<Especime> call, @NonNull Response<Especime> response) {
                 mostrarCarregamento(false);
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(
-                            TelaCadastroEspecime.this,
-                            "Espécie cadastrada com sucesso!",
-                            Toast.LENGTH_SHORT
-                    ).show();
+                    Toast.makeText(TelaCadastroEspecime.this,
+                            "Espécie cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(
-                            TelaCadastroEspecime.this,
-                            "Erro ao cadastrar: HTTP " + response.code(),
-                            Toast.LENGTH_LONG
-                    ).show();
+                    Toast.makeText(TelaCadastroEspecime.this,
+                            "Erro ao cadastrar: HTTP " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(
-                    @NonNull Call<Especime> call,
-                    @NonNull Throwable t
-            ) {
+            public void onFailure(@NonNull Call<Especime> call, @NonNull Throwable t) {
                 mostrarCarregamento(false);
-                Toast.makeText(
-                        TelaCadastroEspecime.this,
-                        "Falha na conexão: " + t.getMessage(),
-                        Toast.LENGTH_LONG
-                ).show();
+                Toast.makeText(TelaCadastroEspecime.this,
+                        "Falha na conexão: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -447,50 +622,32 @@ public class TelaCadastroEspecime extends AppCompatActivity {
     private void atualizarEspecime(Especime e) {
         api.atualizarEspecime(especieId, e).enqueue(new Callback<Especime>() {
             @Override
-            public void onResponse(
-                    @NonNull Call<Especime> call,
-                    @NonNull Response<Especime> response
-            ) {
+            public void onResponse(@NonNull Call<Especime> call, @NonNull Response<Especime> response) {
                 mostrarCarregamento(false);
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(
-                            TelaCadastroEspecime.this,
-                            "Espécie atualizada com sucesso!",
-                            Toast.LENGTH_SHORT
-                    ).show();
+                    Toast.makeText(TelaCadastroEspecime.this,
+                            "Espécie atualizada com sucesso!", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(
-                            TelaCadastroEspecime.this,
-                            "Erro ao atualizar: HTTP " + response.code(),
-                            Toast.LENGTH_LONG
-                    ).show();
+                    Toast.makeText(TelaCadastroEspecime.this,
+                            "Erro ao atualizar: HTTP " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(
-                    @NonNull Call<Especime> call,
-                    @NonNull Throwable t
-            ) {
+            public void onFailure(@NonNull Call<Especime> call, @NonNull Throwable t) {
                 mostrarCarregamento(false);
-                Toast.makeText(
-                        TelaCadastroEspecime.this,
-                        "Falha na conexão: " + t.getMessage(),
-                        Toast.LENGTH_LONG
-                ).show();
+                Toast.makeText(TelaCadastroEspecime.this,
+                        "Falha na conexão: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void mostrarCarregamento(boolean carregando) {
         if (progressForm != null) {
-            progressForm.setVisibility(
-                    carregando ? View.VISIBLE : View.GONE
-            );
+            progressForm.setVisibility(carregando ? View.VISIBLE : View.GONE);
         }
-
         if (btnSalvar != null) {
             btnSalvar.setEnabled(!carregando);
         }

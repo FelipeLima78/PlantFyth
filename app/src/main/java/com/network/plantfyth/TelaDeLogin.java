@@ -13,20 +13,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.network.plantfyth.ui.dashboard.DashboardFragment;
-import com.network.plantfyth.ui.home.HomeFragment;
 import com.network.plantfyth.model.Usuario;
-import com.network.plantfyth.notifications.NotificationPermissionHelper;
 import com.network.plantfyth.notifications.PlantCareDailyWorker;
-import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
-
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
