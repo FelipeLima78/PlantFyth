@@ -99,4 +99,16 @@ public class PlantioController{
 public List<Plantio> buscarPlantiosUsuario(@PathVariable Integer id) {
     return plantioService.buscarPorUsuarioId(id);
 }		
+
+@PostMapping("/resetar-flags-diarias/{usuarioId}")
+public ResponseEntity<String> resetarFlagsDiarias(
+        @PathVariable Integer usuarioId) {
+
+    plantioRepository.resetarFlagsDiariasPorUsuario(usuarioId);
+
+    return ResponseEntity.ok(
+            "Flags diárias resetadas com sucesso."
+    );
+}
+
 }

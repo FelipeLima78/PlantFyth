@@ -28,5 +28,16 @@ public interface PlantioRepository extends JpaRepository<Plantio, Integer>{
 @Transactional
 @Query("UPDATE Plantio p SET p.pegouSolHoje = false, p.foiRegadoHoje = false")
 void resetarFlagsDiarias();
-
+@Modifying
+@Transactional
+@Query("""
+    UPDATE Plantio p
+    SET p.pegouSolHoje = false,
+        p.foiRegadoHoje = false
+    WHERE p.usuarioId = :usuarioId
+""")
+void resetarFlagsDiariasPorUsuario(
+    @org.springframework.data.repository.query.Param("usuarioId")
+    Integer usuarioId
+);
 }

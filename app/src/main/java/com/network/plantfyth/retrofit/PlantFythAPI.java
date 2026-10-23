@@ -32,6 +32,10 @@ public interface PlantFythAPI {
     Call<Plantio> atualizarPlanta (@Path("id") Integer id, @Body Plantio plantio);
     @GET("plantios/usuario/{id}") Call<List<Plantio>>
     buscarPlantasUsuario (@Path("id") Integer usuarioId);
+    @POST("plantios/resetar-flags-diarias/{usuarioId}")
+    Call<ResponseBody> resetarFlagsDiarias(
+            @Path("usuarioId") Integer usuarioId
+    );
     @DELETE("plantios/{id}")
     Call<Void> deletarPlantio (@Path("id") Integer plantioId);
     @GET("plantios/id/{id}")
