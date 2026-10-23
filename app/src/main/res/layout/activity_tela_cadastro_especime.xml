@@ -202,8 +202,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:hint="Ex.: 1"
-                        android:inputType="number"
-                        android:maxLength="3"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:maxLines="1" />
 
                     <Spinner
@@ -232,8 +231,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:hint="Ex.: 2"
-                        android:inputType="number"
-                        android:maxLength="3"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:maxLines="1" />
 
                     <Spinner
@@ -263,7 +261,6 @@
                         android:layout_weight="1"
                         android:hint="Ex.: 2"
                         android:inputType="number"
-                        android:maxLength="3"
                         android:maxLines="1" />
 
                     <Spinner

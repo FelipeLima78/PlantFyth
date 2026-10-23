@@ -43,13 +43,9 @@ public class TelaCadastroEspecime extends AppCompatActivity {
     private static final String UN_SEMANAS = "Semanas";
     private static final String UN_MESES = "Meses";
     private static final String UN_ANOS = "Anos";
-    private static final String UN_SAZONAL = "Sazonal";
     private static final String UN_NAO_PRECISA = "Não precisa";
 
-    private static final int HORAS_MAX = 8760; // 1 ano
-
-    // Só casa se o texto INTEIRO for um intervalo ("2 semanas", "a cada 3 meses").
-    // Aplicado sobre o texto sem acento e em minúsculas.
+    private static final int HORAS_MAX = 8760;
     private static final Pattern PADRAO_PERIODO = Pattern.compile(
             "^(?:a cada\\s+)?(\\d+)\\s*(dias?|semanas?|meses|mes|anos?)$");
 
@@ -71,27 +67,25 @@ public class TelaCadastroEspecime extends AppCompatActivity {
 
     private int especieId = -1;
 
-    // Espécie carregada na edição: é ela que é alterada e enviada, para não apagar
-    // colunas que este formulário não mostra.
     private Especime especimeAtual;
-
-    // Nome científico como veio do banco: só checa duplicidade se ele mudar.
     private String nomeCientificoOriginal;
+    private final String[] unidadesAdubacao = {
+            UN_DIAS, UN_SEMANAS, UN_MESES, UN_ANOS, UN_NAO_PRECISA
+    };
 
-    // Valores antigos que o formulário não entendeu: ficam como estão se o campo não for mexido.
-    private final Map<Spinner, String> naoReconhecido = new HashMap<>();
+    private final String[] unidadesPoda = {
+            UN_MESES, UN_ANOS, UN_NAO_PRECISA
+    };
 
+    private final String[] unidadesTrocaVaso = {
+            UN_MESES, UN_ANOS, UN_NAO_PRECISA
+    };
     private final String[] crescimentos = {"Devagar", "Médio", "Rápido"};
     private final String[] volumes = {"Baixa", "Moderada", "Alta"};
     private final String[] luzes = {"Sol pleno", "Luz filtrada", "Sombra Parcial", "Sombra Profunda"};
 
-    // Irrigação: o banco guarda em HORAS (é o que o CuidadoCalculator soma).
     private final String[] unidadesIrrigacao = {UN_DIAS, UN_SEMANAS, UN_HORAS};
 
-    // Poda, adubação e troca de vaso
-    private final String[] unidadesCuidado = {
-            UN_DIAS, UN_SEMANAS, UN_MESES, UN_ANOS, UN_SAZONAL, UN_NAO_PRECISA
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,10 +143,11 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         configurarSpinner(spnCrescimento, comSelecione(crescimentos));
         configurarSpinner(spnVolumeIrrigacao, comSelecione(volumes));
         configurarSpinner(spnLuz, comSelecione(luzes));
+
         configurarSpinner(spnUnidadeIrrigacao, unidadesIrrigacao);
-        configurarSpinner(spnUnidadeAdubacao, unidadesCuidado);
-        configurarSpinner(spnUnidadePoda, unidadesCuidado);
-        configurarSpinner(spnUnidadeVaso, unidadesCuidado);
+        configurarSpinner(spnUnidadeAdubacao, unidadesAdubacao);
+        configurarSpinner(spnUnidadePoda, unidadesPoda);
+        configurarSpinner(spnUnidadeVaso, unidadesTrocaVaso);
 
         ligarCampoPeriodo(edtAdubacao, spnUnidadeAdubacao);
         ligarCampoPeriodo(edtPeriodoPoda, spnUnidadePoda);
@@ -167,17 +162,20 @@ public class TelaCadastroEspecime extends AppCompatActivity {
     }
 
     private void configurarSpinner(Spinner spinner, String[] opcoes) {
-        // lista própria (ArrayList) para poder inserir valores antigos fora do padrão
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
-                new ArrayList<>(Arrays.asList(opcoes))
+                opcoes
         );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+        );
+
         spinner.setAdapter(adapter);
     }
 
-    /** "Sazonal" e "Não precisa" não têm número: o campo fica desabilitado. */
+
     private void ligarCampoPeriodo(EditText campo, Spinner spinner) {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -194,33 +192,41 @@ public class TelaCadastroEspecime extends AppCompatActivity {
     }
 
     private boolean ehEspecial(String unidade) {
-        return UN_SAZONAL.equals(unidade) || UN_NAO_PRECISA.equals(unidade);
+        return  UN_NAO_PRECISA.equals(unidade);
     }
 
     /** Seleciona o valor; se ele não estiver na lista, entra na lista em vez de ser trocado. */
-    @SuppressWarnings("unchecked")
     private void selecionarSpinner(Spinner spinner, String valor) {
-        if (valor == null || valor.trim().isEmpty()) {
+        if (spinner == null || valor == null || valor.trim().isEmpty()) {
             return;
         }
-        for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(valor.trim())) {
+
+        android.widget.SpinnerAdapter adapter = spinner.getAdapter();
+
+        if (adapter == null) {
+            return;
+        }
+
+        String valorProcurado = valor.trim();
+
+        for (int i = 0; i < adapter.getCount(); i++) {
+            Object item = adapter.getItem(i);
+
+            if (item != null &&
+                    item.toString().equalsIgnoreCase(valorProcurado)) {
                 spinner.setSelection(i);
                 return;
             }
         }
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinner.getAdapter();
-        adapter.insert(valor.trim(), 1);
-        spinner.setSelection(1);
+
+        // O valor salvo não existe nas opções atuais.
+        // Não altera a lista do spinner automaticamente.
+        android.util.Log.w(
+                "TelaCadastroEspecime",
+                "Valor não encontrado no spinner: " + valorProcurado
+        );
     }
 
-    private String valorSpinnerOpcional(Spinner spinner) {
-        if (spinner.getSelectedItemPosition() <= 0) return null; // "Selecione"
-        Object valor = spinner.getSelectedItem();
-        return valor == null ? null : valor.toString();
-    }
-
-    // --------------------------------------------------------------- carregar
 
     private void buscarEspecime() {
         mostrarCarregamento(true);
@@ -284,56 +290,17 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         selecionarSpinner(spnVolumeIrrigacao, e.getVolume_irrigacao());
         selecionarSpinner(spnLuz, e.getExposicao_a_luz());
 
-        preencherPeriodo(edtAdubacao, spnUnidadeAdubacao, e.getAdubacao());
-        preencherPeriodo(edtPeriodoPoda, spnUnidadePoda, e.getPeriodo_poda());
-        preencherPeriodo(edtTrocaVaso, spnUnidadeVaso, e.getTroca_de_vaso());
+        edtAdubacao.setText(valorTexto(e.getAdubacao()));
+        edtPeriodoPoda.setText(valorTexto(e.getPeriodo_poda()));
+        edtTrocaVaso.setText(valorTexto(e.getTroca_de_vaso()));
     }
 
     private String valorTexto(String valor) {
         return valor == null ? "" : valor;
     }
 
-    // ------------------------------------------------- períodos (poda, adubo...)
 
-    /**
-     * Só entende o texto quando ele É um intervalo ("2 semanas", "A cada 3 meses", "Mensal",
-     * "Semestral"), "Sazonal" ou "Não precisa de ...". Uma frase com outras informações não é
-     * reescrita: aparece como dica e é mantida enquanto você não digitar um número novo.
-     */
-    private void preencherPeriodo(EditText campo, Spinner spinner, String periodo) {
-        naoReconhecido.remove(spinner);
-        if (periodo == null || periodo.trim().isEmpty()) {
-            return;
-        }
 
-        String t = CuidadoCalculator.normalizar(periodo).trim();
-
-        if (t.length() <= 32 && CuidadoCalculator.naoPrecisa(periodo)) {
-            selecionarSpinner(spinner, UN_NAO_PRECISA);
-            return;
-        }
-        if (t.length() <= 32 && t.contains("sazonal")) {
-            selecionarSpinner(spinner, UN_SAZONAL);
-            return;
-        }
-
-        Matcher m = PADRAO_PERIODO.matcher(t);
-        if (m.matches()) {
-            campo.setText(m.group(1));
-            selecionarSpinner(spinner, unidadePorTexto(m.group(2)));
-            return;
-        }
-
-        String[] palavra = periodoPorPalavra(t);
-        if (palavra != null) {
-            campo.setText(palavra[0]);
-            selecionarSpinner(spinner, palavra[1]);
-            return;
-        }
-
-        naoReconhecido.put(spinner, periodo);
-        campo.setHint("Valor atual: " + periodo);
-    }
 
     private String unidadePorTexto(String u) {
         if (u.startsWith("dia")) return UN_DIAS;
@@ -342,7 +309,7 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         return UN_ANOS;
     }
 
-    // Comparação exata. Quinzenal = 15 dias, para o texto gravado depois ser igual ao lido.
+
     private String[] periodoPorPalavra(String t) {
         switch (t) {
             case "diaria":
@@ -367,27 +334,73 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         }
     }
 
-    private String montarPeriodo(EditText campo, Spinner spinner, String textoNaoPrecisa) {
-        String unidade = String.valueOf(spinner.getSelectedItem());
+    private String montarPeriodo(
+            EditText campo,
+            Spinner spinner,
+            String textoNaoPrecisa
+    ) {
+        String texto = campo.getText().toString().trim();
 
-        if (UN_NAO_PRECISA.equals(unidade)) return textoNaoPrecisa;
-        if (UN_SAZONAL.equals(unidade)) return "Sazonal";
-
-        String numero = campo.getText().toString().trim();
-        if (numero.isEmpty()) {
-            // campo vazio: mantém o valor antigo que o formulário não entendeu (ou null)
-            return naoReconhecido.get(spinner);
-        }
-
-        int n;
-        try {
-            n = Integer.parseInt(numero);
-        } catch (NumberFormatException ex) {
+        if (texto.isEmpty()) {
             return null;
         }
-        if (n <= 0) return null;
 
-        return textoPadrao(n, unidade);
+        String normalizado = CuidadoCalculator.normalizar(texto).trim();
+
+        // Mantém os intervalos já padronizados.
+        switch (normalizado) {
+            case "diaria":
+            case "diariamente":
+                return "Diária";
+            case "semanal":
+                return "Semanal";
+            case "quinzenal":
+                return "Quinzenal";
+            case "mensal":
+                return "Mensal";
+            case "bimestral":
+                return "Bimestral";
+            case "trimestral":
+                return "Trimestral";
+            case "semestral":
+                return "Semestral";
+            case "anual":
+                return "Anual";
+        }
+
+        // Se for uma frase, preserva o texto inteiro.
+        if (texto.matches(".*[a-zA-ZÀ-ÿ].*")) {
+            return texto;
+        }
+
+        // Se for número, precisa de uma unidade válida.
+        String unidade = spinner.getSelectedItem() == null
+                ? null
+                : spinner.getSelectedItem().toString();
+
+        if (unidade == null) {
+            campo.setError("Selecione a unidade do período");
+            return null;
+        }
+
+        if (UN_NAO_PRECISA.equals(unidade)) {
+            return textoNaoPrecisa;
+        }
+
+        try {
+            int n = Integer.parseInt(texto);
+
+            if (n <= 0) {
+                campo.setError("O período deve ser maior que zero");
+                return null;
+            }
+
+            return textoPadrao(n, unidade);
+
+        } catch (NumberFormatException ex) {
+            campo.setError("Informe um número válido ou uma instrução");
+            return null;
+        }
     }
 
     /** Nome quando existe (Semanal, Mensal...); senão dias, meses ou anos. */
@@ -509,9 +522,17 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         e.setVolume_irrigacao(valorSpinnerOpcional(spnVolumeIrrigacao));
         e.setPeriodo_irrigacao((int) horas);
 
-        e.setAdubacao(montarPeriodo(edtAdubacao, spnUnidadeAdubacao, "Não precisa de adubação"));
-        e.setPeriodo_poda(montarPeriodo(edtPeriodoPoda, spnUnidadePoda, "Não precisa de poda"));
-        e.setTroca_de_vaso(montarPeriodo(edtTrocaVaso, spnUnidadeVaso, "Não precisa de troca de vaso"));
+        e.setAdubacao(
+                montarPeriodo(edtAdubacao, spnUnidadeAdubacao, null)
+        );
+
+        e.setPeriodo_poda(
+                montarPeriodo(edtPeriodoPoda, spnUnidadePoda, null)
+        );
+
+        e.setTroca_de_vaso(
+                montarPeriodo(edtTrocaVaso, spnUnidadeVaso, null)
+        );
         e.setTemperatura(textoOuNull(edtTemperatura));
         e.setTamanho_adulto_cm(tamanho);
 
@@ -651,5 +672,13 @@ public class TelaCadastroEspecime extends AppCompatActivity {
         if (btnSalvar != null) {
             btnSalvar.setEnabled(!carregando);
         }
+    }
+    private String valorSpinnerOpcional(Spinner spinner) {
+        if (spinner.getSelectedItemPosition() <= 0) {
+            return null;
+        }
+
+        Object valor = spinner.getSelectedItem();
+        return valor == null ? null : valor.toString();
     }
 }
