@@ -16,3 +16,4 @@
 local.properties
 /.idea/markdown.xml
 api-plantfyth/src/main/resources/application.properties
+app/src/main/java/com/network/plantfyth/retrofit/RetroFitService.java

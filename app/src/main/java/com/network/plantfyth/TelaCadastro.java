@@ -2,10 +2,18 @@ package com.network.plantfyth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -34,6 +42,8 @@ import retrofit2.Response;
 public class TelaCadastro extends AppCompatActivity {
     Button btnCadastro;
     EditText edtCadastroUsuario, edtCadastroEmail, edtCadastroSenha, edtConfirmeSenha;
+    private boolean senhaVisivel;
+    private boolean confirmacaoVisivel;
 
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
@@ -44,7 +54,9 @@ public class TelaCadastro extends AppCompatActivity {
         setContentView(R.layout.activity_tela_cadastro);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomInset = Math.max(systemBars.bottom, ime.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomInset);
             return insets;
 
         });
@@ -55,7 +67,45 @@ public class TelaCadastro extends AppCompatActivity {
         edtCadastroEmail = findViewById(R.id.edtCadastroEmail);
         edtCadastroSenha = findViewById(R.id.edtCadastroSenha);
         edtConfirmeSenha = findViewById(R.id.edtConfirmeSenha);
+
+        ImageButton btnMostrarSenha = findViewById(R.id.btnMostrarSenha);
+        ImageButton btnMostrarConfirmacao = findViewById(R.id.btnMostrarConfirmacao);
+        btnMostrarSenha.setOnClickListener(v -> {
+            senhaVisivel = !senhaVisivel;
+            alternarVisibilidadeSenha(edtCadastroSenha, btnMostrarSenha, senhaVisivel);
+        });
+        btnMostrarConfirmacao.setOnClickListener(v -> {
+            confirmacaoVisivel = !confirmacaoVisivel;
+            alternarVisibilidadeSenha(edtConfirmeSenha, btnMostrarConfirmacao, confirmacaoVisivel);
+        });
+
+        TextView txtEntrar = findViewById(R.id.txtEntrarCadastro);
+        SpannableString textoEntrar = new SpannableString("Já tem uma conta? Entrar");
+        int inicioEntrar = textoEntrar.length() - "Entrar".length();
+        textoEntrar.setSpan(new ForegroundColorSpan(0xFF287A38), inicioEntrar,
+                textoEntrar.length(), 0);
+        textoEntrar.setSpan(new StyleSpan(Typeface.BOLD), inicioEntrar,
+                textoEntrar.length(), 0);
+        txtEntrar.setText(textoEntrar);
     }
+
+    private void alternarVisibilidadeSenha(EditText campo, ImageButton botao, boolean visivel) {
+        int posicaoCursor = campo.getSelectionStart();
+        campo.setTransformationMethod(visivel
+                ? HideReturnsTransformationMethod.getInstance()
+                : PasswordTransformationMethod.getInstance());
+        campo.setSelection(Math.max(0, Math.min(posicaoCursor, campo.length())));
+        botao.setImageResource(visivel ? R.drawable.ic_login_eye_on : R.drawable.ic_login_eye_off);
+        botao.setContentDescription(visivel ? "Ocultar senha" : "Mostrar senha");
+    }
+
+    public void voltarParaLogin(View view) {
+        Intent intent = new Intent(TelaCadastro.this, TelaDeLogin.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+    }
+
     public void Cadastrar(View view){
         String nome = String.valueOf(edtCadastroUsuario.getText());
         String email = String.valueOf(edtCadastroEmail.getText());

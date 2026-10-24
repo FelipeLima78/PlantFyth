@@ -2,9 +2,12 @@ package com.network.plantfyth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -27,6 +30,8 @@ public class TelaDeLogin extends AppCompatActivity {
 
     private EditText edtUsuario, edtSenha;
     private Button btnEntrarLogin, btnCadastroLogin;
+    private boolean senhaVisivel;
+    private boolean confirmacaoVisivel;
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
 
@@ -38,13 +43,29 @@ public class TelaDeLogin extends AppCompatActivity {
         setContentView(R.layout.activity_tela_de_login);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomInset = Math.max(systemBars.bottom, ime.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomInset);
             return insets;
         });
         edtUsuario = findViewById(R.id.edtUsuario);
         edtSenha = findViewById(R.id.edtSenha);
         btnEntrarLogin = findViewById(R.id.btnEntrarLogin);
         btnCadastroLogin = findViewById(R.id.btnCadastroLogin);
+        ImageButton btnMostrarSenha = findViewById(R.id.btnMostrarSenha_login);
+        btnMostrarSenha.setOnClickListener(v -> {
+            senhaVisivel = !senhaVisivel;
+            alternarVisibilidadeSenha(edtSenha, btnMostrarSenha, senhaVisivel);
+        });
+    }
+    private void alternarVisibilidadeSenha(EditText campo, ImageButton botao, boolean visivel) {
+        int posicaoCursor = campo.getSelectionStart();
+        campo.setTransformationMethod(visivel
+                ? HideReturnsTransformationMethod.getInstance()
+                : PasswordTransformationMethod.getInstance());
+        campo.setSelection(Math.max(0, Math.min(posicaoCursor, campo.length())));
+        botao.setImageResource(visivel ? R.drawable.ic_login_eye_on : R.drawable.ic_login_eye_off);
+        botao.setContentDescription(visivel ? "Ocultar senha" : "Mostrar senha");
     }
     public void irParaCadastro(View view){
         Intent intent = new Intent(TelaDeLogin.this, TelaCadastro.class);
