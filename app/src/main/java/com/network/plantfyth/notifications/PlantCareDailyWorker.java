@@ -1,10 +1,12 @@
 
 package com.network.plantfyth.notifications;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -46,6 +48,7 @@ public class PlantCareDailyWorker extends Worker {
         super(context, params);
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @NonNull
     @Override
     public Result doWork() {

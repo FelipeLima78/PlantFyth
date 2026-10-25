@@ -57,6 +57,52 @@
             android:paddingTop="16dp"
             android:paddingBottom="88dp" />
 
+        <LinearLayout
+            android:id="@+id/layoutCarregandoDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progressBarDashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="#2E7D32" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutVazioDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="88dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nenhuma planta cadastrada"
+                android:textColor="#424242"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="Toque no + para adicionar sua primeira planta"
+                android:textColor="#757575"
+                android:textSize="13sp" />
+        </LinearLayout>
+
 
     </LinearLayout>
 
