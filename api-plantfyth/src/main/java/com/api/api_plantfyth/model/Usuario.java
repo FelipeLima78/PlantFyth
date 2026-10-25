@@ -30,14 +30,19 @@ public class Usuario {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    
     private String nome;
+    
     private String email;
+
+    private LocalDateTime data_criacao;
+
+    private LocalDateTime ultimo_login;
 
     @Column(name = "hash_senha")
       private String hash_senha;
 
-    private LocalDateTime data_criacao;
-    private LocalDateTime ultimo_login;
+    private boolean admin;
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore

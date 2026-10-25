@@ -77,15 +77,16 @@ public class PlantaAdapter extends RecyclerView.Adapter<PlantaAdapter.ViewHolder
 
         holder.btnExcluir.setOnClickListener(v -> {
             if (position == RecyclerView.NO_ID) return;
-            Ap.deletarPlantio(plantio.getId()).enqueue (new Callback<Void>() {
-                @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    Toast.makeText(v.getContext(),"Excluido com sucesso",Toast.LENGTH_SHORT).show();
-                    plantas.remove(holder.getAdapterPosition());
-                    notifyItemRemoved(holder.getAdapterPosition());
+                Ap.deletarPlantio(plantio.getId()).enqueue (new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        int adapterPosition = holder.getAdapterPosition();
+                        if (adapterPosition == RecyclerView.NO_POSITION) return;
 
-
-                }
+                        Toast.makeText(v.getContext(), "Excluído com sucesso", Toast.LENGTH_SHORT).show();
+                        plantas.remove(adapterPosition);
+                        notifyItemRemoved(adapterPosition);
+                    }
                 @Override
                 public void onFailure(Call<Void> call, Throwable throwable) {
                     Toast.makeText(v.getContext(), "Não foi possível excluir, erro: "+ throwable, Toast.LENGTH_LONG).show();

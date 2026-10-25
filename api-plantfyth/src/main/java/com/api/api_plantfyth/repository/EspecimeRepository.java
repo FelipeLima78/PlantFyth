@@ -14,9 +14,8 @@ public interface EspecimeRepository extends JpaRepository<Especime, Integer> {
 
       public Especime findByNomePopular(String nome);
 
-    Optional<Especime> findByPerenualId(Integer perenualId);
-    
-    boolean existsByPerenualId(Integer perenualId);
+    Optional<Especime> findById(Integer Id);
+
 
   
     

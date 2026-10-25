@@ -54,19 +54,17 @@ public class NotificationsFragment extends Fragment {
         api.buscarUsuarioPorEmail(usuarioEmail).enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                if (binding == null) return;
-                mostrarCarregando(false);
-
-                if (!response.isSuccessful() || response.body() == null) {
-                    mostrarErroUsuario();
+                if (binding == null || !isAdded()) {
                     return;
                 }
+                if (response.isSuccessful() && response.body() != null) {
 
                 Usuario usuario = response.body();
                 binding.txtNomeUsuario.setText(usuario.getNome());
                 binding.txtEmailUsuario.setText(usuario.getEmail());
-                binding.txtDataConta.setText("Sua conta foi criada em: " + formatarData(usuario.getDataCriacao()));
-                binding.txtUltimoLogin.setText("Voce logou a ultima vez em: " + formatarData(usuario.getUltimoLogin()));
+
+                binding.txtDataConta.setText("Sua conta foi criada em: "+usuario.getDataCriacao().substring(0,10));
+                  binding.txtUltimoLogin.setText("Você logou a última vez em: "+usuario.getUltimoLogin().substring(0,10));}
             }
 
             @Override

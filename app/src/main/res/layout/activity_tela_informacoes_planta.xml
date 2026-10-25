@@ -4,7 +4,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F3">
+    android:background="#F4F6F3"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,49 +17,63 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#2E7D32"
-            android:padding="24dp"
-            android:paddingTop="40dp">
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingTop="48dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="56dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌿 Minha planta"
+                android:textColor="#C8E6C9"
+                android:textSize="13sp"/>
 
             <TextView
                 android:id="@+id/txtNomePlanta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Nome da Planta"
                 android:textColor="#FFFFFF"
-                android:textSize="28sp"
+                android:textSize="30sp"
                 android:textStyle="bold"/>
         </LinearLayout>
 
-        <!-- CARD STATUS -->
+        <!-- 📊 STATUS -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="-24dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1E8DF"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Status"
+                    android:layout_marginBottom="16dp"
+                    android:text="📊 Status"
                     android:textColor="#1B5E20"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="18dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -66,17 +81,24 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Regado hoje"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtFoiRegado"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
 
@@ -85,25 +107,33 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Data do plantio"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtDataPlantio"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="0dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -111,17 +141,24 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Plantada como"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:text="Recebeu luz?"
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
-                            android:id="@+id/txtPlantadaComo"
+                            android:id="@+id/txtRecebeuLuz"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
 
@@ -130,55 +167,65 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tamanho atual"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:text="Período que deve trocar o vaso"
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
-                            android:id="@+id/txtTamanhoAtual"
+                            android:id="@+id/txtVaso"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="— cm"
+                            android:layout_marginTop="2dp"
+                            android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
+
                 </LinearLayout>
-
-
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- CARD PREVISÕES -->
+        <!-- 🔮 PREVISÕES -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1E8DF"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Previsões"
+                    android:layout_marginBottom="16dp"
+                    android:text="🔮 Previsões"
                     android:textColor="#1B5E20"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="18dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -186,17 +233,24 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Próxima irrigação"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtProximaIrrigacao"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
 
@@ -205,24 +259,33 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Horário de irrigar"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtHorarioIrrigar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -230,17 +293,24 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Próxima poda"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtProximaPoda"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
 
@@ -248,72 +318,106 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"/>
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Intervalo adubação"
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
+                        <TextView
+                            android:id="@+id/txtProximaAdubacao"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- CARD ESPÉCIE -->
+        <!-- 🌱 INFORMAÇÕES DA ESPÉCIE -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#E1E8DF"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Informações da Espécie"
+                    android:layout_marginBottom="16dp"
+                    android:text="🌱 Informações da espécie"
                     android:textColor="#1B5E20"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"/>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nome popular"
+                    android:textAllCaps="true"
+                    android:textColor="#7A8A7A"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nome popular"
-                        android:textColor="#757575"
-                        android:textSize="12sp"/>
-                    <TextView
-                        android:id="@+id/txtNomePopular"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"/>
+                <TextView
+                    android:id="@+id/txtNomePopular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="18dp"
+                    android:text="—"
+                    android:textColor="#263238"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Nome científico"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
-                        <TextView
-                            android:id="@+id/txtNomeCientifico"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="—"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nome científico"
+                    android:textAllCaps="true"
+                    android:textColor="#7A8A7A"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"/>
 
-
+                <TextView
+                    android:id="@+id/txtNomeCientifico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="18dp"
+                    android:text="—"
+                    android:textColor="#263238"
+                    android:textSize="15sp"
+                    android:textStyle="bold|italic"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="18dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -321,90 +425,110 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Família"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtFamilia"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Crescimento"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtCrescimento"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Ciclo"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtCiclo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Tamanho adulto"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtTamanhoAdulto"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="— cm"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
 
@@ -413,7 +537,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="18dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -421,17 +545,84 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Volume de irrigação"
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
+                        <TextView
+                            android:id="@+id/txtVolumeIrrigacao"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Frequência de irrigação"
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
+                        <TextView
+                            android:id="@+id/txtFrequenciaIrrigacao"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Exposição à luz"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
                             android:id="@+id/txtExposicaoLuz"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
 
@@ -440,99 +631,91 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Período de irrigação"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
+                            android:text="Temperatura ideal"
+                            android:textAllCaps="true"
+                            android:textColor="#7A8A7A"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.05"/>
+
                         <TextView
-                            android:id="@+id/txtPeriodoIrrigacao"
+                            android:id="@+id/txtTemperaturaIdeal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="—"
+                            android:textColor="#263238"
+                            android:textSize="15sp"
                             android:textStyle="bold"/>
                     </LinearLayout>
+
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Unidade de irrigação"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
-                        <TextView
-                            android:id="@+id/txtUnidadeIrrigacao"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="—"
-                            android:textStyle="bold"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Período de poda"
-                            android:textColor="#757575"
-                            android:textSize="12sp"/>
-                        <TextView
-                            android:id="@+id/txtPeriodoPoda"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="—"
-                            android:textStyle="bold"/>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- DESCRIÇÃO OCUPA LINHA INTEIRA -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Descrição"
-                    android:textColor="#757575"
-                    android:textSize="12sp"/>
+                    android:text="Período de poda"
+                    android:textAllCaps="true"
+                    android:textColor="#7A8A7A"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"/>
+
+                <TextView
+                    android:id="@+id/txtPeriodoPoda"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="18dp"
+                    android:text="—"
+                    android:textColor="#263238"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="#E6ECE4"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DESCRIÇÃO"
+                    android:textColor="#7A8A7A"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"/>
+
                 <TextView
                     android:id="@+id/txtDescricao"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="—"
-                    android:textStyle="bold"
                     android:layout_marginTop="4dp"
-                    android:lineSpacingExtra="4dp"/>
+                    android:lineSpacingExtra="4dp"
+                    android:text="—"
+                    android:textColor="#37474F"
+                    android:textSize="14sp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSairInformacao"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="#4CAF50"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#2E7D32"
             android:onClick="SairInformacao"
             android:text="Sair"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            android:textSize="12dp" />
-
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

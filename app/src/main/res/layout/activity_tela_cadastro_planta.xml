@@ -4,7 +4,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F3">
+    android:background="#F4F6F3"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,172 +16,173 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cadastrar Planta"
-            android:textSize="30sp"
-            android:textStyle="bold"
+            android:text="🌱 Cadastrar Planta"
             android:textColor="#1B5E20"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preencha os dados da sua nova planta"
+            android:textColor="#6B7A6B"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="20dp"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="6dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="22dp">
 
                 <!-- Nome -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nome da Planta"
+                    android:text="Nome da planta"
+                    android:textColor="#33443A"
+                    android:textSize="14sp"
                     android:textStyle="bold"/>
 
                 <EditText
                     android:id="@+id/edtNomePlanta"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ex: Rosa do Jardim"
-                    android:inputType="textCapWords"/>
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:hint="Ex: Alecrim Dourado"
+                    android:inputType="textCapWords"
+                    android:paddingHorizontal="14dp"
+                    android:textColorHint="#9AA69A"
+                    android:textSize="15sp"/>
 
                 <!-- Espécime -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
                     android:text="Espécime"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"/>
+                    android:textColor="#33443A"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
 
-                <Spinner
-                    android:id="@+id/spinnerEspecime"
+                <EditText
+                    android:id="@+id/edtEspecie"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:drawableEnd="@android:drawable/ic_menu_search"
+                    android:focusable="false"
+                    android:hint="Toque para buscar a espécie"
+                    android:inputType="text"
+                    android:onClick="AbrirSeletorEspecie"
+                    android:paddingHorizontal="14dp"
+                    android:textColorHint="#9AA69A"
+                    android:textSize="15sp" />
+                <TextView
+                    android:id="@+id/txtVolumeIrrigacao"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Volume de irrigação: --"
+                    android:textColor="#33443A"
+                    android:textSize="14sp" />
 
-                <!-- Data do Plantio -->
+                <TextView
+                    android:id="@+id/txtExposicaoLuz"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Exposição à luz: --"
+                    android:textColor="#33443A"
+                    android:textSize="14sp" />
+
+
+                <!-- Data do plantio -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Data do Plantio"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"/>
+                    android:layout_marginTop="18dp"
+                    android:text="Data do plantio"
+                    android:textColor="#33443A"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
 
                 <EditText
                     android:id="@+id/edtDataPlantio"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:drawableEnd="@android:drawable/ic_menu_my_calendar"
                     android:focusable="false"
-                    android:hint="ddMMaaaa"
+                    android:hint="dd/MM/aaaa"
                     android:inputType="number"
                     android:maxLength="10"
-                    android:onClick="AbrirCalendario" />
+                    android:onClick="AbrirCalendario"
+                    android:paddingHorizontal="14dp"
+                    android:textColorHint="#9AA69A"
+                    android:textSize="15sp"/>
 
-                <!-- Plantada como -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="18dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Plantada como"
-                        android:textStyle="bold"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="  Opcional"
-                        android:textSize="12sp"
-                        android:textColor="#757575"/>
-                </LinearLayout>
-
-                <RadioGroup
-                    android:id="@+id/radioPlantadaComo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/rbSemente"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Semente"/>
-
-                    <RadioButton
-                        android:id="@+id/rbMuda"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Muda"
-                        android:layout_marginStart="8dp"/>
-
-                    <RadioButton
-                        android:id="@+id/rbEstaca"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Estaca"
-                        android:layout_marginStart="8dp"/>
-
-                </RadioGroup>
-
-                <!-- Tamanho atual -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tamanho Atual (cm)"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="  Opcional"
-                        android:textSize="12sp"
-                        android:textColor="#757575"/>
-                </LinearLayout>
-
-                <EditText
-                    android:id="@+id/edtTamanhoAtual"
+                <!-- Divisor -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ex: 12.5"
-                    android:inputType="numberDecimal"/>
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#E6ECE4"/>
 
-                <!-- Foi regado hoje -->
+                <!-- Checks -->
                 <CheckBox
                     android:id="@+id/checkFoiRegadoHoje"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="#2E7D32"
+                    android:text="💧 Foi regado hoje?"
+                    android:textColor="#33443A"
+                    android:textSize="15sp"/>
+
+                <CheckBox
+                    android:id="@+id/checkPegouSolHoje"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="#2E7D32"
+                    android:text="☀️ Pegou sol hoje?"
+                    android:textColor="#33443A"
+                    android:textSize="15sp"/>
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Foi regado hoje?"
-                    android:textStyle="bold"
                     android:layout_marginTop="18dp"
-                    android:buttonTint="#2E7D32"/>
+                    android:text="⚠️ Atenção, sempre confira das informações de seu plantio, cada espécime necessita de um cuidado específico!!!"
+                    android:textColor="#33443A"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
 
                 <!-- Salvar -->
                 <Button
                     android:id="@+id/btnSalvarPlanta"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="54dp"
                     android:layout_marginTop="24dp"
                     android:backgroundTint="#2E7D32"
                     android:onClick="CadastrarPlanta"
-                    android:text="Salvar Planta"
+                    android:text="Salvar planta"
+                    android:textAllCaps="false"
                     android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
-
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
-
     </LinearLayout>
-
 </ScrollView>

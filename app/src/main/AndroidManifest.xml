@@ -19,6 +19,15 @@
         android:theme="@style/Theme.PlantFyth"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".TelaCadastroEspecime"
+            android:exported="false" />
+        <activity
+            android:name=".TelaListaEspecimesAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".EscolherEspecieActivity"
+            android:exported="false" />
+        <activity
             android:name=".TelaEditarUsuario"
             android:exported="false" />
         <activity
@@ -30,16 +39,12 @@
         <activity
             android:name=".TelaCadastroPlanta"
             android:exported="false" />
-        <!--
-         <activity
-            android:name=".TelaEsqueciASenha"
-            android:exported="false"
-            android:theme="@style/Theme.PlantFyth" />
-        -->
+
         <activity
             android:name=".TelaCadastro"
             android:exported="false"
-            android:theme="@style/Theme.App.NoActionBar" />
+            android:theme="@style/Theme.App.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
             android:exported="false"
@@ -49,7 +54,8 @@
             android:name=".TelaDeLogin"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.App.NoActionBar">
+            android:theme="@style/Theme.App.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -3,7 +3,6 @@ package com.network.plantfyth.retrofit;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.model.Usuario;
-import retrofit2.http.PUT;
 import java.util.List;
 
 import okhttp3.RequestBody;
@@ -25,25 +24,34 @@ public interface PlantFythAPI {
 
     //plantios
 
-    @GET("especimes/indoor")
-    Call<List<Especime>> listarIndoorPlants();
+    @GET("especimes")
+    Call<List<Especime>> listarEspecimes();
     @POST("plantios/inserir")
     Call<Plantio> savePlantio(@Body Plantio plantio);
     @PUT("plantios/id/{id}")
     Call<Plantio> atualizarPlanta (@Path("id") Integer id, @Body Plantio plantio);
     @GET("plantios/usuario/{id}") Call<List<Plantio>>
     buscarPlantasUsuario (@Path("id") Integer usuarioId);
+    @POST("plantios/resetar-flags-diarias/{usuarioId}")
+    Call<ResponseBody> resetarFlagsDiarias(
+            @Path("usuarioId") Integer usuarioId
+    );
     @DELETE("plantios/{id}")
     Call<Void> deletarPlantio (@Path("id") Integer plantioId);
     @GET("plantios/id/{id}")
     Call<Plantio> buscarPlantaPorId (@Path("id") Integer plantioId);
 
 
-    //especimes
-    @GET("especimes/indoor/{perenualId}")
-    Call<Especime> buscarDetalhes(@Path("perenualId")int perenualId);
     @GET("especimes/id/{id}")
     Call<Especime> buscarEspecimePorId(@Path("id") Integer id);
+    @POST("especimes")
+    Call<Especime> criarEspecime(@Body Especime especime);
+
+    @PUT("especimes/id/{id}")
+    Call<Especime> atualizarEspecime(
+            @Path("id") Integer id,
+            @Body Especime especime
+    );
 
 
     //usuario
@@ -59,8 +67,5 @@ public interface PlantFythAPI {
     @DELETE("usuarios/deletar/{id}")
     Call<ResponseBody> deleteUsuario(@Path("id")Integer id);
 
-    //chatbot
-    @POST("chat")
-    @Headers("Content-Type: text/plain")
-    Call<ResponseBody> chat(@Body RequestBody pergunta);
+
 }

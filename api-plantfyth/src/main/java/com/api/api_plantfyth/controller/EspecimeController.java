@@ -3,23 +3,17 @@ package com.api.api_plantfyth.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.api_plantfyth.model.Especime;
-import com.api.api_plantfyth.model.Plantio;
 import com.api.api_plantfyth.repository.EspecimeRepository;
 import com.api.api_plantfyth.service.EspecimeService;
-import com.api.api_plantfyth.service.PerenualService;
-import com.api.api_plantfyth.service.PlantioService;
 
 @RestController
 @RequestMapping("/especimes")
@@ -28,41 +22,28 @@ public class EspecimeController {
 	@Autowired
 	private EspecimeService especimeService;
 	@Autowired
-    private PlantioService plantioService;
-	@Autowired
 	private EspecimeRepository especimeRepository;
-	@Autowired
-	private PerenualService perenualService;
-	
+
+
 	@GetMapping
 	public List<Especime> listarTodos(){
-		return especimeService.listarTodos();
-	}
-
-	@GetMapping("/indoor")
-	public List<Especime> listarIndoor(@RequestParam(defaultValue = "1") int page) {
-    return perenualService.buscarIndoor(page);
-	}
-
-	@GetMapping("/indoor/{perenualId}")
-	public Especime buscarDetalhe(@PathVariable int perenualId) {
-    return perenualService.buscarDetalhe(perenualId);
-	}
-	
-	@DeleteMapping("/{id}")
-	public String deletar(@PathVariable int id){
-		especimeService.deletar(id);
-		return "Especime Deletado com Sucesso!!!";
+		return especimeService.findAll();
 	}
 	@GetMapping("/id/{id}")
-public Especime buscarPorId(@PathVariable Integer id) {
-    Especime e = especimeRepository.findById(id).orElse(null);
+	public Especime buscarPorId(@PathVariable int id){
+		Especime especime = especimeService.buscarPorId(id);
+		return especime;
+	}
 	
-    if (e != null && e.getDescricao() != null && e.getDescricao().matches(".*[a-zA-Z].*")) {
-        perenualService.traduzirEspecime(e);
-        especimeRepository.save(e);
-    }
-    return e;
+	@PostMapping
+public Especime criar(@RequestBody Especime especime) {
+    return especimeRepository.save(especime);
 }
-    
+
+@PutMapping("/id/{id}")
+public Especime atualizar(@PathVariable Integer id, @RequestBody Especime especime) {
+    especimeService.buscarPorId(id);
+    especime.setId(id);
+    return especimeRepository.save(especime);
+}
 }

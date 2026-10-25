@@ -10,42 +10,32 @@ import java.util.List;
 @Table(name = "especime")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Especime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "perenual_id")
-    private Integer perenualId;
+    private Integer id;
 
     @JsonProperty("periodoIrrigacao")
-@Column(name = "periodo_irrigacao")
-private String periodoIrrigacao;
-
-@JsonProperty("unidadeIrrigacao")
-@Column(name = "unidade_irrigacao")
-private String unidadeIrrigacao;
+    @Column(name = "periodo_irrigacao")
+    private Integer periodoIrrigacao;
 
     @Column(name = "exposicao_a_luz")
     private String exposicaoALuz;
-
-    @Column(name = "periodo_poda")
-    private String periodoPoda;
-
+    
     @Column(name = "descricao", columnDefinition = "TEXT")
     @JsonProperty("descricao")
     private String descricao;
 
     @Column(name = "tamanho_adulto_cm")
-    private Float tamanhoAdultoCM;
+    private Float tamanho_adulto_cm;
 
     @Column(name = "familia")
     @JsonProperty("familia")
     private String familia;
-
+    
     @Column(name = "ciclo")
     @JsonProperty("ciclo")
     private String ciclo;
@@ -61,6 +51,29 @@ private String unidadeIrrigacao;
     @Column(name = "nome_popular")
     @JsonProperty("nome_popular")
     private String nomePopular;
+
+    @Column(name = "periodo_poda")
+    private String periodoPoda;
+
+    @JsonProperty("adubacao")
+    @Column(name = "adubacao")
+    private String adubacao;
+
+    @JsonProperty("troca_de_vaso")
+    @Column(name = "troca_de_vaso")
+    private String troca_de_vaso;
+
+    @JsonProperty("volume_irrigacao")
+    @Column(name = "volume_irrigacao")
+    private String volume_irrigacao;
+
+    @JsonProperty("temperatura")
+    @Column(name = "temperatura")
+    private String temperatura;
+
+       
+
+    
 
     @OneToMany(mappedBy = "especime", cascade = CascadeType.ALL)
     @JsonIgnore

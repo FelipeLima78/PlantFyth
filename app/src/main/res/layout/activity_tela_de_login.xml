@@ -5,101 +5,241 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_login"
+    android:background="#103217"
     tools:context=".TelaDeLogin">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="409dp"
-        android:layout_height="729dp"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/loginHeaderGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.44" />
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="198dp"
-            android:layout_height="33dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="564dp"
-            android:fontFamily="@font/amita"
-            android:text="Não possui Cadastro?"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/loginLogoTopGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
 
-        <EditText
-            android:id="@+id/edtSenha"
-            android:layout_width="300dp"
-            android:layout_height="52dp"
-            android:layout_marginTop="367dp"
-            android:backgroundTint="#FFFFFF"
-            android:ems="10"
-            android:hint="Digite sua senha"
-            android:inputType="text"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#DBD9D9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.495"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/loginLogoBottomGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.38" />
 
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="300dp"
-            android:layout_height="81dp"
-            android:layout_marginTop="104dp"
-            android:fontFamily="@font/amita"
-            android:gravity="center"
-            android:text="PlantFyth"
-            android:textColor="#FFFFFF"
-            android:textSize="48sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/loginBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription=""
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_login"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/loginHeaderGuide"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <EditText
-            android:id="@+id/edtUsuario"
-            android:layout_width="300dp"
-            android:layout_height="52dp"
-            android:layout_marginTop="285dp"
-            android:backgroundTint="#FFFFFF"
-            android:ems="10"
-            android:fontFamily="sans-serif"
-            android:hint="Digite seu email"
-            android:inputType="text"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#DBD9D9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/loginLogoCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="#F5FAF4"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:layout_constraintWidth_percent="0.56"
+        app:layout_constraintTop_toTopOf="@id/loginLogoTopGuide"
+        app:layout_constraintBottom_toTopOf="@id/loginLogoBottomGuide"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/btnEntrarLogin"
-            android:layout_width="302dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="444dp"
-            android:backgroundTint="#8BC34A"
-            android:onClick="DarLogin"
-            android:text="Entrar"
-            app:cornerRadius="100px"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:contentDescription="PlantFyth"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/logo" />
+    </com.google.android.material.card.MaterialCardView>
 
-        <Button
-            android:id="@+id/btnCadastroLogin"
-            android:layout_width="122dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="244dp"
-            android:layout_marginTop="564dp"
-            android:backgroundTint="#8BC34A"
-            android:fontFamily="@font/amita"
-            android:onClick="irParaCadastro"
-            android:text="Cadastrar"
-            android:textSize="12sp"
-            app:cornerRadius="100px"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <ScrollView
+        android:id="@+id/loginFormScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_login_panel"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toTopOf="@id/loginHeaderGuide"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:background="@drawable/bg_login_brand_chip"
+                android:drawableStart="@drawable/ic_login_leaf"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="PlantFyth"
+                android:textColor="#287A38"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Bem-vindo de volta 🌿"
+                android:textColor="#214F2A"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:gravity="center"
+                android:text="Entre ou crie sua conta para cuidar\ndas suas plantas com carinho"
+                android:textColor="#66836A"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/edtUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="14dp"
+                android:autofillHints="emailAddress"
+                android:background="@drawable/bg_login_input"
+                android:drawableStart="@drawable/ic_login_email"
+                android:drawablePadding="8dp"
+                android:ems="10"
+                android:hint="email@dominio.com"
+                android:inputType="textEmailAddress"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:singleLine="true"
+                android:textColor="#294E2E"
+                android:textColorHint="#8AA58D"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_login_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="6dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription=""
+                    android:src="@drawable/ic_login_lock" />
+
+                <EditText
+                    android:id="@+id/edtSenha"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:autofillHints="newPassword"
+                    android:background="@android:color/transparent"
+                    android:hint="Digite a sua senha"
+                    android:inputType="textPassword"
+                    android:padding="0dp"
+                    android:singleLine="true"
+                    android:textColor="#294E2E"
+                    android:textColorHint="#8AA58D"
+                    android:textSize="13sp"  />
+
+                <ImageButton
+                    android:id="@+id/btnMostrarSenha_login"
+                    android:layout_width="36dp"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Mostrar senha"
+                    android:padding="9dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_login_eye_off" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnEntrarLogin"
+                android:shape="rectangle"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#2D7F38"
+                android:elevation="3dp"
+                android:onClick="DarLogin"
+                android:text="Continuar"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textColorLink="#4CAF50"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#C9E6CC" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="ou"
+                    android:textColor="#7BA47F"
+                    android:textSize="12sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#C9E6CC" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnCadastroLogin"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#E2DDDD"
+                android:onClick="irParaCadastro"
+                android:paddingBottom="12dp"
+                android:text="Criar uma Conta"
+                android:textAllCaps="false"
+                android:textColor="#294E2E"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

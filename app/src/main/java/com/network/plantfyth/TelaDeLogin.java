@@ -2,9 +2,12 @@ package com.network.plantfyth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -13,20 +16,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.network.plantfyth.ui.dashboard.DashboardFragment;
-import com.network.plantfyth.ui.home.HomeFragment;
 import com.network.plantfyth.model.Usuario;
-import com.network.plantfyth.notifications.NotificationPermissionHelper;
 import com.network.plantfyth.notifications.PlantCareDailyWorker;
-import com.network.plantfyth.notifications.PlantNotificationScheduler;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
-
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,6 +30,8 @@ public class TelaDeLogin extends AppCompatActivity {
 
     private EditText edtUsuario, edtSenha;
     private Button btnEntrarLogin, btnCadastroLogin;
+    private boolean senhaVisivel;
+    private boolean confirmacaoVisivel;
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
 
@@ -47,13 +43,29 @@ public class TelaDeLogin extends AppCompatActivity {
         setContentView(R.layout.activity_tela_de_login);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomInset = Math.max(systemBars.bottom, ime.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomInset);
             return insets;
         });
         edtUsuario = findViewById(R.id.edtUsuario);
         edtSenha = findViewById(R.id.edtSenha);
         btnEntrarLogin = findViewById(R.id.btnEntrarLogin);
         btnCadastroLogin = findViewById(R.id.btnCadastroLogin);
+        ImageButton btnMostrarSenha = findViewById(R.id.btnMostrarSenha_login);
+        btnMostrarSenha.setOnClickListener(v -> {
+            senhaVisivel = !senhaVisivel;
+            alternarVisibilidadeSenha(edtSenha, btnMostrarSenha, senhaVisivel);
+        });
+    }
+    private void alternarVisibilidadeSenha(EditText campo, ImageButton botao, boolean visivel) {
+        int posicaoCursor = campo.getSelectionStart();
+        campo.setTransformationMethod(visivel
+                ? HideReturnsTransformationMethod.getInstance()
+                : PasswordTransformationMethod.getInstance());
+        campo.setSelection(Math.max(0, Math.min(posicaoCursor, campo.length())));
+        botao.setImageResource(visivel ? R.drawable.ic_login_eye_on : R.drawable.ic_login_eye_off);
+        botao.setContentDescription(visivel ? "Ocultar senha" : "Mostrar senha");
     }
     public void irParaCadastro(View view){
         Intent intent = new Intent(TelaDeLogin.this, TelaCadastro.class);
@@ -111,15 +123,24 @@ public class TelaDeLogin extends AppCompatActivity {
                             String EmailUsuario= usuario.getEmail();
                             getSharedPreferences("USER_EMAIL", MODE_PRIVATE).edit().putString("usuario_email", EmailUsuario).apply();
                             getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().putInt("usuario_id", idUsuario).apply();
-                            NotificationPermissionHelper.requestIfNeeded(TelaDeLogin.this);
+                            if (idUsuario == null) {
+                                Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            getSharedPreferences("USER_EMAIL", MODE_PRIVATE).edit()
+                                    .putString("usuario_email", usuario.getEmail()).apply();
+                            getSharedPreferences("USER_DATA", MODE_PRIVATE).edit()
+                                    .putInt("usuario_id", idUsuario)
+                                    .putBoolean("usuario_admin", usuario.isAdmin()).apply();
+
+                            if (usuario.isAdmin()) {
+                                startActivity(new Intent(TelaDeLogin.this, TelaListaEspecimesAdmin.class));
+                                finish();
+                                return;
+                            }
+
                             PlantCareDailyWorker.scheduleDailyChecks(TelaDeLogin.this, idUsuario);
-                            PlantNotificationScheduler.refreshPlantCareAlarmsAndNotifyDue(
-                                    getApplicationContext(),
-                                    idUsuario,
-                                    true
-                            );
-                            Intent intent = new Intent(TelaDeLogin.this, MainActivity.class);
-                            startActivity(intent);
+                            startActivity(new Intent(TelaDeLogin.this, MainActivity.class));
                             finish();
                         } else {
                             Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();
