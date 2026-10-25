@@ -48,34 +48,76 @@ public class NotificationsFragment extends Fragment {
         return binding.getRoot();
     }
 
+
     private void carregarUsuario(String usuarioEmail) {
+        if (usuarioEmail == null || usuarioEmail.trim().isEmpty()) {
+            mostrarCarregando(false);
+            mostrarErroUsuario();
+            Toast.makeText(requireContext(),
+                    "E-mail do usuário não encontrado.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         mostrarCarregando(true);
 
         api.buscarUsuarioPorEmail(usuarioEmail).enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                if (binding == null || !isAdded()) {
-                    return;
-                }
+                if (binding == null || !isAdded()) return;
+
+                mostrarCarregando(false);
+
                 if (response.isSuccessful() && response.body() != null) {
+                    Usuario usuario = response.body();
 
-                Usuario usuario = response.body();
-                binding.txtNomeUsuario.setText(usuario.getNome());
-                binding.txtEmailUsuario.setText(usuario.getEmail());
+                    binding.txtNomeUsuario.setText(
+                            usuario.getNome() != null ? usuario.getNome() : "-"
+                    );
 
-                binding.txtDataConta.setText("Sua conta foi criada em: "+usuario.getDataCriacao().substring(0,10));
-                  binding.txtUltimoLogin.setText("Você logou a última vez em: "+usuario.getUltimoLogin().substring(0,10));}
+                    binding.txtEmailUsuario.setText(
+                            usuario.getEmail() != null ? usuario.getEmail() : "-"
+                    );
+
+                    binding.txtDataConta.setText(
+                            "Sua conta foi criada em: " +
+                                    formatarData(usuario.getDataCriacao())
+                    );
+
+                    binding.txtUltimoLogin.setText(
+                            "Você logou a última vez em: " +
+                                    formatarData(usuario.getUltimoLogin())
+                    );
+
+                } else {
+                    mostrarErroUsuario();
+
+                    Log.e("PERFIL", "Erro HTTP ao buscar usuário: "
+                            + response.code());
+
+                    Toast.makeText(requireContext(),
+                            "Não foi possível carregar o perfil. Código: "
+                                    + response.code(),
+                            Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
-            public void onFailure(Call<Usuario> call, Throwable throwable) {
-                if (binding == null) return;
+            public void onFailure(Call<Usuario> call, Throwable t) {
+                if (binding == null || !isAdded()) return;
+
                 mostrarCarregando(false);
                 mostrarErroUsuario();
-                Toast.makeText(getContext(), "Erro: " + throwable, Toast.LENGTH_SHORT).show();
+
+                Log.e("PERFIL", "Falha ao buscar usuário", t);
+
+                Toast.makeText(requireContext(),
+                        "Erro de conexão ao carregar o perfil.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void configurarBotoes(int usuarioId) {
         binding.btnSairConta.setOnClickListener(view -> {
