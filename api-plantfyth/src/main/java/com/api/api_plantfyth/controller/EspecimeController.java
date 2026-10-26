@@ -3,6 +3,8 @@ package com.api.api_plantfyth.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,5 +47,15 @@ public Especime atualizar(@PathVariable Integer id, @RequestBody Especime especi
     especimeService.buscarPorId(id);
     especime.setId(id);
     return especimeRepository.save(especime);
+}
+
+@DeleteMapping("/{id}")
+public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+    if (!especimeRepository.existsById(id)) {
+        return ResponseEntity.notFound().build();
+    }
+
+    especimeService.deleteEspecime(id);
+    return ResponseEntity.noContent().build();
 }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FEFFFD" />
+            <stroke android:width="1dp" android:color="#DCE6DB" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_species_chevron"
+        android:gravity="end|center_vertical"
+        android:right="12dp"
+        android:width="16dp"
+        android:height="16dp" />
+</layer-list>

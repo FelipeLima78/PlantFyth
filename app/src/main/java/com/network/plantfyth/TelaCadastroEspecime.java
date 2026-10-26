@@ -12,9 +12,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.retrofit.PlantFythAPI;
@@ -90,10 +94,21 @@ public class TelaCadastroEspecime extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tela_cadastro_especime);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomInset = Math.max(systemBars.bottom, ime.bottom);
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomInset);
+            return insets;
+        });
 
         inicializarViews();
         configurarSpinners();
+
+        findViewById(R.id.btnVoltarEspecies).setOnClickListener(v -> finish());
 
         especieId = getIntent().getIntExtra(EXTRA_ID, -1);
 

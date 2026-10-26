@@ -26,6 +26,8 @@ import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +42,7 @@ public class TelaListaEspecimesAdmin extends AppCompatActivity {
     private EspecieAdminAdapter adapter;
     private ProgressBar progress;
     private TextView txtVazio, txtContagem;
+    private final Set<Integer> exclusoesEmAndamento = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +66,7 @@ public class TelaListaEspecimesAdmin extends AppCompatActivity {
                 findViewById(R.id.fabNovaEspecie);
         View btnSair = findViewById(R.id.btnSairAdmin);
 
-        adapter = new EspecieAdminAdapter(this::editar);
+        adapter = new EspecieAdminAdapter(this::editar, this::confirmarExclusao);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         recycler.setAdapter(adapter);
 
@@ -156,6 +159,54 @@ public class TelaListaEspecimesAdmin extends AppCompatActivity {
         Intent intent = new Intent(this, TelaCadastroEspecime.class);
         intent.putExtra(TelaCadastroEspecime.EXTRA_ID, id);
         startActivity(intent);
+    }
+
+    private void confirmarExclusao(Especime especime) {
+        if (especime == null || especime.getId() == null) return;
+
+        String nome = EspecieAdapter.nomeExibicao(especime);
+        new AlertDialog.Builder(this)
+                .setTitle("Excluir espécie?")
+                .setMessage("Tem certeza de que deseja excluir \"" + nome + "\"? "
+                        + "Esta ação não pode ser desfeita. Os plantios cadastrados com "
+                        + "esta espécie também serão excluídos.")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Excluir", (dialog, which) -> excluir(especime))
+                .show();
+    }
+
+    private void excluir(Especime especime) {
+        Integer id = especime.getId();
+        if (!exclusoesEmAndamento.add(id)) return;
+
+        api.deletarEspecime(id).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call,
+                                   @NonNull Response<Void> response) {
+                exclusoesEmAndamento.remove(id);
+                if (response.isSuccessful()) {
+                    adapter.remover(especime);
+                    atualizarContagem();
+                    Toast.makeText(TelaListaEspecimesAdmin.this,
+                            "Espécie excluída.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e(TAG, "Falha ao excluir espécie " + id + ": HTTP " + response.code());
+                    Toast.makeText(TelaListaEspecimesAdmin.this,
+                            "Não foi possível excluir a espécie (HTTP "
+                                    + response.code() + ").",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                exclusoesEmAndamento.remove(id);
+                Log.e(TAG, "Falha de rede ao excluir espécie " + id, t);
+                Toast.makeText(TelaListaEspecimesAdmin.this,
+                        "Sem conexão com o servidor. A espécie não foi excluída.",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }

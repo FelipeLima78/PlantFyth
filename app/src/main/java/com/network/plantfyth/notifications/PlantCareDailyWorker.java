@@ -175,7 +175,7 @@ public class PlantCareDailyWorker extends Worker {
         );
     }
 
-    private boolean jaResetouHoje(Context context, int usuarioId) {
+    public static boolean jaResetouHoje(Context context, int usuarioId) {
         String hoje = new SimpleDateFormat(
                 "yyyy-MM-dd",
                 Locale.getDefault()
@@ -194,7 +194,7 @@ public class PlantCareDailyWorker extends Worker {
         return hoje.equals(ultimoReset);
     }
 
-    private void registrarReset(Context context, int usuarioId) {
+    public static void registrarReset(Context context, int usuarioId) {
         String hoje = new SimpleDateFormat(
                 "yyyy-MM-dd",
                 Locale.getDefault()
