@@ -74,21 +74,41 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEditarEspecie"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="12dp"
-                android:minHeight="0dp"
-                android:text="Editar espécie"
-                android:textAllCaps="false"
-                android:textColor="#2E7D32"
-                android:textSize="13sp"
-                app:cornerRadius="12dp"
-                app:strokeColor="#B7D3B8"
-                app:strokeWidth="1dp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditarEspecie"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minHeight="0dp"
+                    android:text="Editar espécie"
+                    android:textAllCaps="false"
+                    android:textColor="#2E7D32"
+                    android:textSize="13sp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#B7D3B8"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExcluirEspecie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:minHeight="0dp"
+                    android:text="Excluir"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    app:backgroundTint="#C62828"
+                    app:cornerRadius="12dp" />
+            </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>

@@ -30,8 +30,10 @@ public class TelaDeLogin extends AppCompatActivity {
 
     private EditText edtUsuario, edtSenha;
     private Button btnEntrarLogin, btnCadastroLogin;
+    private ImageButton btnMostrarSenhaLogin;
+    private View loginLoadingContainer;
     private boolean senhaVisivel;
-    private boolean confirmacaoVisivel;
+    private boolean loginEmAndamento;
     RetroFitService retroFitService = new RetroFitService();
     PlantFythAPI Ap  = retroFitService.getRetrofit().create(PlantFythAPI.class);
 
@@ -52,12 +54,24 @@ public class TelaDeLogin extends AppCompatActivity {
         edtSenha = findViewById(R.id.edtSenha);
         btnEntrarLogin = findViewById(R.id.btnEntrarLogin);
         btnCadastroLogin = findViewById(R.id.btnCadastroLogin);
-        ImageButton btnMostrarSenha = findViewById(R.id.btnMostrarSenha_login);
-        btnMostrarSenha.setOnClickListener(v -> {
+        btnMostrarSenhaLogin = findViewById(R.id.btnMostrarSenha_login);
+        loginLoadingContainer = findViewById(R.id.loginLoadingContainer);
+        btnMostrarSenhaLogin.setOnClickListener(v -> {
             senhaVisivel = !senhaVisivel;
-            alternarVisibilidadeSenha(edtSenha, btnMostrarSenha, senhaVisivel);
+            alternarVisibilidadeSenha(edtSenha, btnMostrarSenhaLogin, senhaVisivel);
         });
     }
+
+    private void definirCarregamento(boolean carregando) {
+        loginEmAndamento = carregando;
+        loginLoadingContainer.setVisibility(carregando ? View.VISIBLE : View.GONE);
+        btnEntrarLogin.setEnabled(!carregando);
+        btnCadastroLogin.setEnabled(!carregando);
+        edtUsuario.setEnabled(!carregando);
+        edtSenha.setEnabled(!carregando);
+        btnMostrarSenhaLogin.setEnabled(!carregando);
+    }
+
     private void alternarVisibilidadeSenha(EditText campo, ImageButton botao, boolean visivel) {
         int posicaoCursor = campo.getSelectionStart();
         campo.setTransformationMethod(visivel
@@ -72,11 +86,16 @@ public class TelaDeLogin extends AppCompatActivity {
         startActivity(intent);
     }
     public void DarLogin(View view) {
+        if (loginEmAndamento) {
+            return;
+        }
 
         Usuario request = new Usuario();
 
         request.setEmail(edtUsuario.getText().toString().trim());
         request.setHashSenha(edtSenha.getText().toString().trim());
+
+        definirCarregamento(true);
 
         Call<ResponseBody> call = Ap.LoginUsuario(request);
 
@@ -91,13 +110,15 @@ public class TelaDeLogin extends AppCompatActivity {
                         String result = response.body().string();
 
                         Toast.makeText(TelaDeLogin.this, result, Toast.LENGTH_SHORT).show();
-                        buscarUsuario();
+                        buscarUsuario(request.getEmail());
                     } catch (Exception e) {
                         e.printStackTrace();
+                        definirCarregamento(false);
                         Toast.makeText(TelaDeLogin.this, "Erro ao ler resposta", Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
+                    definirCarregamento(false);
                     Toast.makeText(TelaDeLogin.this,
                             "Erro no login: " + response.code(),
                             Toast.LENGTH_SHORT).show();
@@ -105,14 +126,14 @@ public class TelaDeLogin extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                definirCarregamento(false);
                 Toast.makeText(TelaDeLogin.this,
                         "Falha de conexão: " + t.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }
         });
     }
-    private void buscarUsuario() {
-        String email = edtUsuario.getText().toString().trim();
+    private void buscarUsuario(String email) {
         Call<Usuario> call = Ap.buscarUsuarioPorEmail(email);
         call.enqueue(new Callback<Usuario>() {
                     @Override
@@ -120,10 +141,8 @@ public class TelaDeLogin extends AppCompatActivity {
                         if(response.isSuccessful() && response.body() != null){
                             Usuario usuario = response.body();
                             Integer idUsuario = usuario.getId();
-                            String EmailUsuario= usuario.getEmail();
-                            getSharedPreferences("USER_EMAIL", MODE_PRIVATE).edit().putString("usuario_email", EmailUsuario).apply();
-                            getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().putInt("usuario_id", idUsuario).apply();
                             if (idUsuario == null) {
+                                definirCarregamento(false);
                                 Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();
                                 return;
                             }
@@ -134,19 +153,23 @@ public class TelaDeLogin extends AppCompatActivity {
                                     .putBoolean("usuario_admin", usuario.isAdmin()).apply();
 
                             if (usuario.isAdmin()) {
+                                definirCarregamento(false);
                                 startActivity(new Intent(TelaDeLogin.this, TelaListaEspecimesAdmin.class));
                                 finish();
                                 return;
                             }
 
+                            definirCarregamento(false);
                             PlantCareDailyWorker.scheduleDailyChecks(TelaDeLogin.this, idUsuario);
                             startActivity(new Intent(TelaDeLogin.this, MainActivity.class));
                             finish();
                         } else {
+                            definirCarregamento(false);
                             Toast.makeText(TelaDeLogin.this, "Usuário não encontrado", Toast.LENGTH_SHORT).show();
                         } }
                     @Override
                     public void onFailure(Call<Usuario> call, Throwable t) {
+                        definirCarregamento(false);
                         Toast.makeText(TelaDeLogin.this, "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();}
                 });
     }

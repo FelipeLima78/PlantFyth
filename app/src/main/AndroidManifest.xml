@@ -20,7 +20,9 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".TelaCadastroEspecime"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.App.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".TelaListaEspecimesAdmin"
             android:exported="false" />

@@ -53,6 +53,9 @@ public interface PlantFythAPI {
             @Body Especime especime
     );
 
+    @DELETE("especimes/{id}")
+    Call<Void> deletarEspecime(@Path("id") Integer id);
+
 
     //usuario
     @POST("usuarios/login")

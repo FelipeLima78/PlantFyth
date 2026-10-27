@@ -22,13 +22,19 @@ public class EspecieAdminAdapter extends RecyclerView.Adapter<EspecieAdminAdapte
         void editar(Especime especime);
     }
 
+    public interface OnExcluir {
+        void excluir(Especime especime);
+    }
+
     private final List<Especime> todas = new ArrayList<>();
     private final List<Especime> exibidas = new ArrayList<>();
     private final OnEditar listener;
+    private final OnExcluir excluirListener;
     private String consulta = "";
 
-    public EspecieAdminAdapter(OnEditar listener) {
+    public EspecieAdminAdapter(OnEditar listener, OnExcluir excluirListener) {
         this.listener = listener;
+        this.excluirListener = excluirListener;
     }
 
     public void setDados(List<Especime> dados) {
@@ -53,6 +59,14 @@ public class EspecieAdminAdapter extends RecyclerView.Adapter<EspecieAdminAdapte
 
     public int getTotal() {
         return todas.size();
+    }
+
+    public void remover(Especime especime) {
+        if (especime == null || especime.getId() == null) return;
+        Integer id = especime.getId();
+        todas.removeIf(item -> id.equals(item.getId()));
+        exibidas.removeIf(item -> id.equals(item.getId()));
+        notifyDataSetChanged();
     }
 
     private static boolean contem(String texto, String consulta) {
@@ -107,6 +121,7 @@ public class EspecieAdminAdapter extends RecyclerView.Adapter<EspecieAdminAdapte
         View.OnClickListener abrir = v -> listener.editar(e);
         h.itemView.setOnClickListener(abrir);
         h.btnEditar.setOnClickListener(abrir);
+        h.btnExcluir.setOnClickListener(v -> excluirListener.excluir(e));
     }
 
     @Override
@@ -116,7 +131,7 @@ public class EspecieAdminAdapter extends RecyclerView.Adapter<EspecieAdminAdapte
 
     static class VH extends RecyclerView.ViewHolder {
         final TextView txtPopular, txtCientifico, txtResumo, txtFaltando;
-        final Button btnEditar;
+        final Button btnEditar, btnExcluir;
 
         VH(@NonNull View itemView) {
             super(itemView);
@@ -125,6 +140,7 @@ public class EspecieAdminAdapter extends RecyclerView.Adapter<EspecieAdminAdapte
             txtResumo = itemView.findViewById(R.id.txtResumoAdmin);
             txtFaltando = itemView.findViewById(R.id.txtFaltandoAdmin);
             btnEditar = itemView.findViewById(R.id.btnEditarEspecie);
+            btnExcluir = itemView.findViewById(R.id.btnExcluirEspecie);
         }
     }
 }
