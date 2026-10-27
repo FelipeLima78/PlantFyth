@@ -129,6 +129,7 @@ public class HomeFragment extends Fragment {
                     atualizarLista(response.body());
                 } else {
                     Log.e(TAG, "Falha ao carregar plantas: HTTP " + response.code());
+                    PlantNotificationScheduler.notifySunPendingFromCachedState(requireContext());
                     Toast.makeText(requireContext(),
                             "Não foi possível carregar as plantas.",
                             Toast.LENGTH_SHORT).show();
@@ -140,6 +141,7 @@ public class HomeFragment extends Fragment {
                 if (!isAdded() || binding == null) return;
                 mostrarCarregando(false);
                 Log.e(TAG, "Falha ao carregar plantas", t);
+                PlantNotificationScheduler.notifySunPendingFromCachedState(requireContext());
                 Toast.makeText(requireContext(),
                         "Sem conexão com o servidor. Verifique a internet.",
                         Toast.LENGTH_LONG).show();

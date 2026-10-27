@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -22,19 +23,15 @@ import android.util.Log;
 import com.network.plantfyth.MainActivity;
 import com.network.plantfyth.R;
 import com.network.plantfyth.model.Plantio;
-import com.network.plantfyth.retrofit.PlantFythAPI;
-import com.network.plantfyth.retrofit.RetroFitService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public final class PlantNotificationScheduler {
 
@@ -43,41 +40,33 @@ public final class PlantNotificationScheduler {
     public static final String EXTRA_NOTIFICATION_ID = "notification_id";
 
     private static final String CHANNEL_ID = "plant_care_channel";
-    private static final int SUMMARY_NOTIFICATION_ID = 8800;
     private static final int SUN_PENDING_NOTIFICATION_ID = 8801;
     private static final int DAILY_SUN_REMINDER_NOTIFICATION_ID = 8802;
+    private static final int DAILY_CARE_REMINDER_NOTIFICATION_ID = 8803;
     private static final int ACTION_IRRIGAR = 1;
     private static final int ACTION_PODAR = 2;
     private static final int ACTION_SOL = 3;
     private static final int ACTION_ADUBAR = 4;
+    private static final String ALARM_PREFS = "PLANT_CARE_LOCAL_ALARMS";
+    private static final String KEY_SCHEDULED_ALARMS = "scheduled_alarms";
+    private static final String SUN_CACHE_PREFS = "PLANT_CARE_SUN_CACHE";
 
     private PlantNotificationScheduler() {
     }
 
-    public static void refreshPlantCareAlarmsAndNotifyDue(Context context, int usuarioId, boolean notifyDueNow) {
-        PlantFythAPI api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
-        api.buscarPlantasUsuario(usuarioId).enqueue(new Callback<List<Plantio>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Plantio>> call,
-                                   @NonNull Response<List<Plantio>> response) {
-                if (!response.isSuccessful() || response.body() == null) return;
-
-                List<Plantio> plantas = response.body();
-                schedulePlantCareAlarms(context, plantas);
-                if (notifyDueNow) {
-                    notifyDuePlants(context, plantas);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Plantio>> call, @NonNull Throwable t) {
-            }
-        });
-    }
-
     public static void schedulePlantCareAlarms(Context context, List<Plantio> plantas) {
+        Set<Integer> activePlantIds = new HashSet<>();
         for (Plantio plantio : plantas) {
+            if (plantio.getId() != null) activePlantIds.add(plantio.getId());
             schedulePlantCareAlarms(context, plantio);
+        }
+
+        Set<String> scheduledKeys = getScheduledAlarmKeys(context);
+        for (String key : new HashSet<>(scheduledKeys)) {
+            Integer plantId = plantIdFromAlarmKey(key);
+            if (plantId != null && !activePlantIds.contains(plantId)) {
+                cancelAlarm(context, plantId, actionTypeFromAlarmKey(key));
+            }
         }
     }
 
@@ -85,64 +74,10 @@ public final class PlantNotificationScheduler {
         Date irrigacao = parsePlantDate(plantio.getPrevisaoProximaIrrigacao());
         Date poda = parsePlantDate(plantio.getPrevisaoProximaPoda());
         Date adubacao = parsePlantDate(plantio.getPrevisao_proxima_adubacao());
-        if (irrigacao != null && irrigacao.after(new Date())) {
-            scheduleAlarm(context, plantio, ACTION_IRRIGAR, "regar", irrigacao);
-        }
-
-        if (poda != null && poda.after(new Date())) {
-            scheduleAlarm(context, plantio, ACTION_PODAR, "podar", poda);
-        }
-
-        if (adubacao != null && adubacao.after(new Date())) {
-            scheduleAlarm(context, plantio, ACTION_ADUBAR, "adubar", adubacao);
-        }
-
-    }
-
-    public static void notifyDuePlants(Context context, List<Plantio> plantas) {
-        if (!canPostNotifications(context)) return;
-
-        List<String> messages = new ArrayList<>();
-        Date now = new Date();
-
-        for (Plantio plantio : plantas) {
-            Date irrigacao = parsePlantDate(plantio.getPrevisaoProximaIrrigacao());
-            Date poda = parsePlantDate(plantio.getPrevisaoProximaPoda());
-            Date adubacao = parsePlantDate(plantio.getPrevisao_proxima_adubacao());
-
-            String plantName = plantName(plantio);
-
-            if (irrigacao != null && !irrigacao.after(now)) {
-                messages.add("Conferir rega: " + plantName);
-            }
-
-            if (poda != null && !poda.after(now)) {
-                messages.add("Conferir Poda: " + plantName);
-            }
-            if (adubacao != null && !adubacao.after(now)) {
-                messages.add("Conferir Adubacao: " + plantName);
-            }
-        }
-
-        if (messages.isEmpty()) return;
-
-        createNotificationChannel(context);
-        String title = "Suas plantas precisam de atenção";
-        String text = messages.size() == 1
-                ? messages.get(0)
-                : messages.size() + " cuidados pendentes";
-        String bigText = joinMessages(messages);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(bigText))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-                .setContentIntent(openAppIntent(context));
-
-        postar(context, SUMMARY_NOTIFICATION_ID, builder.build());
+        if (plantio.getId() == null) return;
+        agendarOuCancelar(context, plantio, ACTION_IRRIGAR, "regar", irrigacao);
+        agendarOuCancelar(context, plantio, ACTION_PODAR, "podar", poda);
+        agendarOuCancelar(context, plantio, ACTION_ADUBAR, "adubar", adubacao);
     }
 
     public static void showSingleCareNotification(Context context, int notificationId,
@@ -165,22 +100,44 @@ public final class PlantNotificationScheduler {
     }
 
     public static void notifySunPending(Context context, List<Plantio> plantas) {
-        if (!canPostNotifications(context)) return;
+        boolean hasPlants = !plantas.isEmpty();
+        boolean pending = false;
         for (Plantio plantio : plantas) {
             if (!plantio.isPegou_sol_hoje()) {
-                createNotificationChannel(context);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                        .setContentTitle("Confira a luz solar das suas plantas")
-                        .setContentText("Há plantas que ainda não receberam luz solar hoje.")
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setAutoCancel(true)
-                        .setContentIntent(openAppIntent(context));
-                postar(context, SUN_PENDING_NOTIFICATION_ID, builder.build());
-                return;
+                pending = true;
+                break;
             }
         }
-        NotificationManagerCompat.from(context).cancel(SUN_PENDING_NOTIFICATION_ID);
+        String hoje = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        context.getSharedPreferences(SUN_CACHE_PREFS, Context.MODE_PRIVATE).edit()
+                .putBoolean("has_plants", hasPlants)
+                .putBoolean("sun_pending", pending)
+                .putString("snapshot_date", hoje)
+                .apply();
+        notifySunPendingFromCachedState(context);
+    }
+
+    public static void notifySunPendingFromCachedState(Context context) {
+        SharedPreferences cache = context.getSharedPreferences(SUN_CACHE_PREFS, Context.MODE_PRIVATE);
+        String hoje = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        boolean hasPlants = cache.getBoolean("has_plants", false);
+        boolean pending = hasPlants && (!hoje.equals(cache.getString("snapshot_date", ""))
+                || cache.getBoolean("sun_pending", true));
+
+        if (!pending) {
+            NotificationManagerCompat.from(context).cancel(SUN_PENDING_NOTIFICATION_ID);
+            return;
+        }
+        if (!canPostNotifications(context)) return;
+        createNotificationChannel(context);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle("Confira a luz solar das suas plantas")
+                .setContentText("Há plantas que ainda não receberam luz solar hoje.")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setContentIntent(openAppIntent(context));
+        postar(context, SUN_PENDING_NOTIFICATION_ID, builder.build());
     }
 
     public static void notifyDailySunReminder(Context context) {
@@ -196,30 +153,156 @@ public final class PlantNotificationScheduler {
         postar(context, DAILY_SUN_REMINDER_NOTIFICATION_ID, builder.build());
     }
 
-    private static void scheduleAlarm(Context context, Plantio plantio, int actionType,
-                                      String actionName, Date date) {
+    public static void notifyDailyCareReminder(Context context) {
+        if (!canPostNotifications(context)) return;
+        createNotificationChannel(context);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle("Confira os cuidados das suas plantas")
+                .setContentText("Verifique se alguma planta precisa de água ou manutenção.")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setContentIntent(openAppIntent(context));
+        postar(context, DAILY_CARE_REMINDER_NOTIFICATION_ID, builder.build());
+    }
+
+    public static void restorePlantCareAlarms(Context context) {
+        SharedPreferences prefs = alarmPreferences(context);
+        for (String key : new HashSet<>(getScheduledAlarmKeys(context))) {
+            Integer plantId = plantIdFromAlarmKey(key);
+            int actionType = actionTypeFromAlarmKey(key);
+            long triggerAt = prefs.getLong(key, -1L);
+            String plantName = prefs.getString(key + "_plant", "Planta sem nome");
+            String actionName = prefs.getString(key + "_action", "cuidar");
+            if (plantId == null || actionType == 0 || triggerAt < 0) {
+                removerAlarmeSalvo(context, key);
+            } else if (triggerAt <= System.currentTimeMillis()) {
+                showSingleCareNotification(
+                        context,
+                        notificationId(plantId, actionType),
+                        plantName,
+                        actionName
+                );
+                removerAlarmeSalvo(context, key);
+            } else {
+                scheduleAlarm(context, plantId, actionType, plantName, actionName, triggerAt);
+            }
+        }
+    }
+
+    public static void clearScheduledAlarm(Context context, int notificationId) {
+        int plantId = notificationId / 10;
+        int actionType = notificationId % 10;
+        removerAlarmeSalvo(context, alarmKey(plantId, actionType));
+    }
+
+    private static void agendarOuCancelar(Context context, Plantio plantio, int actionType,
+                                          String actionName, Date date) {
+        if (date != null && date.after(new Date())) {
+            scheduleAlarm(context, plantio.getId(), actionType, plantName(plantio),
+                    actionName, date.getTime());
+        } else {
+            cancelAlarm(context, plantio.getId(), actionType);
+        }
+    }
+
+    private static void scheduleAlarm(Context context, int plantId, int actionType,
+                                      String plantName, String actionName, long triggerAt) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager == null || plantio.getId() == null) return;
+        if (alarmManager == null) return;
 
         Intent intent = new Intent(context, PlantCareAlarmReceiver.class);
-        intent.putExtra(EXTRA_PLANT_NAME, plantName(plantio));
+        intent.putExtra(EXTRA_PLANT_NAME, plantName);
         intent.putExtra(EXTRA_ACTION_NAME, actionName);
-        intent.putExtra(EXTRA_NOTIFICATION_ID, notificationId(plantio.getId(), actionType));
+        intent.putExtra(EXTRA_NOTIFICATION_ID, notificationId(plantId, actionType));
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                notificationId(plantio.getId(), actionType),
+                notificationId(plantId, actionType),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        long triggerAt = date.getTime();
+        salvarAlarme(context, plantId, actionType, triggerAt, plantName, actionName);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent);
         } else {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent);
+        }
+    }
+
+    private static void cancelAlarm(Context context, int plantId, int actionType) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, PlantCareAlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                notificationId(plantId, actionType),
+                intent,
+                PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE
+        );
+        if (alarmManager != null && pendingIntent != null) {
+            alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+        }
+        removerAlarmeSalvo(context, alarmKey(plantId, actionType));
+    }
+
+    private static void salvarAlarme(Context context, int plantId, int actionType,
+                                     long triggerAt, String plantName, String actionName) {
+        String key = alarmKey(plantId, actionType);
+        Set<String> keys = getScheduledAlarmKeys(context);
+        keys.add(key);
+        alarmPreferences(context).edit()
+                .putLong(key, triggerAt)
+                .putString(key + "_plant", plantName)
+                .putString(key + "_action", actionName)
+                .putStringSet(KEY_SCHEDULED_ALARMS, keys)
+                .apply();
+    }
+
+    private static void removerAlarmeSalvo(Context context, String key) {
+        Set<String> keys = getScheduledAlarmKeys(context);
+        keys.remove(key);
+        alarmPreferences(context).edit()
+                .remove(key)
+                .remove(key + "_plant")
+                .remove(key + "_action")
+                .putStringSet(KEY_SCHEDULED_ALARMS, keys)
+                .apply();
+    }
+
+    private static SharedPreferences alarmPreferences(Context context) {
+        return context.getSharedPreferences(ALARM_PREFS, Context.MODE_PRIVATE);
+    }
+
+    private static Set<String> getScheduledAlarmKeys(Context context) {
+        Set<String> saved = alarmPreferences(context).getStringSet(KEY_SCHEDULED_ALARMS, null);
+        return saved == null ? new HashSet<>() : new HashSet<>(saved);
+    }
+
+    private static String alarmKey(int plantId, int actionType) {
+        return "alarm_" + plantId + "_" + actionType;
+    }
+
+    private static Integer plantIdFromAlarmKey(String key) {
+        String[] parts = key.split("_");
+        if (parts.length != 3 || !"alarm".equals(parts[0])) return null;
+        try {
+            return Integer.parseInt(parts[1]);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private static int actionTypeFromAlarmKey(String key) {
+        String[] parts = key.split("_");
+        if (parts.length != 3 || !"alarm".equals(parts[0])) return 0;
+        try {
+            return Integer.parseInt(parts[2]);
+        } catch (NumberFormatException ignored) {
+            return 0;
         }
     }
 
@@ -287,15 +370,6 @@ public final class PlantNotificationScheduler {
 
     private static int notificationId(int plantId, int actionType) {
         return plantId * 10 + actionType;
-    }
-
-    private static String joinMessages(List<String> messages) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < messages.size(); i++) {
-            if (i > 0) builder.append('\n');
-            builder.append(messages.get(i));
-        }
-        return builder.toString();
     }
 
     @SuppressLint("MissingPermission")

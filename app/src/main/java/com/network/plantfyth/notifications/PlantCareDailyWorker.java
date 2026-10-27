@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 import androidx.work.Constraints;
-import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
@@ -16,7 +15,6 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.network.plantfyth.model.Plantio;
 import com.network.plantfyth.retrofit.PlantFythAPI;
 import com.network.plantfyth.retrofit.RetroFitService;
 
@@ -24,7 +22,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -37,9 +34,10 @@ public class PlantCareDailyWorker extends Worker {
     private static final String KEY_RESET_FLAGS = "reset_flags";
 
     private static final String WORK_MORNING_PREFIX =
+            "plant_care_sun_morning_";
+    private static final String LEGACY_WORK_MORNING_PREFIX =
             "plant_care_morning_";
-    private static final String WORK_EVENING_PREFIX =
-            "plant_care_evening_";
+    private static final String LEGACY_WORK_EVENING_PREFIX = "plant_care_evening_";
 
     public PlantCareDailyWorker(
             @NonNull Context context,
@@ -69,53 +67,23 @@ public class PlantCareDailyWorker extends Worker {
             return Result.success();
         }
 
+        boolean deveResetar = getInputData().getBoolean(KEY_RESET_FLAGS, false);
+        if (!deveResetar || jaResetouHoje(context, usuarioId)) {
+            return Result.success();
+        }
+
         PlantFythAPI api = new RetroFitService()
                 .getRetrofit()
                 .create(PlantFythAPI.class);
 
         try {
-            // Só a tarefa da manhã pode resetar as flags.
-            boolean deveResetar = getInputData()
-                    .getBoolean(KEY_RESET_FLAGS, false);
-
-            if (deveResetar && !jaResetouHoje(context, usuarioId)) {
-
-                Response<ResponseBody> resetResponse = api
-                        .resetarFlagsDiarias(usuarioId)
-                        .execute();
-
-                if (!resetResponse.isSuccessful()) {
-                    return Result.retry();
-                }
-
-                // Registra somente depois que a API confirmar o sucesso.
-                registrarReset(context, usuarioId);
-            }
-
-            // Mantém o funcionamento atual das notificações.
-            Response<List<Plantio>> response = api
-                    .buscarPlantasUsuario(usuarioId)
+            Response<ResponseBody> resetResponse = api
+                    .resetarFlagsDiarias(usuarioId)
                     .execute();
 
-            if (!response.isSuccessful() || response.body() == null) {
-                return Result.retry();
-            }
+            if (!resetResponse.isSuccessful()) return Result.retry();
 
-            List<Plantio> plantas = response.body();
-
-            PlantNotificationScheduler.schedulePlantCareAlarms(
-                    context,
-                    plantas
-            );
-
-            PlantNotificationScheduler.notifyDuePlants(
-                    context,
-                    plantas
-            );
-
-            if (deveResetar) {
-                PlantNotificationScheduler.notifyDailySunReminder(context);
-            }
+            registrarReset(context, usuarioId);
 
             return Result.success();
 
@@ -128,14 +96,9 @@ public class PlantCareDailyWorker extends Worker {
             Context context,
             int usuarioId
     ) {
-        Data morningData = new Data.Builder()
+        androidx.work.Data morningData = new androidx.work.Data.Builder()
                 .putInt(KEY_USUARIO_ID, usuarioId)
                 .putBoolean(KEY_RESET_FLAGS, true)
-                .build();
-
-        Data eveningData = new Data.Builder()
-                .putInt(KEY_USUARIO_ID, usuarioId)
-                .putBoolean(KEY_RESET_FLAGS, false)
                 .build();
 
         Constraints constraints = new Constraints.Builder()
@@ -149,22 +112,15 @@ public class PlantCareDailyWorker extends Worker {
         )
                 .setInputData(morningData)
                 .setConstraints(constraints)
-                .setInitialDelay(delayUntilHour(9), TimeUnit.MILLISECONDS)
-                .build();
-
-        PeriodicWorkRequest evening = new PeriodicWorkRequest.Builder(
-                PlantCareDailyWorker.class,
-                24,
-                TimeUnit.HOURS
-        )
-                .setInputData(eveningData)
-                .setConstraints(constraints)
-                .setInitialDelay(delayUntilHour(18), TimeUnit.MILLISECONDS)
+                .setInitialDelay(delayUntilHour(7), TimeUnit.MILLISECONDS)
                 .build();
 
         WorkManager workManager = WorkManager.getInstance(
                 context.getApplicationContext()
         );
+
+        // Remove o agendamento antigo das 9h em aparelhos que já tinham o app.
+        workManager.cancelUniqueWork(LEGACY_WORK_MORNING_PREFIX + usuarioId);
 
         workManager.enqueueUniquePeriodicWork(
                 WORK_MORNING_PREFIX + usuarioId,
@@ -172,11 +128,10 @@ public class PlantCareDailyWorker extends Worker {
                 morning
         );
 
-        workManager.enqueueUniquePeriodicWork(
-                WORK_EVENING_PREFIX + usuarioId,
-                ExistingPeriodicWorkPolicy.KEEP,
-                evening
-        );
+        workManager.cancelUniqueWork(LEGACY_WORK_EVENING_PREFIX + usuarioId);
+
+        DailySunReminderWorker.scheduleDailyReminder(context, usuarioId);
+        DailyCareReminderWorker.scheduleDailyReminder(context, usuarioId);
     }
 
     public static boolean jaResetouHoje(Context context, int usuarioId) {
