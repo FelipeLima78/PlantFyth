@@ -63,7 +63,10 @@ public class HomeFragment extends Fragment {
         notificationPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 permitido -> {
-                    if (isAdded()) pedirAlarmeExatoSeNecessario();
+                    if (isAdded()) {
+                        pedirAlarmeExatoSeNecessario();
+                        notificarSolPendenteDaLista();
+                    }
                 });
     }
 
@@ -154,6 +157,14 @@ public class HomeFragment extends Fragment {
         mostrarEstadoVazio(itens.isEmpty());
         atualizarAviso();
         verificarNotificacoesDaHome(plantas);
+        PlantNotificationScheduler.notifySunPending(requireContext(), plantas);
+    }
+
+    private void notificarSolPendenteDaLista() {
+        if (!isAdded()) return;
+        List<Plantio> plantas = new ArrayList<>();
+        for (PlantioHomeItem item : itens) plantas.add(item.plantio);
+        PlantNotificationScheduler.notifySunPending(requireContext(), plantas);
     }
 
     private PlantioHomeItem criarItem(Plantio plantio) {
@@ -337,6 +348,7 @@ public class HomeFragment extends Fragment {
                     }
                     item.plantio = atualizado;
                     PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), atualizado);
+                    notificarSolPendenteDaLista();
 
                     Toast.makeText(requireContext(), "Ação registrada.", Toast.LENGTH_SHORT).show();
                 } else {

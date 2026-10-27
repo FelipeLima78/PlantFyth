@@ -1,7 +1,7 @@
 package com.api.api_plantfyth.model;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import org.springframework.cglib.core.Local;
@@ -57,8 +57,9 @@ public class Plantio {
     @Column(name = "fk_usuario_id")
     private Integer usuarioId;
     
-    @Column(name = "pegou_sol_hoje")
-    private Boolean pegouSolHoje;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "data_ultima_vez_pegou_sol")
+    private LocalDate dataUltimaVezPegouSol;
 
     @Column(name = "previsao_proxima_adubacao")
     private String previsaoProximaAdubacao;
@@ -76,5 +77,18 @@ public class Plantio {
     @ManyToOne
     @JoinColumn(name = "fk_especime_id", insertable = false, updatable = false)
     private Especime especime;
+
+    @JsonProperty("pegouSolHoje")
+    public boolean isPegouSolHoje() {
+        return dataUltimaVezPegouSol != null
+                && dataUltimaVezPegouSol.equals(LocalDate.now(ZoneId.of("America/Sao_Paulo")));
+    }
+
+    @JsonProperty("pegouSolHoje")
+    public void setPegouSolHoje(Boolean pegouSolHoje) {
+        if (Boolean.TRUE.equals(pegouSolHoje)) {
+            dataUltimaVezPegouSol = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        }
+    }
 
 }

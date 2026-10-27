@@ -90,7 +90,11 @@ public class PlantioController{
         plantioAtualizar.setPrevisaoProximaIrrigacao(plantio.getPrevisaoProximaIrrigacao());
         plantioAtualizar.setPrevisaoProximaPoda(plantio.getPrevisaoProximaPoda());
 		plantioAtualizar.setData_que_foi_Plantado(plantio.getData_que_foi_Plantado());
-        plantioAtualizar.setPegouSolHoje(plantio.getPegouSolHoje());
+        // A data do sol é registrada pelo servidor no momento da ação. Um PUT
+        // com false não apaga o histórico da última exposição.
+        if (plantio.isPegouSolHoje()) {
+            plantioAtualizar.setPegouSolHoje(true);
+        }
 		plantioAtualizar.setEspecime(plantio.getEspecime());
 		plantioAtualizar.setPrevisaoProximaAdubacao(plantio.getPrevisaoProximaAdubacao());
 		return plantioService.savePlantio(plantioAtualizar);

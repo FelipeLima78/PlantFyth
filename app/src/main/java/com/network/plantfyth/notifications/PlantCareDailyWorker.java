@@ -113,6 +113,10 @@ public class PlantCareDailyWorker extends Worker {
                     plantas
             );
 
+            if (deveResetar) {
+                PlantNotificationScheduler.notifyDailySunReminder(context);
+            }
+
             return Result.success();
 
         } catch (IOException e) {
@@ -164,13 +168,13 @@ public class PlantCareDailyWorker extends Worker {
 
         workManager.enqueueUniquePeriodicWork(
                 WORK_MORNING_PREFIX + usuarioId,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 morning
         );
 
         workManager.enqueueUniquePeriodicWork(
                 WORK_EVENING_PREFIX + usuarioId,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 evening
         );
     }
