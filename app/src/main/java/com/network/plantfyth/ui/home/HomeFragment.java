@@ -87,6 +87,8 @@ public class HomeFragment extends Fragment {
         binding.recyclerPlantasHome.setAdapter(adapter);
         binding.fabAdicionarPlanta.setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), TelaCadastroPlanta.class)));
+
+        PlantNotificationScheduler.notifyDailySunReminder(requireContext());
     }
 
     private void abrirInfo(PlantioHomeItem item) {

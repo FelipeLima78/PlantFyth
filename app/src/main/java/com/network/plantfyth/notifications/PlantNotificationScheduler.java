@@ -42,7 +42,6 @@ public final class PlantNotificationScheduler {
     private static final String CHANNEL_ID = "plant_care_channel";
     private static final int SUN_PENDING_NOTIFICATION_ID = 8801;
     private static final int DAILY_SUN_REMINDER_NOTIFICATION_ID = 8802;
-    private static final int DAILY_CARE_REMINDER_NOTIFICATION_ID = 8803;
     private static final int ACTION_IRRIGAR = 1;
     private static final int ACTION_PODAR = 2;
     private static final int ACTION_SOL = 3;
@@ -89,7 +88,7 @@ public final class PlantNotificationScheduler {
         String safePlantName = plantName != null ? plantName : "sua planta";
         String safeActionName = actionName != null ? actionName : "cuidar";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setSmallIcon(R.drawable.ic_notification_leaf)
                 .setContentTitle("Talvez seja hora de " + safeActionName)
                 .setContentText("A planta " + safePlantName + " talvez precise de cuidado.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -131,7 +130,7 @@ public final class PlantNotificationScheduler {
         if (!canPostNotifications(context)) return;
         createNotificationChannel(context);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setSmallIcon(R.drawable.ic_notification_leaf)
                 .setContentTitle("Confira a luz solar das suas plantas")
                 .setContentText("Há plantas que ainda não receberam luz solar hoje.")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -141,29 +140,20 @@ public final class PlantNotificationScheduler {
     }
 
     public static void notifyDailySunReminder(Context context) {
+        notifyDailySunReminder(context, DAILY_SUN_REMINDER_NOTIFICATION_ID);
+    }
+
+    public static void notifyDailySunReminder(Context context, int notificationId) {
         if (!canPostNotifications(context)) return;
         createNotificationChannel(context);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setSmallIcon(R.drawable.ic_notification_leaf)
                 .setContentTitle("Hora de conferir suas plantas")
                 .setContentText("Verifique se suas plantas já receberam luz solar hoje.")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .setContentIntent(openAppIntent(context));
-        postar(context, DAILY_SUN_REMINDER_NOTIFICATION_ID, builder.build());
-    }
-
-    public static void notifyDailyCareReminder(Context context) {
-        if (!canPostNotifications(context)) return;
-        createNotificationChannel(context);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle("Confira os cuidados das suas plantas")
-                .setContentText("Verifique se alguma planta precisa de água ou manutenção.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentIntent(openAppIntent(context));
-        postar(context, DAILY_CARE_REMINDER_NOTIFICATION_ID, builder.build());
+        postar(context, notificationId, builder.build());
     }
 
     public static void restorePlantCareAlarms(Context context) {

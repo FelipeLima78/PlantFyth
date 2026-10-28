@@ -38,6 +38,7 @@ public class PlantCareDailyWorker extends Worker {
     private static final String LEGACY_WORK_MORNING_PREFIX =
             "plant_care_morning_";
     private static final String LEGACY_WORK_EVENING_PREFIX = "plant_care_evening_";
+    private static final String LEGACY_LOCAL_CARE_REMINDER_PREFIX = "daily_care_reminder_local_";
 
     public PlantCareDailyWorker(
             @NonNull Context context,
@@ -129,9 +130,9 @@ public class PlantCareDailyWorker extends Worker {
         );
 
         workManager.cancelUniqueWork(LEGACY_WORK_EVENING_PREFIX + usuarioId);
+        workManager.cancelUniqueWork(LEGACY_LOCAL_CARE_REMINDER_PREFIX + usuarioId);
 
         DailySunReminderWorker.scheduleDailyReminder(context, usuarioId);
-        DailyCareReminderWorker.scheduleDailyReminder(context, usuarioId);
     }
 
     public static boolean jaResetouHoje(Context context, int usuarioId) {
