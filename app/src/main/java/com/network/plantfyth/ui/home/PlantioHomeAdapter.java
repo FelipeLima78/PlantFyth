@@ -13,12 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.network.plantfyth.R;
 import com.network.plantfyth.model.Especime;
 import com.network.plantfyth.model.Plantio;
+import com.network.plantfyth.model.PlantioSearch;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.ViewHolder> {
 
-    private final List<PlantioHomeItem> itens;
+    private final List<PlantioHomeItem> todosOsItens;
+    private final List<PlantioHomeItem> itensVisiveis = new ArrayList<>();
+    private String filtro = "";
     private final HomeFragment.OnAcaoListener listener;
 
     private final HomeFragment.OnInfoListener infoListener;
@@ -26,7 +30,8 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
     public PlantioHomeAdapter(List<PlantioHomeItem> itens,
                               HomeFragment.OnAcaoListener listener,
                               HomeFragment.OnInfoListener infoListener) {
-        this.itens = itens;
+        this.todosOsItens = itens;
+        this.itensVisiveis.addAll(itens);
         this.listener = listener;
         this.infoListener = infoListener;
     }
@@ -40,7 +45,7 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
     }
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PlantioHomeItem item = itens.get(position);
+        PlantioHomeItem item = itensVisiveis.get(position);
         Plantio plantio = item.plantio;
 
         holder.txtNomePlanta.setText(textoOuPadrao(plantio.getNome(), "Planta sem nome"));
@@ -59,7 +64,20 @@ public class PlantioHomeAdapter extends RecyclerView.Adapter<PlantioHomeAdapter.
 
     @Override
     public int getItemCount() {
-        return itens.size();
+        return itensVisiveis.size();
+    }
+
+    public void filtrar(String texto) {
+        filtro = texto == null ? "" : texto.trim();
+        itensVisiveis.clear();
+        for (PlantioHomeItem item : todosOsItens) {
+            if (PlantioSearch.matches(item.plantio, filtro)) itensVisiveis.add(item);
+        }
+        notifyDataSetChanged();
+    }
+
+    public int posicaoDe(PlantioHomeItem item) {
+        return itensVisiveis.indexOf(item);
     }
 
     private void configurarAcao(TextView txtTempo, Button botao, PlantioHomeItem item,

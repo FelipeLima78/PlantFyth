@@ -4,6 +4,8 @@
  import android.content.Intent;
  import android.content.SharedPreferences;
  import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
  import android.util.Log;
  import android.view.LayoutInflater;
  import android.view.View;
@@ -48,6 +50,19 @@
          api = new RetroFitService().getRetrofit().create(PlantFythAPI.class);
 
          configurarRecyclerView();
+         binding.edtBuscarPlantas.addTextChangedListener(new TextWatcher() {
+             @Override
+             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+             @Override
+             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                 adapter.filtrar(s == null ? "" : s.toString());
+                 mostrarEstadoVazio(adapter.getItemCount() == 0);
+             }
+
+             @Override
+             public void afterTextChanged(Editable s) { }
+         });
          configurarBotaoAdicionar();
 
          return binding.getRoot();
@@ -97,7 +112,7 @@
                  if (response.isSuccessful() && response.body() != null) {
                      List<Plantio> plantas = response.body();
                      adapter.atualizarLista(plantas);
-                     mostrarEstadoVazio(plantas.isEmpty());
+                     mostrarEstadoVazio(adapter.getItemCount() == 0);
                  } else {
                      mostrarEstadoVazio(true);
                      Log.e("DASHBOARD", "Resposta sem sucesso: " + response.code());
@@ -137,6 +152,17 @@
          binding.layoutCarregandoDashboard.setVisibility(View.GONE);
          binding.layoutVazioDashboard.setVisibility(vazio ? View.VISIBLE : View.GONE);
          binding.recyclerPlantas.setVisibility(vazio ? View.GONE : View.VISIBLE);
+         if (vazio) {
+             boolean semCorrespondencias = adapter != null
+                     && adapter.getTotalItemCount() > 0
+                     && adapter.getItemCount() == 0;
+             binding.txtTituloVazioDashboard.setText(semCorrespondencias
+                     ? "Nenhuma planta encontrada"
+                     : "Nenhuma planta cadastrada");
+             binding.txtSubtituloVazioDashboard.setText(semCorrespondencias
+                     ? "Tente buscar por outro nome ou espécie."
+                     : "Toque no + para adicionar sua primeira planta");
+         }
      }
 
      @Override
