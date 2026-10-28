@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +65,10 @@ public class HomeFragment extends Fragment {
         notificationPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 permitido -> {
-                    if (isAdded()) pedirAlarmeExatoSeNecessario();
+                    if (isAdded()) {
+                        pedirAlarmeExatoSeNecessario();
+                        notificarSolPendenteDaLista();
+                    }
                 });
     }
 
@@ -82,6 +87,18 @@ public class HomeFragment extends Fragment {
         adapter = new PlantioHomeAdapter(itens, this::onAcaoMarcada, this::abrirInfo);
         binding.recyclerPlantasHome.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerPlantasHome.setAdapter(adapter);
+        binding.edtBuscarPlantasHome.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                aplicarBusca(s == null ? "" : s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
         binding.fabAdicionarPlanta.setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), TelaCadastroPlanta.class)));
     }
@@ -126,6 +143,7 @@ public class HomeFragment extends Fragment {
                     atualizarLista(response.body());
                 } else {
                     Log.e(TAG, "Falha ao carregar plantas: HTTP " + response.code());
+                    PlantNotificationScheduler.notifySunPendingFromCachedState(requireContext());
                     Toast.makeText(requireContext(),
                             "Não foi possível carregar as plantas.",
                             Toast.LENGTH_SHORT).show();
@@ -137,6 +155,7 @@ public class HomeFragment extends Fragment {
                 if (!isAdded() || binding == null) return;
                 mostrarCarregando(false);
                 Log.e(TAG, "Falha ao carregar plantas", t);
+                PlantNotificationScheduler.notifySunPendingFromCachedState(requireContext());
                 Toast.makeText(requireContext(),
                         "Sem conexão com o servidor. Verifique a internet.",
                         Toast.LENGTH_LONG).show();
@@ -150,10 +169,33 @@ public class HomeFragment extends Fragment {
             itens.add(criarItem(plantio));
         }
 
-        adapter.notifyDataSetChanged();
-        mostrarEstadoVazio(itens.isEmpty());
+        aplicarBusca(binding.edtBuscarPlantasHome.getText().toString());
         atualizarAviso();
         verificarNotificacoesDaHome(plantas);
+        PlantNotificationScheduler.notifySunPending(requireContext(), plantas);
+    }
+
+    private void notificarSolPendenteDaLista() {
+        if (!isAdded()) return;
+        List<Plantio> plantas = new ArrayList<>();
+        for (PlantioHomeItem item : itens) plantas.add(item.plantio);
+        PlantNotificationScheduler.notifySunPending(requireContext(), plantas);
+    }
+
+    private void aplicarBusca(String texto) {
+        if (adapter == null || binding == null) return;
+        adapter.filtrar(texto);
+        boolean semResultados = adapter.getItemCount() == 0;
+        binding.layoutVazio.setVisibility(semResultados ? View.VISIBLE : View.GONE);
+        binding.recyclerPlantasHome.setVisibility(semResultados ? View.GONE : View.VISIBLE);
+
+        if (itens.isEmpty()) {
+            binding.txtTituloVazioHome.setText("Nenhuma planta cadastrada");
+            binding.txtSubtituloVazioHome.setText("Toque no + para adicionar sua primeira planta");
+        } else {
+            binding.txtTituloVazioHome.setText("Nenhuma planta encontrada");
+            binding.txtSubtituloVazioHome.setText("Tente buscar por outro nome ou espécie.");
+        }
     }
 
     private PlantioHomeItem criarItem(Plantio plantio) {
@@ -262,7 +304,7 @@ public class HomeFragment extends Fragment {
     // ---------------------------------------------------------------- ações
 
     private void onAcaoMarcada(PlantioHomeItem item, TipoAcao tipoAcao) {
-        int posicao = itens.indexOf(item);
+        int posicao = adapter.posicaoDe(item);
         if (posicao == -1 || item.salvandoAcao != null) return;
 
         Plantio plantio = item.plantio;
@@ -325,8 +367,7 @@ public class HomeFragment extends Fragment {
             public void onResponse(@NonNull Call<Plantio> call, @NonNull Response<Plantio> response) {
                 if (!isAdded() || binding == null) return;
 
-                int pos = itens.indexOf(item);
-                if (pos == -1) return;
+                int pos = adapter.posicaoDe(item);
                 item.salvandoAcao = null;
 
                 if (response.isSuccessful() && response.body() != null) {
@@ -337,6 +378,7 @@ public class HomeFragment extends Fragment {
                     }
                     item.plantio = atualizado;
                     PlantNotificationScheduler.schedulePlantCareAlarms(requireContext(), atualizado);
+                    notificarSolPendenteDaLista();
 
                     Toast.makeText(requireContext(), "Ação registrada.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -348,7 +390,7 @@ public class HomeFragment extends Fragment {
                 }
 
                 recalcularStatus(item);
-                adapter.notifyItemChanged(pos);
+                if (pos != -1) adapter.notifyItemChanged(pos);
                 atualizarAviso();
             }
 
@@ -356,15 +398,14 @@ public class HomeFragment extends Fragment {
             public void onFailure(@NonNull Call<Plantio> call, @NonNull Throwable t) {
                 if (!isAdded() || binding == null) return;
 
-                int pos = itens.indexOf(item);
-                if (pos == -1) return;
+                int pos = adapter.posicaoDe(item);
                 item.salvandoAcao = null;
 
                 desfazerAcao(plantioLocal, tipoAcao, dataAnterior, regadoAnterior);
                 Log.e(TAG, "Falha de rede ao salvar", t);
 
                 recalcularStatus(item);
-                adapter.notifyItemChanged(pos);
+                if (pos != -1) adapter.notifyItemChanged(pos);
                 atualizarAviso();
 
                 Toast.makeText(requireContext(),

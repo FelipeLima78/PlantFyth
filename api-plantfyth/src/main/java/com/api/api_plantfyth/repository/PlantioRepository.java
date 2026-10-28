@@ -26,14 +26,13 @@ public interface PlantioRepository extends JpaRepository<Plantio, Integer>{
     List<Plantio> findByNomeContaining(String nome);
     @Modifying
 @Transactional
-@Query("UPDATE Plantio p SET p.pegouSolHoje = false, p.foiRegadoHoje = false")
+@Query("UPDATE Plantio p SET p.foiRegadoHoje = false")
 void resetarFlagsDiarias();
 @Modifying
 @Transactional
 @Query("""
     UPDATE Plantio p
-    SET p.pegouSolHoje = false,
-        p.foiRegadoHoje = false
+    SET p.foiRegadoHoje = false
     WHERE p.usuarioId = :usuarioId
 """)
 void resetarFlagsDiariasPorUsuario(

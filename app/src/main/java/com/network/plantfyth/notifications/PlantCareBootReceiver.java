@@ -15,6 +15,6 @@ public class PlantCareBootReceiver extends BroadcastReceiver {
         if (usuarioId == -1) return;
 
         PlantCareDailyWorker.scheduleDailyChecks(context, usuarioId);
-        PlantNotificationScheduler.refreshPlantCareAlarmsAndNotifyDue(context, usuarioId, false);
+        PlantNotificationScheduler.restorePlantCareAlarms(context);
     }
 }

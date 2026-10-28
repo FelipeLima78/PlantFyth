@@ -45,6 +45,25 @@
 
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/edtBuscarPlantas"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_search_plant"
+            android:drawableStart="@drawable/ic_search_plant"
+            android:drawablePadding="10dp"
+            android:hint="Buscar por nome ou espécie"
+            android:inputType="text"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#244B2A"
+            android:textColorHint="#829585"
+            android:textSize="14sp" />
+
         <!-- RECYCLERVIEW -->
 
         <androidx.recyclerview.widget.RecyclerView
@@ -86,6 +105,7 @@
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/txtTituloVazioDashboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nenhuma planta cadastrada"
@@ -94,6 +114,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/txtSubtituloVazioDashboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"

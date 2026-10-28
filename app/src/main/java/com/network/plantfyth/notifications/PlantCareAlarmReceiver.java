@@ -22,5 +22,6 @@ public class PlantCareAlarmReceiver extends BroadcastReceiver {
                 plantName,
                 actionName
         );
+        PlantNotificationScheduler.clearScheduledAlarm(context, notificationId);
     }
 }

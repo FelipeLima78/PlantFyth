@@ -173,12 +173,12 @@ public class TelaCadastroPlanta extends AppCompatActivity {
                             ).show();
 
 
-                            PlantNotificationScheduler
-                                    .refreshPlantCareAlarmsAndNotifyDue(
-                                            getApplicationContext(),
-                                            usuarioId,
-                                            true
-                                    );
+                            if (response.body() != null) {
+                                PlantNotificationScheduler.schedulePlantCareAlarms(
+                                        getApplicationContext(),
+                                        response.body()
+                                );
+                            }
 
                             finish();
 
