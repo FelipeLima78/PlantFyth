@@ -289,7 +289,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="7dp"
                             android:layout_weight="1"
-                            android:text="Digite só o número e escolha a unidade ao lado. “Sazonal” e “Não precisa” dispensam o número."
+                            android:text="Digite só o número e escolha a unidade ao lado."
                             android:textColor="#54715A"
                             android:textSize="10sp" />
                     </LinearLayout>
