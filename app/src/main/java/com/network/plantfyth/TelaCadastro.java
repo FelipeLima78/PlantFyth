@@ -141,12 +141,23 @@ public class TelaCadastro extends AppCompatActivity {
                                      startActivity(new Intent(TelaCadastro.this,
                                              TelaDeLogin.class));
                                         finish();
-                                 } else {
+                                 }  else {
+                        if (response.code() == 409) {
+                            Toast.makeText(
+                                    TelaCadastro.this,
+                                    "Este e-mail já está cadastrado.",
+                                    Toast.LENGTH_LONG
+                            ).show();
 
-                                     Toast.makeText(TelaCadastro.this,
-                                             "Erro: " + response.code(),
-                                             Toast.LENGTH_SHORT).show();
-                                 }
+                            edtCadastroEmail.setError("E-mail já cadastrado");
+                            edtCadastroEmail.requestFocus();
+                        }else {
+                            Toast.makeText(
+                                    TelaCadastro.this,
+                                    "Não foi possível realizar o cadastro.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }}
                              }
                              @Override
                              public void onFailure(Call<Usuario> call, Throwable t) {

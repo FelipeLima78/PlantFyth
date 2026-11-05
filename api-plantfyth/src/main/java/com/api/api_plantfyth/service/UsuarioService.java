@@ -3,8 +3,10 @@ package com.api.api_plantfyth.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.api.api_plantfyth.model.Usuario;
 import com.api.api_plantfyth.repository.UsuarioRepository;
@@ -32,6 +34,12 @@ public class UsuarioService {
     public Usuario saveUsuario(Usuario usuario) {
         String hash = passwordEncoder.encode(usuario.getHash_senha());
    		usuario.setHash_senha(hash);
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+        throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Este e-mail já está cadastrado."
+        );
+    }
         return usuarioRepository.save(usuario);
     }
 
